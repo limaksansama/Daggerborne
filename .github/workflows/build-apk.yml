@@ -24,10 +24,15 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: "17"
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: |
+            platform-tools
+            platforms;android-34
+            build-tools;34.0.0
 
       - name: Install Capacitor dependencies
         run: npm install
@@ -37,6 +42,33 @@ jobs:
           mkdir -p www
           cp index.html manifest.webmanifest sw.js www/
           cp -R css js data public www/
+
+      - name: Create Android project
+        run: npx cap add android
+
+      - name: Sync web app into Android project
+        run: npx cap sync android
+
+      - name: Build debug APK
+        run: cd android && ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: daggervault-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retentpion-days: 14name: Build Android APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+www/
 
       - name: Create Android project
         run: npx cap add android
