@@ -1,80 +1,52 @@
-# Daggerborne
-# Daggerheart · Compagnon — PWA française
-
-Compagnon de jeu **Daggerheart** : création de personnages guidée pas à pas, dés de Dualité, compendium complet en français et outils du MJ. Fonctionne **hors-ligne** une fois installée, sur mobile, tablette et ordinateur.
-
-## Contenu
-
-- **Assistant de création en 9 étapes** : Classe → Sous-classe → Ascendance → Communauté → Traits (+2/+1/+1/0/0/−1 avec suggestions de classe) → Équipement (armes filtrées par trait d'Incantation, armures avec seuils) → 2 cartes de domaine de niveau 1 → Expériences → Identité (nom, pronoms, questions de background de la classe)
-- **Fiche de personnage calquée sur la feuille officielle** (layout Daggerheart, thème sombre) :
-  - **En-tête identité** : Nom, Pronoms, Héritage, Sous-classe (éditables) + **badge Niveau 1–10** avec **assistant de montée de niveau interactif en **5 étapes** (★ Monter) conforme au livre de règles (p. 109-111) : **Étape 1 — Récompense de palier** automatique aux niveaux 2/5/8 (nouvelle Expérience à +2 saisie directement dans l'assistant, +1 Maîtrise, effacement des traits cochés aux niveaux 5/8) ; **Étape 2 — 2 améliorations** avec compteur de points dynamique et compteurs d'utilisation par option (traits non cochés avec sélecteur intégré, emplacements PV/Stress permanents, +1 à deux Expériences, Évasion, carte de sous-classe améliorée, +1 Maîtrise à double coût — 2 cases liées consommant 2/2 points, multiclassage dès le palier 3) ; **Étape 3 — Carte(s) de domaine obligatoire(s)** (recherche, filtres par domaine et par niveau, cartes en accordéon avec description complète et coût de rappel, quota 1 → 2 si l'option supplémentaire est prise) ; **Étape 4 — Échange facultatif** d'une carte possédée contre une autre de niveau égal ou inférieur (1 seul échange) ; **Étape 5 — Récapitulatif** complet puis application **atomique** (une seule écriture de sauvegarde). Interface : en-tête fixe avec barre de progression Étape 1/5 → 5/5, corps à défilement unique (aucun double scroll), pied sticky Précédent/Annuler · Suivant/Passer/Appliquer, zones tactiles ≥ 44px, geste retour Android = étape précédente (popstate), seuils de dégâts recalculés automatiquement, max 5 cartes en main. **Colonne gauche — Survie & ressources** : **Dégâts & Santé** (3 seuils calculés : base d'armure + niveau + bonus d'aptitudes ; jauges PV et Stress : 6 cases actives + 6 déblocables en pointillés), **Espoir** (6 losanges + feature d'Espoir), **Expériences** (5 lignes, modificateur, 🎲 = dépense 1 Espoir + jet), **Or** (10 poignées / 10 sacs / 1 coffre : pastilles creuses → dorées, compteurs par palier, report automatique au palier supérieur au 11e clic, bouton ⇄ Convertir, total en poignées), **Aptitude de classe** (zone de texte libre, alimentée par les cartes de sous-classe prises en montée de niveau)
-  - **Colonne droite — Équipement** : **Armes** (maîtrise 1–6 dés, 4 emplacements : switch Portée/Sac, 1 ou 2 mains, Principale/Secondaire, trait, portée, dé de dégâts, 🎲 = dégâts = Maîtrise × dé d'arme), **Armure active** (nom, seuils et score de base qui alimentent toute la fiche), **Inventaire** (recherche sur 242 objets, quantités, objets perso)
-  - **Onglet « Plus »** : cartes de domaine, aptitudes, background, journal — barre d'onglets stylisée assortie au thème
-  - **Mobile** : navigation par onglets **Combat / Stats & Ressources / Équipement / Plus**
-  - **Export / import JSON** du personnage, repos court / long
-- **Dés de Dualité** : deux d12 animés (dé d'Espoir + dé de Peur), avantage (+1d6) / désavantage (−1d6), sélection de trait ou d'Expérience (dépense l'Espoir), succès critique (dés égaux : efface un Stress), gains automatiques d'Espoir/Peur, historique — accessibles depuis la fiche **en overlay sans quitter la page**
-- **Compendium** : 210 cartes de domaine, **242 objets (butin magique + consommables, avec descriptions FR officielles et ajout direct à l'inventaire)**, 13 classes, 26 sous-classes, 24 ascendances, 15 communautés, 324 armes, 69 armures, 264 adversaires — recherche et filtres
-- **Outils du MJ** : pool de Peur, comptes à rebours, rappel des actes du MJ
-- **Réglages → À propos** : licence MIT du module Foundry (Foundryborne, © 2025 WBHarry), licence DPCGL (Daggerheart SRD © Critical Role, LLC), crédit de traduction Black Book Éditions
-
-## Données en français
-
-- Cœur des règles : termes officiels de la traduction française du **Livre de règles Daggerheart** (Black Book Éditions) — Dés de Dualité, Espoir/Peur, ascendances, communautés, classes, domaines, 186 cartes de domaine
-- **242 objets d'inventaire** (121 butins magiques + 121 consommables) extraits du module Foundry : noms et descriptions officiels en français depuis le chapitre « Butin » du livre de règles ; les objets du supplément **Hope & Fear** (non traduit officiellement) gardent leur description anglaise et le badge « H&F »
-- Supplément **Hope & Fear** : 21 cartes du domaine Effroi, classes Assassin/Bagarreur/Occultiste/Sorcière, 6 ascendances et 6 communautés supplémentaires — traductions amateurs marquées « H&F » dans l'app
-- Les noms des 264 adversaires restent en anglais (statblocks prêts, traduction à venir)
-
-## Installation
-
-### Option A — Test immédiat (le plus simple)
-
-Dézippez `daggerheart-compagnon-pwa.zip`, puis depuis le dossier dézippé :
-
-```bash
+Daggerborne
+Compagnon de jeu français pour Daggerheart (PWA hors-ligne)
+Une application web tout-en-un pour créer vos personnages, lancer vos dés de Dualité et gérer vos parties de Daggerheart sur mobile, tablette ou ordinateur. Une fois ouverte une première fois, elle fonctionne 100 % hors-ligne et ne nécessite aucun compte.
+Ce que fait l'application
+Création & Fiche de personnage
+ * Assistant en 9 étapes : laissez-vous guider de l'ascendance jusqu'aux questions de background, avec suggestions automatiques selon la classe.
+ * Fiche interactive : reprenant la mise en page officielle en thème sombre. Gérez vos PV, Stress, Espoir, Or (avec conversion automatique poignées/sacs/coffres) et seuils de dégâts recalculés en temps réel.
+ * Montée de niveau (Niveaux 1 à 10) : un assistant dédié en 5 étapes gère les paliers, l'achat d'améliorations, le multiclassage et l'échange de cartes de domaine selon les règles officielles.
+ * Sauvegarde locale : exportez et importez vos personnages au format JSON à tout moment.
+Dés de Dualité intégrés
+ * Accessible directement depuis la fiche sans quitter la page.
+ * Lancez vos deux d12 (Espoir et Peur) avec gestion de l'avantage/désavantage, dépense automatique d'Espoir pour vos Expériences, détection des succès critiques et historique des jets.
+Compendium & Outils du MJ
+ * Tout le SRD à portée de main : 210 cartes de domaine, 242 objets (butins et consommables), 13 classes, 26 sous-classes, 24 ascendances, 15 communautés, 6 transformations, plus de 390 armes et armures.
+ * Bestiaire & Environnements : 264 adversaires complets et 47 environnements prêts à l'emploi, filtrables par palier et par type.
+ * Écran du MJ : réserve de Peur, gestion des comptes à rebours et aide-mémoire des règles (conditions, repos, création d'affrontements).
+Langues et traduction
+L'interface et le cœur des règles utilisent la terminologie française officielle de Black Book Éditions.
+ * Contenu traduit : règles de base, créateur de personnage, 186 cartes de domaine, 242 objets d'inventaire.
+ * Contenu Hope & Fear : les ajouts de l'extension (domaine Effroi, 4 classes, ascendances/communautés) disposent d'une traduction amateure signalée par un badge « H&F ».
+ * Bestiaire (en cours) : les statblocks des 264 adversaires sont complets, mais une partie des descriptions et capacités est encore en anglais en attendant la fin de la traduction.
+Installation & Lancement
+L'application est une PWA (Progressive Web App) purement statique.
+> Important : Ne lancez pas index.html directement (en file://), cela bloquerait le mode hors-ligne. Passez toujours par un serveur local ou un hébergement web.
+> 
+1. Tester en local
+Décompressez l'archive et lancez un serveur HTTP simple dans le dossier :
 python3 -m http.server 8080
-```
 
-Ouvrez `http://localhost:8080` dans votre navigateur.
+Rendez-vous ensuite sur http://localhost:8080.
+2. Installer sur mobile ou ordinateur
+Une fois l'application hébergée (GitHub Pages, Netlify, Vercel...) et ouverte dans votre navigateur :
+ * iOS (Safari) : appuyez sur Partager → Sur l'écran d'accueil.
+ * Android (Chrome) : ouvrez le menu ⋮ → Installer l'application.
+ * PC / Mac (Chrome, Edge) : cliquez sur l'icône d'installation à droite de la barre d'adresse.
+Vie privée
+Aucune donnée ne quitte votre appareil. Vos personnages, vos jets de dés et vos réglages MJ sont enregistrés uniquement dans le stockage local (localStorage) de votre navigateur.
+Notes techniques & Contribution (v25)
+Les données du jeu sont extraites directement du SRD 2.0 officiel via les scripts Python situés dans scripts/ (en stricte conformité avec la licence DPCGL 2.0 : aucun contenu playtest ni illustration propriétaire).
+Pour mettre à jour ou poursuivre la traduction des données SRD :
+python3 scripts/translate-srd.py   # Reprend la traduction via le cache
+python3 scripts/build-app-data.py  # Recompile les données pour l'application
 
-### Option B — Installation comme application (mobile/tablette)
-
-1. Servez le dossier (option A, ou n'importe quel hébergement statique : GitHub Pages, Netlify, Vercel…)
-2. Ouvrez l'URL dans Safari (iOS) ou Chrome (Android/desktop)
-3. **iOS** : bouton Partager → « Sur l'écran d'accueil »
-4. **Android/Chrome** : menu ⋮ → « Installer l'application »
-5. **Desktop Chrome/Edge** : icône d'installation dans la barre d'adresse
-
-Une fois visitée une première fois, l'application fonctionne **100 % hors-ligne** (service worker).
-
-> ⚠️ L'ouverture directe de `index.html` en `file://` ne permet ni le service worker ni l'installation PWA — passez toujours par un serveur HTTP (même local).
-
-### Option C — Dossier prêt
-
-Le dossier `daggerheart-compagnon/` contient l'application dézippée, prêt à copier sur n'importe quel hébergement statique.
-
-## Données & vie privée
-
-Tout est stocké **localement** dans le navigateur (localStorage) : personnages, jets, pool de Peur, comptes à rebours. Aucune donnée n'est envoyée en ligne. Export/import JSON disponibles (fiche par fiche, ou sauvegarde complète dans Réglages).
-
-## Licences
-
-- Code, structure de données, polices (Cinzel, Overpass), icônes et palette : module **Foundryborne Daggerheart** — [Licence MIT](https://github.com/Foundryborne/daggerheart/blob/main/LICENSE), © 2025 WBHarry
-- Contenu de jeu : **Daggerheart SRD 1.0** © Critical Role, LLC — [Darrington Press Community Gaming License](https://www.daggerheart.com/)
-- Termes français : traduction © **Black Book Éditions** (Livre de règles Daggerheart, 2026)
-- Application non officielle, sans affiliation avec Critical Role, Darrington Press, Black Book Éditions ni Foundry Gaming LLC
-
-
----
-
-## v25 — Audit SRD 2.0 (source unique : PDF officiel)
-
-**Nouveau cette version :**
-- **264 adversaires** : statblocks complets extraits du SRD 2.0 (PV, Stress, seuils majeur/grave, ATQ, dégâts, Expérience, motivations & tactiques, features) — consultables dans le Compendium et le nouvel onglet MJ « Bestiaire » (filtres par palier et type).
-- **47 environnements** (Paliers 1–4) : impulsions, adversaires potentiels et features — onglet MJ « Environnements » + Compendium.
-- **6 transformations** (Demi-dieu, Fantôme, Ranimé, Changeur de forme, Vampire, Loup-garou) avec features et questions d'identité — Compendium + champ « Transformation » sur la fiche personnage.
-- **Référence de règles MJ** : conditions, repos/temps morts, création d'affrontements, seuils de dégâts, multiclassage.
-- Correction : 33 cartes de domaine avec coût de rappel 0 (conforme SRD), sous-classe « Sorcière des haies » (Witch/Hedge).
-
-**Conformité DPCGL 2.0 :** source unique = SRD 2.0 officiel (le module Foundry n'est plus utilisé) ; zéro Campaign Frame, zéro illustration officielle, zéro contenu playtest.
-
-**État de la traduction :** les données SRD proviennent d'un pipeline d'extraction PDF (scripts dans `scripts/`). La traduction FR est en cours (239/264 descriptions, 287/906 features traduites) ; les textes restants sont en anglais. Relancez la traduction avec `python3 scripts/translate-srd.py` (reprise sur cache) puis `python3 scripts/build-app-data.py`.
+Licences & Crédits
+ * Règles et contenu : Daggerheart SRD 2.0 © Critical Role, LLC — sous licence Darrington Press Community Gaming License (DPCGL).
+ * Terminologie française : © Black Book Éditions (Livre de règles Daggerheart, 2026).
+ * Architecture & Design : inspirés du module Foundryborne Daggerheart (© 2025 WBHarry, licence MIT).
+Application non officielle développée par des fans, sans affiliation avec Critical Role, Darrington Press ou Black Book Éditions.
+Ce qui a changé :
+ * Lisibilité : J'ai découpé les gros blocs en listes courtes orientées "bénéfices pour le joueur".
+ * Cohérence : J'ai fusionné les infos de la v25 dans le corps du texte (ex: les 6 transformations, le bestiaire, la source SRD 2.0) et supprimé la contradiction sur le module Foundry (tu disais d'abord que les objets venaient de Foundry, puis en bas que Foundry n'était plus utilisé).
+ * Hiérarchie : Les détails techniques sur les scripts Python sont relégués à la fin pour ne pas effrayer les joueurs qui veulent juste installer l'appli.
