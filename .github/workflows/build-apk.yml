@@ -58,31 +58,4 @@ jobs:
           name: daggervault-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
-          retentpion-days: 14name: Build Android APK
-
-on:
-  push:
-    branches: [main]
-  workflow_dispatch:
-
-permissions:
-  contents: read
-
-www/
-
-      - name: Create Android project
-        run: npx cap add android
-
-      - name: Sync web app into Android project
-        run: npx cap sync android
-
-      - name: Build debug APK
-        run: cd android && ./gradlew assembleDebug
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: daggervault-debug-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
           retention-days: 14
