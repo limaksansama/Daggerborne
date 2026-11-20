@@ -209,16 +209,19 @@
 .dh-g-lbl { font-size: .64rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim); }
 .dh-g-nums { font-family: var(--font-title); font-size: .82rem; color: var(--text-dim); }
 .dh-g-nums b { color: var(--text); font-size: 1rem; }
+.dh-g-tools { margin-left: auto; display: inline-flex; align-items: center; gap: .25rem; }
 .dh-g-lock {
-  margin-left: auto; width: 26px; height: 26px; border-radius: 7px; font-size: .8rem;
+  width: 26px; height: 26px; border-radius: 7px; font-size: .8rem;
   border: 1px solid var(--border); color: var(--text-faint); background: var(--panel-3);
 }
+.dh-g-lock:disabled { opacity: .35; cursor: not-allowed; }
 .dh-boxrow { display: flex; flex-wrap: wrap; gap: .28rem; }
 .dh-box {
   width: 26px; height: 20px; border-radius: 5px; padding: 0;
   background: var(--panel); border: 1.5px solid #a0303066;
 }
 .dh-box.dash { border-style: dashed; border-color: var(--border); background: transparent; }
+.dh-box.locked { opacity: .4; cursor: not-allowed; }
 .dh-box.xtra { border-color: #a0303066; }
 .dh-box.on { background: var(--gradient-hp); border-color: #a03030; }
 .dh-box.stress { border-color: #c0783066; }

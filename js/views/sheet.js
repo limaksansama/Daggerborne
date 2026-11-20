@@ -226,13 +226,19 @@ export async function render(main, params) {
           <div class="dh-gauge">
             <div class="dh-g-head"><span class="dh-g-lbl">PV</span>
               <span class="dh-g-nums"><b>${c.hp.current}</b>/${c.hp.max}</span>
-              <button class="dh-g-lock" data-hlock title="Masquer les cases déblocables vides">⟲</button></div>
+              <span class="dh-g-tools">
+                <button class="dh-g-lock" data-hp-slot="-1" title="Retirer 1 case débloquée" ${c.hp.unlocked <= 0 ? 'disabled' : ''}>−</button>
+                <button class="dh-g-lock" data-hp-slot="1" title="Débloquer 1 case bonus" ${c.hp.max >= 14 ? 'disabled' : ''}>+</button>
+                <button class="dh-g-lock" data-hlock title="Masquer les cases déblocables vides">⟲</button>
+              </span>
+            </div>
             <div class="dh-boxrow">
-              ${Array.from({ length: c.hp.active + 6 }, (_, i) => {
+              ${Array.from({ length: Math.max(12, c.hp.max) }, (_, i) => {
                 const avail = i < c.hp.active;
-                const extraOn = !avail && i < c.hp.active + c.hp.unlocked;
+                const extraOn = !avail && i < c.hp.max;
+                const locked = i >= c.hp.max;
                 const filled = i < c.hp.current;
-                return `<button class="dh-box${avail ? '' : ' dash'}${extraOn ? ' xtra' : ''}${filled ? ' on' : ''}" data-hpbox="${i}" ${!avail && !extraOn ? 'title="Case déblocable — cliquez pour débloquer"' : ''}></button>`;
+                return `<button class="dh-box${avail ? '' : ' dash'}${extraOn ? ' xtra' : ''}${locked ? ' locked' : ''}${filled ? ' on' : ''}" data-hpbox="${i}" ${locked ? 'aria-disabled="true" title="Emplacement verrouillé — utilisez + ou la montée de niveau"' : ''}></button>`;
               }).join('')}
             </div>
           </div>
@@ -240,13 +246,19 @@ export async function render(main, params) {
           <div class="dh-gauge">
             <div class="dh-g-head"><span class="dh-g-lbl">Stress</span>
               <span class="dh-g-nums"><b>${c.stress.current}</b>/${c.stress.max}</span>
-              <button class="dh-g-lock" data-slock title="Masquer les cases déblocables vides">⟲</button></div>
+              <span class="dh-g-tools">
+                <button class="dh-g-lock" data-st-slot="-1" title="Retirer 1 case débloquée" ${c.stress.unlocked <= 0 ? 'disabled' : ''}>−</button>
+                <button class="dh-g-lock" data-st-slot="1" title="Débloquer 1 case bonus" ${c.stress.max >= 14 ? 'disabled' : ''}>+</button>
+                <button class="dh-g-lock" data-slock title="Masquer les cases déblocables vides">⟲</button>
+              </span>
+            </div>
             <div class="dh-boxrow">
-              ${Array.from({ length: c.stress.active + 6 }, (_, i) => {
+              ${Array.from({ length: Math.max(12, c.stress.max) }, (_, i) => {
                 const avail = i < c.stress.active;
-                const extraOn = !avail && i < c.stress.active + c.stress.unlocked;
+                const extraOn = !avail && i < c.stress.max;
+                const locked = i >= c.stress.max;
                 const filled = i < c.stress.current;
-                return `<button class="dh-box stress${avail ? '' : ' dash'}${extraOn ? ' xtra' : ''}${filled ? ' on' : ''}" data-stbox="${i}" ${!avail && !extraOn ? 'title="Case déblocable — cliquez pour débloquer"' : ''}></button>`;
+                return `<button class="dh-box stress${avail ? '' : ' dash'}${extraOn ? ' xtra' : ''}${locked ? ' locked' : ''}${filled ? ' on' : ''}" data-stbox="${i}" ${locked ? 'aria-disabled="true" title="Emplacement verrouillé — utilisez + ou la montée de niveau"' : ''}></button>`;
               }).join('')}
             </div>
           </div>
@@ -560,17 +572,33 @@ function bindAll(root, c, ctx) {
     openRoller(c, { trait: t.dataset.troll }, ctx);
   }));
 
-  /* --- PV / Stress : cases + déblocage --- */
+  /* --- PV / Stress : cases actives + déblocage explicite (+ / − / ⟲) --- */
   $$('[data-hpbox]', root).forEach(b => b.addEventListener('click', () => {
     const i = +b.dataset.hpbox;
-    if (i < c.hp.active + c.hp.unlocked) c.hp.current = (i < c.hp.current) ? i : i + 1;
-    else { c.hp.unlocked = i - c.hp.active + 1; c.hp.current = i + 1; }
+    if (i >= c.hp.max) {
+      toast('Emplacement verrouillé — débloquez une case avec + ou lors de la montée de niveau.');
+      return;
+    }
+    c.hp.current = (i < c.hp.current) ? i : i + 1;
     syncMaxes(c); refresh();
   }));
   $$('[data-stbox]', root).forEach(b => b.addEventListener('click', () => {
     const i = +b.dataset.stbox;
-    if (i < c.stress.active + c.stress.unlocked) c.stress.current = (i < c.stress.current) ? i : i + 1;
-    else { c.stress.unlocked = i - c.stress.active + 1; c.stress.current = i + 1; }
+    if (i >= c.stress.max) {
+      toast('Emplacement verrouillé — débloquez une case avec + ou lors de la montée de niveau.');
+      return;
+    }
+    c.stress.current = (i < c.stress.current) ? i : i + 1;
+    syncMaxes(c); refresh();
+  }));
+  $$('[data-hp-slot]', root).forEach(b => b.addEventListener('click', () => {
+    const d = +b.dataset.hpSlot;
+    c.hp.unlocked = Math.max(0, Math.min(14 - c.hp.active, (c.hp.unlocked || 0) + d));
+    syncMaxes(c); refresh();
+  }));
+  $$('[data-st-slot]', root).forEach(b => b.addEventListener('click', () => {
+    const d = +b.dataset.stSlot;
+    c.stress.unlocked = Math.max(0, Math.min(14 - c.stress.active, (c.stress.unlocked || 0) + d));
     syncMaxes(c); refresh();
   }));
   $('[data-hlock]', root)?.addEventListener('click', () => {
