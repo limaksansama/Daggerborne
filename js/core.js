@@ -1,4 +1,4 @@
-/* Daggervault — no-build ES modules PWA (FR) */
+/* Daggerborne — no-build ES modules PWA (FR) */
 
 // ---------- tiny helpers ----------
 export const $ = (sel, root = document) => root.querySelector(sel);
@@ -55,7 +55,7 @@ export async function data(name) {
 
 // ---------- i18n-ish static strings ----------
 export const T = {
-  appName: 'Daggervault',
+  appName: 'Daggerborne',
   pageHome: 'Accueil', pageChars: 'Personnages', pageDice: 'Dés', pageCompendium: 'Compendium', pageGM: 'MJ', pageSettings: 'Réglages',
   traits: { agility: 'Agilité', strength: 'Force', finesse: 'Finesse', instinct: 'Instinct', presence: 'Présence', knowledge: 'Savoir' },
   traitShort: { agility: 'AGI', strength: 'FOR', finesse: 'FIN', instinct: 'INS', presence: 'PRÉ', knowledge: 'SAV' },

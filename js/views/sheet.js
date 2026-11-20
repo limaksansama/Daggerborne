@@ -3,7 +3,7 @@
    2 colonnes (Dégâts&Santé/Espoir/Expériences/Or/Aptitude || Armes/Armure/Inventaire).
    Thème sombre conservé, mobile = onglets Combat / Stats / Équipement / Plus. */
 import { $, $$, el, esc, go, T, data, toast, getChar, saveChar, setState, uid, rollD, ensureCharacter } from '../core.js';
-import { rollDuality, rollDice, rollAttack, rollDamage } from '../dice3d.js';
+import { rollDuality, rollDice, rollAttack, rollDamage, isRolling } from '../dice3d.js';
 import { openLevelUp } from './levelup.js';
 
 const TRAIT_KEYS = ['agility', 'strength', 'finesse', 'instinct', 'presence', 'knowledge'];
@@ -538,7 +538,11 @@ function bindAll(root, c, ctx) {
   $$('[data-f]', root).forEach(inp => inp.addEventListener('change', () => {
     const k = inp.dataset.f;
     if (k === 'evasion') c.evasion = Math.max(0, Math.min(30, parseInt(inp.value, 10) || 0));
-    else if (k === 'armorScore') c.armorCard.baseScore = Math.max(0, Math.min(12, parseInt(inp.value, 10) || 0));
+    else if (k === 'armorScore') {
+      c.armorCard.baseScore = Math.max(0, Math.min(12, parseInt(inp.value, 10) || 0));
+      refresh();
+      return;
+    }
     else c[k] = inp.value;
     saveChar(c);
   }));
@@ -595,7 +599,7 @@ function bindAll(root, c, ctx) {
     else c.experiences[+i].name = inp.value;
     saveChar(c);
   }));
-  $$('[data-eroll]', root).forEach(b => b.addEventListener('click', () => openRoller(c, { expIdx: +b.dataset.eroll })));
+  $$('[data-eroll]', root).forEach(b => b.addEventListener('click', () => openRoller(c, { expIdx: +b.dataset.eroll }, ctx)));
 
   /* --- or : clic pastille = remplir jusqu'à N ; re-clic dernière = vider ; à 10/10 → report auto --- */
   $$('[data-goldpip]', root).forEach(p => p.addEventListener('click', () => {
@@ -645,7 +649,14 @@ function bindAll(root, c, ctx) {
   $$('[data-aadd]', root).forEach(b => b.addEventListener('click', () => armorPicker(c, ctx, () => render(main, params))));
   $$('[data-wstate]', root).forEach(b => b.addEventListener('click', () => {
     const [i, st] = b.dataset.wstate.split(':');
-    c.weapons[+i].state = st; refresh();
+    const w = c.weapons[+i];
+    if (!w) return;
+    w.state = st;
+    if (st === 'active' && w.primary && w.hands === 'two' && c.weapons.some((x, j) => j !== +i && x.secondary)) {
+      c.weapons.forEach((x, j) => { if (j !== +i) x.secondary = false; });
+      toast('Arme à deux mains : l\'arme secondaire est rangée.');
+    }
+    refresh();
   }));
   $$('[data-whands]', root).forEach(b => b.addEventListener('click', () => {
     const [i, h] = b.dataset.whands.split(':');
@@ -704,7 +715,7 @@ function bindAll(root, c, ctx) {
     if (k === 'name' || k === 'feature') c.armorCard[k] = inp.value;
     else c.armorCard[k] = Math.max(0, parseInt(inp.value, 10) || 0);
     saveChar(c);
-    if (k === 'baseMajor' || k === 'baseSevere') render(main, params);
+    if (k === 'baseScore' || k === 'baseMajor' || k === 'baseSevere') render(main, params);
   }));
 
   /* --- inventaire --- */
@@ -872,6 +883,7 @@ function bindAll(root, c, ctx) {
       } catch (err) { toast('Fichier invalide : export de personnage attendu.'); }
     };
     rd.readAsText(f);
+    e.target.value = '';
   });
   $('#btn-delete', root).addEventListener('click', () => {
     if (!confirm(`Supprimer définitivement « ${c.name} » ?`)) return;
@@ -934,6 +946,7 @@ function openRoller(c, preset = {}, ctx = null) {
     const expI = $('#dhr-exp', box).value === '' ? null : +$('#dhr-exp', box).value;
     const spend = $('#dhr-spend', box).checked && expI !== null;
 
+    if (isRolling()) { toast('Un lancer de dés est déjà en cours.'); unlock(); return; }
     if (spend && c.hope.current < 1) { toast("Pas assez d'Espoir pour utiliser cette Expérience."); unlock(); return; }
     if (spend) { c.hope.current -= 1; saveChar(c); }
 
@@ -952,7 +965,10 @@ function openRoller(c, preset = {}, ctx = null) {
     /* UNIFICATION : jet de Dualité 3D via rollService */
     const r = await rollDuality({ mod, label, charId: c.id });
     unlock();
-    if (!r) return;
+    if (!r) {
+      if (spend) { c.hope.current = Math.min(c.hope.max, c.hope.current + 1); saveChar(c); }
+      return;
+    }
     back.remove(); /* l'overlay ferme, la bannière 3D prend le relais */
     if (ctx) render(ctx.main, ctx.params); /* re-render : Espoir/Stress/Peur à jour */
   });
@@ -1152,7 +1168,7 @@ async function tabCards(body, c, ctx) {
       actions.push(`<button class="btn ghost small" data-return-card="${dc.cardId}">↻ Remettre en main (${card.recall ? `${card.recall} Espoir${card.recall > 1 ? 's' : ''}` : 'Gratuit'})</button>`);
     } else {
       if (cost.hope) actions.push(`<button class="btn ghost small" data-fx-hope="${cost.hope}">Activer (${cost.hope === 1 ? '1 Espoir' : `${cost.hope} Espoirs`})</button>`);
-      if (cost.stress) actions.push(`<button class="btn ghost small" data-fx-stress="${cost.stress}">Marquer 1 Stress</button>`);
+      if (cost.stress) actions.push(`<button class="btn ghost small" data-fx-stress="${cost.stress}">Marquer ${cost.stress === 1 ? '1 Stress' : `${cost.stress} Stress`}</button>`);
       if (cost.dice) actions.push(`<button class="btn ghost small" data-fx-dice="${cost.dice}" data-fx-name="${esc(card.fr)}" title="Lancer ${cost.dice}">🎲 ${cost.dice}</button>`);
       actions.push(`<button class="btn ghost small" data-toggle-hand="${dc.cardId}">↧ Ranger au caveau</button>`);
     }
@@ -1317,7 +1333,7 @@ function tabFeatures(body, c, ctx) {
     featureSection(`Classe & Espoir${cl ? ` — ${esc(cl.fr)}` : ''}`, sec1.length,
       sec1.map(f => featureCardHTML(f, f.name.startsWith('✦') ? 'Classe' : 'Classe')).join('')) +
     featureSection(`Sous-classe${sub ? ` — ${esc(sub.fr)}` : ''}`, subFeats.length,
-      subFeats.map(f => featureCardHTML(f, 'Fondation', f.__rank)).join('')) +
+      subFeats.map(f => featureCardHTML(f, 'Sous-classe', f.__rank)).join('')) +
     featureSection(`Ascendance${c.ancestry?.fr ? ` — ${esc(c.ancestry.fr)}` : ''}`, ancFeats.length,
       ancFeats.map(f => featureCardHTML(f, 'Ascendance')).join('')) +
     featureSection(`Communauté${c.community?.fr ? ` — ${esc(c.community.fr)}` : ''}`, comFeat.length,

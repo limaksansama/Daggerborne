@@ -2,7 +2,7 @@ name: Build Android APK
 
 on:
   push:
-    branches: [main]
+    branches: [main, master]
   workflow_dispatch:
 
 permissions:
@@ -18,30 +18,31 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '22'
 
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: "17"
+          java-version: '17'
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
-          packages: |
-            platform-tools
-            platforms;android-34
-            build-tools;34.0.0
+          packages: 'platform-tools platforms;android-34 build-tools;34.0.0'
+
+      - name: Accept Android SDK licenses
+        run: (yes || true) | sdkmanager --licenses >/dev/null
 
       - name: Install Capacitor dependencies
         run: npm install
 
       - name: Prepare app files
         run: |
+          rm -rf www android
           mkdir -p www
           cp index.html manifest.webmanifest sw.js www/
-          cp -R css js data public www/
+          cp -R assets css js data public www/
 
       - name: Create Android project
         run: npx cap add android
@@ -50,12 +51,14 @@ jobs:
         run: npx cap sync android
 
       - name: Build debug APK
-        run: cd android && ./gradlew assembleDebug
+        run: |
+          chmod +x android/gradlew
+          cd android && ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: daggervault-debug-apk
+          name: daggerborne-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14

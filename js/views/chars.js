@@ -48,10 +48,10 @@ export async function render(main, params) {
       try {
         const obj = JSON.parse(rd.result);
         if (!obj.name || !obj.traits) throw new Error('format');
-        import('../core.js').then(core => {
-          core.ensureCharacter(obj); /* complète les champs manquants (anciens exports) */
-          core.setState(s => {
-            obj.id = core.uid();
+        ensureCharacter(obj); /* complète les champs manquants (anciens exports) */
+        import('../core.js').then(({ setState }) => {
+          setState(s => {
+            obj.id = uid();
             obj.updatedAt = Date.now();
             s.characters.push(obj);
           });
@@ -63,5 +63,6 @@ export async function render(main, params) {
       }
     };
     rd.readAsText(f);
+    e.target.value = '';
   });
 }

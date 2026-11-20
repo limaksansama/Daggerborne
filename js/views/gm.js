@@ -130,10 +130,7 @@ const TYPES = ['bruiser', 'horde', 'leader', 'minion', 'ranged', 'skulk', 'socia
 const TYPE_LABELS = { bruiser: 'Bagarreur', horde: 'Horde', leader: 'Chef', minion: 'Sbire', ranged: 'À distance', skulk: 'Rôdeur', social: 'Social', solo: 'Solo', standard: 'Standard', support: 'Soutien' };
 
 async function drawBestiary(body, main) {
-  const list = (await data('adversaries'))
-    .filter(a => (!gmUi.tier || a.tier === gmUi.tier) && (!gmUi.type || a.type === gmUi.type))
-    .filter(a => !gmUi.q || (a.en + ' ' + a.desc).toLowerCase().includes(gmUi.q))
-    .sort((a, b) => a.en.localeCompare(b.en));
+  const all = (await data('adversaries')).sort((a, b) => a.en.localeCompare(b.en));
 
   body.innerHTML = `
     <div class="search-bar" style="margin-bottom:.6rem">
@@ -148,37 +145,50 @@ async function drawBestiary(body, main) {
       <button class="filter-chip ${gmUi.type === null ? 'active' : ''}" data-btype="">Tous types</button>
       ${TYPES.map(t => `<button class="filter-chip ${gmUi.type === t ? 'active' : ''}" data-btype="${t}">${TYPE_LABELS[t]}</button>`).join('')}
     </div>
-    <p class="page-sub">${list.length} adversaire(s) — SRD 2.0 · cliquez pour déplier le statblock</p>
+    <p class="page-sub" id="gm-adv-count"></p>
     <div id="gm-adv-list"></div>`;
 
-  const advList = $('#gm-adv-list', body);
-  for (const a of list) {
-    const box = el(`<details class="rules-block adv-block">
-      <summary><b>${esc(a.en)}</b> <span class="tag">${TYPE_LABELS[a.type] || a.type}</span> <span class="ms-meta" style="display:inline">${T.tiers[a.tier]} · Diff ${a.difficulty ?? '—'} · PV ${a.hp ?? '—'} · Stress ${a.stress ?? '—'}</span></summary>
-      <div class="statblock">
-        <div class="sb-row"><span class="sb-k">PV</span><span class="sb-v">${a.hp ?? '—'}</span><span class="sb-k">Stress</span><span class="sb-v">${a.stress ?? '—'}</span><span class="sb-k">Seuils</span><span class="sb-v">${a.major ?? '—'} / ${a.severe ?? '—'}</span>${a.horde ? `<span class="sb-k">Horde</span><span class="sb-v">${a.horde}/PV</span>` : ''}</div>
-        ${a.atkName ? `<div class="sb-row"><span class="sb-k">ATQ</span><span class="sb-v">${a.atkBonus >= 0 ? '+' : ''}${a.atkBonus}</span><span class="sb-k">Attaque</span><span class="sb-v">${esc(a.atkName)} (${esc(a.atkRange)})</span><span class="sb-k">Dégâts</span><span class="sb-v">${esc(a.atkDamage || '—')}</span></div>` : ''}
-        ${a.experience ? `<div class="sb-row"><span class="sb-k">Expérience</span><span class="sb-v">${esc(a.experience)}</span></div>` : ''}
-      </div>
-      <p class="ch-desc">${esc(a.desc)}</p>
-      ${a.motives ? `<p class="ch-desc"><b style="color:var(--golden)">Motivations & tactiques :</b> ${esc(a.motives)}</p>` : ''}
-      <div class="section-title" style="margin-top:.6rem">Features</div>
-      ${a.features.map(f => `<p class="ch-desc" style="margin-bottom:.5rem"><b>${esc(f.name)}</b> <span class="tag">${esc(f.kind)}</span> — ${esc(f.desc)}</p>`).join('')}
-    </details>`);
-    advList.appendChild(box);
-  }
+  const renderList = () => {
+    const list = all
+      .filter(a => (!gmUi.tier || a.tier === gmUi.tier) && (!gmUi.type || a.type === gmUi.type))
+      .filter(a => !gmUi.q || (a.en + ' ' + a.desc).toLowerCase().includes(gmUi.q));
+    $('#gm-adv-count', body).textContent = `${list.length} adversaire(s) — SRD 2.0 · cliquez pour déplier le statblock`;
+    const advList = $('#gm-adv-list', body);
+    advList.innerHTML = '';
+    for (const a of list) {
+      const box = el(`<details class="rules-block adv-block">
+        <summary><b>${esc(a.en)}</b> <span class="tag">${TYPE_LABELS[a.type] || a.type}</span> <span class="ms-meta" style="display:inline">${T.tiers[a.tier]} · Diff ${a.difficulty ?? '—'} · PV ${a.hp ?? '—'} · Stress ${a.stress ?? '—'}</span></summary>
+        <div class="statblock">
+          <div class="sb-row"><span class="sb-k">PV</span><span class="sb-v">${a.hp ?? '—'}</span><span class="sb-k">Stress</span><span class="sb-v">${a.stress ?? '—'}</span><span class="sb-k">Seuils</span><span class="sb-v">${a.major ?? '—'} / ${a.severe ?? '—'}</span>${a.horde ? `<span class="sb-k">Horde</span><span class="sb-v">${a.horde}/PV</span>` : ''}</div>
+          ${a.atkName ? `<div class="sb-row"><span class="sb-k">ATQ</span><span class="sb-v">${a.atkBonus >= 0 ? '+' : ''}${a.atkBonus}</span><span class="sb-k">Attaque</span><span class="sb-v">${esc(a.atkName)} (${esc(a.atkRange)})</span><span class="sb-k">Dégâts</span><span class="sb-v">${esc(a.atkDamage || '—')}</span></div>` : ''}
+          ${a.experience ? `<div class="sb-row"><span class="sb-k">Expérience</span><span class="sb-v">${esc(a.experience)}</span></div>` : ''}
+        </div>
+        <p class="ch-desc">${esc(a.desc)}</p>
+        ${a.motives ? `<p class="ch-desc"><b style="color:var(--golden)">Motivations & tactiques :</b> ${esc(a.motives)}</p>` : ''}
+        <div class="section-title" style="margin-top:.6rem">Features</div>
+        ${a.features.map(f => `<p class="ch-desc" style="margin-bottom:.5rem"><b>${esc(f.name)}</b> <span class="tag">${esc(f.kind)}</span> — ${esc(f.desc)}</p>`).join('')}
+      </details>`);
+      advList.appendChild(box);
+    }
+  };
+  renderList();
 
-  $('#gm-q', body).addEventListener('input', (e) => { gmUi.q = e.target.value.toLowerCase(); drawBestiary(body, main); });
-  $$('[data-btier]', body).forEach(b => b.addEventListener('click', () => { gmUi.tier = b.dataset.btier ? +b.dataset.btier : null; drawBestiary(body, main); }));
-  $$('[data-btype]', body).forEach(b => b.addEventListener('click', () => { gmUi.type = b.dataset.btype || null; drawBestiary(body, main); }));
+  $('#gm-q', body).addEventListener('input', (e) => { gmUi.q = e.target.value.toLowerCase(); renderList(); });
+  $$('[data-btier]', body).forEach(b => b.addEventListener('click', () => {
+    gmUi.tier = b.dataset.btier ? +b.dataset.btier : null;
+    $$('[data-btier]', body).forEach(x => x.classList.toggle('active', (x.dataset.btier ? +x.dataset.btier : null) === gmUi.tier));
+    renderList();
+  }));
+  $$('[data-btype]', body).forEach(b => b.addEventListener('click', () => {
+    gmUi.type = b.dataset.btype || null;
+    $$('[data-btype]', body).forEach(x => x.classList.toggle('active', (x.dataset.btype || null) === gmUi.type));
+    renderList();
+  }));
 }
 
 /* ---------- Environnements SRD 2.0 ---------- */
 async function drawEnvironments(body, main) {
-  const list = (await data('environments'))
-    .filter(e => (!gmUi.tier || e.tier === gmUi.tier))
-    .filter(e => !gmUi.q || (e.en + ' ' + e.desc).toLowerCase().includes(gmUi.q))
-    .sort((a, b) => a.tier - b.tier || a.en.localeCompare(b.en));
+  const all = (await data('environments')).sort((a, b) => a.tier - b.tier || a.en.localeCompare(b.en));
 
   body.innerHTML = `
     <div class="search-bar" style="margin-bottom:.6rem">
@@ -189,24 +199,36 @@ async function drawEnvironments(body, main) {
       <button class="filter-chip ${gmUi.tier === null ? 'active' : ''}" data-btier="">Tous paliers</button>
       ${[1, 2, 3, 4].map(t => `<button class="filter-chip ${gmUi.tier === t ? 'active' : ''}" data-btier="${t}">Palier ${t}</button>`).join('')}
     </div>
-    <p class="page-sub">${list.length} environnement(s) — SRD 2.0</p>
+    <p class="page-sub" id="gm-env-count"></p>
     <div id="gm-env-list"></div>`;
 
-  const envList = $('#gm-env-list', body);
-  for (const e of list) {
-    const box = el(`<details class="rules-block adv-block">
-      <summary><b>${esc(e.en)}</b> <span class="tag">${esc(e.category)}</span> <span class="ms-meta" style="display:inline">${T.tiers[e.tier]}${e.difficulty ? ' · Difficulté ' + e.difficulty : ''}</span></summary>
-      <p class="ch-desc">${esc(e.desc)}</p>
-      ${e.impulses ? `<p class="ch-desc"><b style="color:var(--golden)">Impulsions :</b> ${esc(e.impulses)}</p>` : ''}
-      ${e.adversaries ? `<p class="ch-desc"><b style="color:var(--golden)">Adversaires potentiels :</b> ${esc(e.adversaries)}</p>` : ''}
-      <div class="section-title" style="margin-top:.6rem">Features</div>
-      ${e.features.map(f => `<p class="ch-desc" style="margin-bottom:.5rem"><b>${esc(f.name)}</b> <span class="tag">${esc(f.kind)}</span> — ${esc(f.desc)}</p>`).join('')}
-    </details>`);
-    envList.appendChild(box);
-  }
+  const renderList = () => {
+    const list = all
+      .filter(e => (!gmUi.tier || e.tier === gmUi.tier))
+      .filter(e => !gmUi.q || (e.en + ' ' + e.desc).toLowerCase().includes(gmUi.q));
+    $('#gm-env-count', body).textContent = `${list.length} environnement(s) — SRD 2.0`;
+    const envList = $('#gm-env-list', body);
+    envList.innerHTML = '';
+    for (const e of list) {
+      const box = el(`<details class="rules-block adv-block">
+        <summary><b>${esc(e.en)}</b> <span class="tag">${esc(e.category)}</span> <span class="ms-meta" style="display:inline">${T.tiers[e.tier]}${e.difficulty ? ' · Difficulté ' + e.difficulty : ''}</span></summary>
+        <p class="ch-desc">${esc(e.desc)}</p>
+        ${e.impulses ? `<p class="ch-desc"><b style="color:var(--golden)">Impulsions :</b> ${esc(e.impulses)}</p>` : ''}
+        ${e.adversaries ? `<p class="ch-desc"><b style="color:var(--golden)">Adversaires potentiels :</b> ${esc(e.adversaries)}</p>` : ''}
+        <div class="section-title" style="margin-top:.6rem">Features</div>
+        ${e.features.map(f => `<p class="ch-desc" style="margin-bottom:.5rem"><b>${esc(f.name)}</b> <span class="tag">${esc(f.kind)}</span> — ${esc(f.desc)}</p>`).join('')}
+      </details>`);
+      envList.appendChild(box);
+    }
+  };
+  renderList();
 
-  $('#gm-q', body).addEventListener('input', (e) => { gmUi.q = e.target.value.toLowerCase(); drawEnvironments(body, main); });
-  $$('[data-btier]', body).forEach(b => b.addEventListener('click', () => { gmUi.tier = b.dataset.btier ? +b.dataset.btier : null; drawEnvironments(body, main); }));
+  $('#gm-q', body).addEventListener('input', (e) => { gmUi.q = e.target.value.toLowerCase(); renderList(); });
+  $$('[data-btier]', body).forEach(b => b.addEventListener('click', () => {
+    gmUi.tier = b.dataset.btier ? +b.dataset.btier : null;
+    $$('[data-btier]', body).forEach(x => x.classList.toggle('active', (x.dataset.btier ? +x.dataset.btier : null) === gmUi.tier));
+    renderList();
+  }));
 }
 
 /* ---------- Référence de règles ---------- */

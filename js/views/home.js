@@ -6,12 +6,12 @@ export async function render(main, params) {
   const chars = st.characters;
   main.classList.remove('wide');
 
-  const lastChar = chars.length ? chars.sort((a, b) => b.updatedAt - a.updatedAt)[0] : null;
+  const lastChar = chars.length ? [...chars].sort((a, b) => b.updatedAt - a.updatedAt)[0] : null;
 
   main.innerHTML = `
   <div class="view">
     <div class="hero">
-      <h2>Daggervault</h2>
+      <h2>Daggerborne</h2>
       <span class="hero-badge">Compatible avec Daggerheart™</span>
       <p>Compagnon JDR : créez vos personnages pas à pas, lancez les Dés de Dualité et explorez le compendium en français.</p>
       <div class="cta">

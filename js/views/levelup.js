@@ -335,8 +335,8 @@ export async function openLevelUp(c, ctx) {
   /* ---------- choix de remplacement (étape 4) ---------- */
   const renderSwapChoices = (swapIdx) => {
     const old = cards.find(x => x.id === c.domainCards[swapIdx]?.cardId);
-    const owned = ownedIds();
-    const list = cards.filter(cd => myDomains().includes(cd.domain) && cd.level <= domainLevelCap(cd.domain) && !owned.includes(cd.id))
+    const exclude = new Set([...ownedIds(), ...wiz.cardPicks]);
+    const list = cards.filter(cd => myDomains().includes(cd.domain) && cd.level <= domainLevelCap(cd.domain) && !exclude.has(cd.id))
       .sort((a, b) => a.level - b.level || a.fr.localeCompare(b.fr, 'fr'));
     return `<div class="lu-sub lu-swapbox">
       <div class="lu-sub-lbl">Remplacer « ${esc(old?.fr || '')} » par (niveau ≤ ${newLevel})</div>
@@ -493,7 +493,11 @@ export async function openLevelUp(c, ctx) {
           const id = pick.dataset.lupick;
           const at = wiz.cardPicks.indexOf(id);
           if (at >= 0) wiz.cardPicks.splice(at, 1);
-          else { if (wiz.cardPicks.length >= cardQuota()) { toast(`Maximum : ${cardQuota()} carte(s).`); return; } wiz.cardPicks.push(id); }
+          else {
+            if (wiz.cardPicks.length >= cardQuota()) { toast(`Maximum : ${cardQuota()} carte(s).`); return; }
+            wiz.cardPicks.push(id);
+            if (wiz.swapPick === id) wiz.swapPick = null;
+          }
           refreshCards();
           updateMain();
           updateCardCount();
@@ -568,11 +572,12 @@ export async function openLevelUp(c, ctx) {
     c.tierUses[newTier] = c.tierUses[newTier] || {};
     const tu = c.tierUses[newTier];
     /* 1. récompense de palier */
+    let newExpIdx = -1;
     if (reward) {
       const free = c.experiences.findIndex(e => !e.name.trim());
       if (wiz.expName.trim()) {
-        if (free >= 0) c.experiences[free] = { name: wiz.expName.trim(), mod: 2 };
-        else c.experiences.push({ name: wiz.expName.trim(), mod: 2 });
+        if (free >= 0) { c.experiences[free] = { name: wiz.expName.trim(), mod: 2 }; newExpIdx = free; }
+        else { c.experiences.push({ name: wiz.expName.trim(), mod: 2 }); newExpIdx = c.experiences.length - 1; }
       }
       c.proficiency = Math.min(6, c.proficiency + 1);
       if (newLevel !== 2) c.traitMarks = [];
@@ -585,7 +590,11 @@ export async function openLevelUp(c, ctx) {
       else if (id === 'stressSlots') { c.stress.active = (c.stress.active || 6) + 1; c.stress.max = c.stress.active + (c.stress.unlocked || 0); }
       else if (id === 'experiences') wiz.expPicks.forEach(i => {
         const e = expList()[i];
-        if (e && !e.isNew && c.experiences[e.idx]) c.experiences[e.idx].mod = Math.min(9, c.experiences[e.idx].mod + 1);
+        if (!e) return;
+        const targetIdx = e.isNew ? newExpIdx : e.idx;
+        if (targetIdx >= 0 && c.experiences[targetIdx]) {
+          c.experiences[targetIdx].mod = Math.min(9, c.experiences[targetIdx].mod + 1);
+        }
       });
       else if (id === 'evasion') c.evasion = Math.min(30, c.evasion + 1);
       else if (id === 'domainCard') { /* l'étape 3 permet une carte de plus */ }
@@ -598,7 +607,7 @@ export async function openLevelUp(c, ctx) {
           c.subcardCount = nextIdx + 1;
         }
       }
-      else if (id === 'proficiency') { /* incrémenté ci-dessous via wiz.profChecks — pas ici (bug du double incrément) */ }
+      else if (id === 'proficiency') { /* incrémenté ci-dessous via wiz.profChecks — tu.proficiency déjà compté ci-dessus */ }
       else if (id === 'multiclass') {
         c.multiclassed = true;
         const mcClass = classes.find(x => x.id === wiz.multiclassId);
@@ -614,7 +623,6 @@ export async function openLevelUp(c, ctx) {
     /* Maîtrise : +1 unique si l'option à double coût est prise (les 2 cases valident les 2 points) */
     if (wiz.choices.includes('proficiency') && wiz.profChecks === 2) {
       c.proficiency = Math.min(6, c.proficiency + 1);
-      tu.proficiency = (tu.proficiency || 0) + 1;
     }
     /* 3. niveau (les seuils s'ajustent automatiquement avec le niveau) */
     c.level = newLevel;

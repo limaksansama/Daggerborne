@@ -1,5 +1,5 @@
 /* Dés de Dualité */
-import { $, $$, el, esc, go, T, data, toast, getState, setState, getChar, saveChar, rollD } from '../core.js';
+import { $, $$, el, esc, go, parseHash, T, data, toast, getState, setState, getChar, saveChar, rollD } from '../core.js';
 import { rollDuality } from '../dice3d.js';
 
 let ui = { mod: 0, adv: false, disadv: false, trait: null, expMod: 0, label: '', charId: null };
@@ -28,7 +28,7 @@ export async function render(main, params) {
         ${c ? `<select id="roll-trait" style="grid-column:1/-1;background:var(--panel-3);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:.6rem;font-weight:700">
           <option value="">— Trait (aucun) —</option>
           ${Object.entries(T.traits).map(([k, v]) => `<option value="${k}" ${ui.trait === k ? 'selected' : ''}>${v} ${c.traits[k] > 0 ? '+' : ''}${c.traits[k]}</option>`).join('')}
-          ${c.experiences.filter(e => e.name).map((e, i) => `<option value="exp${i}">✦ ${esc(e.name)} (+${e.mod})</option>`).join('')}
+          ${c.experiences.map((e, i) => ({ e, i })).filter(x => x.e.name && x.e.name.trim()).map(x => `<option value="exp${x.i}" ${ui.trait === `exp${x.i}` ? 'selected' : ''}>✦ ${esc(x.e.name)} (+${x.e.mod})</option>`).join('')}
         </select>` : ''}
         <button class="btn ghost ${ui.adv ? 'sel' : ''}" id="btn-adv">▲ Avantage</button>
         <button class="btn ghost ${ui.disadv ? 'sel' : ''}" id="btn-disadv">▼ Désavantage</button>
@@ -94,13 +94,14 @@ export async function render(main, params) {
     /* UNIFICATION : jet de Dualité 3D via rollService (bannière interactive) */
     const r = await rollDuality({ mod, label, charId: c ? c.id : null });
     unlock();
-    if (!r) return;
+    if (!r || parseHash().path !== 'dice') return;
     /* affichage de secours dans la vue (la bannière 3D porte le résultat principal) */
     const dieH = $('#die-hope', main), dieF = $('#die-fear', main);
     dieH?.classList.remove('rolling'); dieF?.classList.remove('rolling');
     $('#val-hope', main).textContent = r.hope;
     $('#val-fear', main).textContent = r.fear;
     render(main, params).then(() => {
+      if (parseHash().path !== 'dice') return;
       const res = $('#roll-result', main);
       if (res) {
         const cls = r.result === 'crit' ? 'crit' : r.result;

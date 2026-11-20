@@ -33,8 +33,8 @@ function buildShell() {
   app.innerHTML = `
     <header class="topbar">
       <div class="brand">
-        <img src="public/assets/dpcgl-community-logo-light.png" alt="Daggervault — Daggerheart Compatible">
-        <span class="t">Daggervault<span class="brand-badge" title="Compatible avec Daggerheart™">Compatible avec Daggerheart™</span></span>
+        <img src="public/assets/dpcgl-community-logo-light.png" alt="Daggerborne — Daggerheart Compatible">
+        <span class="t">Daggerborne<span class="brand-badge" title="Compatible avec Daggerheart™">Compatible avec Daggerheart™</span></span>
       </div>
       <span class="page-title" id="top-title"></span>
       <button class="icon-btn" id="top-dice" title="Dés de Dualité">

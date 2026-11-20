@@ -20,9 +20,9 @@ export async function render(main, params) {
     <div class="section-title">À propos</div>
     <div class="card">
       <div class="about-logo-row">
-        <img src="public/assets/dpcgl-community-logo-light.png" alt="Daggervault — Daggerheart Compatible">
+        <img src="public/assets/dpcgl-community-logo-light.png" alt="Daggerborne — Daggerheart Compatible">
         <div>
-          <div style="font-family:var(--font-title);font-weight:800;color:var(--golden);font-size:1.15rem">Daggervault · Compagnon JDR</div>
+          <div style="font-family:var(--font-title);font-weight:800;color:var(--golden);font-size:1.15rem">Daggerborne · Compagnon JDR</div>
           <div style="font-size:.78rem;color:var(--text-dim)">Application PWA non officielle — français</div>
         </div>
       </div>
@@ -65,7 +65,7 @@ export async function render(main, params) {
     const blob = new Blob([JSON.stringify(getState(), null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'daggervault-sauvegarde.json';
+    a.download = 'daggerborne-sauvegarde.json';
     a.click();
     URL.revokeObjectURL(a.href);
   });

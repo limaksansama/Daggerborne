@@ -1,9 +1,9 @@
-/* Service worker — cache-first PWA for Daggervault */
-const VERSION = 'daggervault-v28';
+/* Service worker — cache-first PWA for Daggerborne */
+const VERSION = 'daggerborne-v29';
 const CORE = [
   './', './index.html', './manifest.webmanifest',
   './css/app.css', './css/sheet2.css', './css/dice-box.css', './js/app.js', './js/core.js',
-  './js/dice3d.js', './js/fab.js',
+  './js/dice3d.js', './js/fab.js', './js/gmRules.js',
   './js/vendor/dice-box.es.min.js', './js/vendor/world.offscreen.min.js',
   './js/vendor/world.onscreen.min.js', './js/vendor/world.none.min.js',
   './js/views/home.js', './js/views/chars.js', './js/views/create.js', './js/views/sheet.js',
@@ -11,12 +11,17 @@ const CORE = [
   './js/views/dice.js', './js/views/compendium.js', './js/views/gm.js', './js/views/settings.js',
   './data/domains.json', './data/classes.json', './data/subclasses.json', './data/ancestries.json',
   './data/communities.json', './data/domainCards.json', './data/weapons.json', './data/armors.json',
-  './data/adversaries.json', './data/generalItems.json',
+  './data/adversaries.json', './data/generalItems.json', './data/environments.json', './data/transformations.json',
   './assets/fonts/Cinzel-VariableFont_wght.ttf', './assets/fonts/cinzel-decorative-bold-latin.woff2',
   './assets/fonts/overpass-regular-latin.woff2', './assets/fonts/overpass-regular-latin-ext.woff2',
   './assets/fonts/overpass-italic-latin.woff2',
   './assets/icons/favicon-64.png',
   './assets/icons/icon-192.png', './assets/icons/icon-512.png', './assets/icons/maskable-192.png', './assets/icons/maskable-512.png',
+  './assets/icons/domain-card/arcana.png', './assets/icons/domain-card/blade.png',
+  './assets/icons/domain-card/bone.png', './assets/icons/domain-card/codex.png',
+  './assets/icons/domain-card/dread.png', './assets/icons/domain-card/grace.png',
+  './assets/icons/domain-card/midnight.png', './assets/icons/domain-card/sage.png',
+  './assets/icons/domain-card/splendor.png', './assets/icons/domain-card/valor.png',
   /* logo communautaire officiel DPCGL (fiole d'alchimie) — requis hors-ligne */
   './public/assets/dpcgl-community-logo.png',
   './public/assets/dpcgl-community-logo-light.png',

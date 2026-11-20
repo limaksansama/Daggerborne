@@ -138,7 +138,7 @@ async function stepClass(body) {
     </button>`);
     btn.addEventListener('click', () => {
       /* re-clic sur la même classe : garde la sélection (pas de toggle-off piégeux) */
-      if (wiz.classId !== c.id) { wiz.classId = c.id; wiz.subclassId = null; }
+      if (wiz.classId !== c.id) { wiz.classId = c.id; wiz.subclassId = null; wiz.cardIds = []; }
       draw(getMain());
     });
     grid.appendChild(btn);
@@ -147,8 +147,7 @@ async function stepClass(body) {
 
 /* ================= STEP 2: SUBCLASS ================= */
 async function stepSubclass(body) {
-  const classes = await data('classes');
-  const subclasses = await data('subclasses');
+  const [classes, subclasses, weapons] = await Promise.all([data('classes'), data('subclasses'), data('weapons')]);
   const cl = classes.find(c => c.id === wiz.classId);
   const subs = subclasses.filter(s => s.classId === wiz.classId).sort((a, b) => a.fr.localeCompare(b.fr, 'fr'));
   body.innerHTML = `
@@ -166,6 +165,12 @@ async function stepSubclass(body) {
     </button>`);
     btn.addEventListener('click', () => {
       wiz.subclassId = s.id; /* re-clic : conserve la sélection */
+      if (!s.spellcastTrait) {
+        const pw = weapons.find(w => w.id === wiz.primaryWeaponId);
+        const sw = weapons.find(w => w.id === wiz.secondaryWeaponId);
+        if (pw?.dmgType === 'mag') wiz.primaryWeaponId = null;
+        if (sw?.dmgType === 'mag') wiz.secondaryWeaponId = null;
+      }
       draw(getMain());
     });
     grid.appendChild(btn);

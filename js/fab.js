@@ -1,7 +1,7 @@
 /* FAB lanceur de dés flottant — bouton circulaire (d12 doré + d12 indigo),
    bouton Historique, menu vertical déployable : Dualité rapide, dés individuels
    (accumulateur multi-dés avec badge compteur), LANCER ! et vider la sélection. */
-import { $, $$, el, esc, getState } from './core.js';
+import { $, $$, el, esc, getState, toast } from './core.js';
 import { rollDuality, rollDice, isRolling } from './dice3d.js';
 
 /* icônes SVG : d12 stylisé (pentagone) + horloge */
@@ -76,6 +76,8 @@ export function initFab() {
     await rollDuality({ mod: 0, label: 'Dualité' });
   });
   $$('[data-d3d-die]', root).forEach(b => b.addEventListener('click', () => {
+    const total = Object.values(sel).reduce((a, b) => a + b, 0);
+    if (total >= 12) { toast('Maximum 12 dés 3D à la fois.'); return; }
     const d = +b.dataset.d3dDie;
     sel[d] = (sel[d] || 0) + 1;
     refreshSel();
@@ -84,13 +86,9 @@ export function initFab() {
   launch.addEventListener('click', async () => {
     if (isRolling()) return;
     const notation = Object.entries(sel).filter(([, q]) => q > 0).map(([d, q]) => `${q}d${d}`).join(' + ');
-    const qty = Object.values(sel).reduce((a, b) => a + b, 0);
+    if (!notation) return;
     sel = {}; refreshSel(); closeAll();
-    if (qty > 12) { /* garde-fou : plus de 12 dés 3D à la fois nuit à la lisibilité */
-      await rollDice(notation, { label: 'Sélection' });
-    } else {
-      await rollDice(notation, { label: 'Sélection' });
-    }
+    await rollDice(notation, { label: 'Sélection' });
   });
   $('#d3d-hist-btn', root).addEventListener('click', () => {
     const wasOpen = hist.classList.contains('open');
