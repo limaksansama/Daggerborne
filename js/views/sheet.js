@@ -990,6 +990,9 @@ function openRoller(c, preset = {}, ctx = null) {
       else { mod -= v; label += ` − Désavantage d6 (${v})`; }
     }
 
+    /* ferme la fenêtre immédiatement pour laisser voir les dés 3D rouler */
+    back.remove();
+
     /* UNIFICATION : jet de Dualité 3D via rollService */
     const r = await rollDuality({ mod, label, charId: c.id });
     unlock();
@@ -997,7 +1000,6 @@ function openRoller(c, preset = {}, ctx = null) {
       if (spend) { c.hope.current = Math.min(c.hope.max, c.hope.current + 1); saveChar(c); }
       return;
     }
-    back.remove(); /* l'overlay ferme, la bannière 3D prend le relais */
     if (ctx) render(ctx.main, ctx.params); /* re-render : Espoir/Stress/Peur à jour */
   });
 }
