@@ -1,0 +1,601 @@
+[
+  {
+    "id": "5LwX4m8ziY3F1ZGC",
+    "en": "Wizard",
+    "fr": "Magicien",
+    "fan": false,
+    "domains": [
+      "codex",
+      "splendor"
+    ],
+    "hp": 5,
+    "evasion": 11,
+    "hopeAbility": "Pas cette fois",
+    "hopeDesc": "Dépensez 3 Espoirs pour obliger un adversaire à Longue portée à relancer un jet de dégâts ou d'attaque.",
+    "suggestedTraits": {
+      "agility": -1,
+      "strength": 0,
+      "finesse": 0,
+      "instinct": 1,
+      "presence": 1,
+      "knowledge": 2
+    },
+    "questions": [
+      "Quelles responsabilités votre communauté comptait-elle autrefois sur vous pour les assumer ?\nComment les avez-vous déçus ?",
+      "Vous avez passé votre vie à la recherche d'un livre ou d'un objet d'une grande\nimportance. De quoi s'agit-il, et pourquoi est-il si crucial pour vous ?",
+      "Vous avez un rival puissant. Qui est-il, et pourquoi êtes-vous si déterminé à le vaincre ?"
+    ],
+    "features": [
+      {
+        "name": "Pas cette fois",
+        "desc": "Dépensez 3 Espoir pour obliger un adversaire à portée Éloignée à relancer un jet d'attaque ou de dégâts."
+      },
+      {
+        "name": "Prestidigitation",
+        "desc": "Vous pouvez effectuer des effets magiques inoffensifs et subtils à volonté. Par exemple, vous pouvez changer la couleur d'un objet, créer une odeur, allumer une bougie, faire léviter un tout petit objet, illuminer une pièce ou réparer un petit objet."
+      },
+      {
+        "name": "Motifs étranges",
+        "desc": "Choisissez un nombre entre 1 et 12. Lorsque vous obtenez ce nombre sur un Dé de Dualité, gagnez un Espoir ou effacez un Stress.\nVous pouvez changer ce nombre lorsque vous effectuez un long repos."
+      }
+    ],
+    "subclassIds": [
+      "qqQlgCqhOivUFoQn",
+      "4y9Ph7RsCIAbkwTk"
+    ],
+    "img": "icons/magic/symbols/circled-gem-pink.webp",
+    "desc": "Les magiciens étudient les équations du pouvoir. Leur savoir se transforme en sorts dévastateurs ou en connaissances profondes du monde."
+  },
+  {
+    "id": "nRAyoC0fOzXPDa4z",
+    "en": "Guardian",
+    "fr": "Gardien",
+    "fan": false,
+    "domains": [
+      "valor",
+      "blade"
+    ],
+    "hp": 7,
+    "evasion": 9,
+    "hopeAbility": "Tank en première ligne",
+    "hopeDesc": "Dépensez 3 Espoirs pour effacer 2 Emplacements d'armure.",
+    "suggestedTraits": {
+      "agility": 1,
+      "strength": 2,
+      "finesse": -1,
+      "instinct": 0,
+      "presence": 1,
+      "knowledge": 0
+    },
+    "questions": [
+      "Qui de votre communauté n'avez-vous pas pu protéger, et pourquoi pensez-vous encore à cette personne ?",
+      "On vous a confié la protection de quelque chose d'important et il vous faut le\nlivrer quelque part de dangereux. De quoi s'agit-il, et où doit-il être amené ?",
+      "Vous considérez un aspect de vous-même comme une faiblesse. De quoi s'agit-il, et comment cela vous a-t-il affecté ?"
+    ],
+    "features": [
+      {
+        "name": "Char d'assaut de première ligne",
+        "desc": "Dépensez 3 Espoir pour effacer 2 emplacements d'armure."
+      },
+      {
+        "name": "Inarrêtable",
+        "desc": "Une fois par long repos, vous pouvez devenir Inarrêtable. Vous obtenez un Dé Inarrêtable. Au niveau 1, votre Dé Inarrêtable est un d4. Placez-le sur votre fiche de personnage dans l'espace prévu, en commençant par la valeur 1 face visible. Après avoir effectué un jet de dégâts infligeant 1 ou plus de PV à une cible, augmentez la valeur du Dé Inarrêtable de un. Lorsque la valeur du dé dépasserait sa valeur maximale ou lorsque la scène se termine, retirez le dé et sortez de l'état Inarrêtable. Au niveau 5, votre Dé Inarrêtable passe à un d6. Tant que vous êtes Inarrêtable, vous bénéficiez des avantages suivants :\nVous réduisez la gravité des dégâts physiques d'un seuil (Grave à Majeur, Majeur à Mineur, Mineur à Aucun).\nVous ajoutez la valeur actuelle du Dé Inarrêtable à votre jet de dégâts.\nVous ne pouvez pas être Entravé ou Vulnérable.\nAstuce : si votre Dé Inarrêtable est un d4 et que la valeur 4 est actuellement visible, vous retirez le dé la prochaine fois que vous devriez l'augmenter. Cependant, si votre Dé Inarrêtable a augmenté à un d6 et que la valeur 4 est actuellement visible, vous le tournerez à 5 la prochaine fois que vous devriez l'augmenter. Dans ce cas, vous retirerez le dé lorsque vous devrez l'augmenter au-delà de 6."
+      }
+    ],
+    "subclassIds": [
+      "rKRxFBlkbh9cDK8K",
+      "SUo8NPBPO8aN193u"
+    ],
+    "img": "icons/equipment/shield/heater-wooden-sword-green.webp",
+    "desc": "Les gardiens se tiennent au premier rang, bouclier dressé, résistant aux coups les plus puissants pour protéger leurs alliés."
+  },
+  {
+    "id": "cgq9QzytVs6uyaBW",
+    "en": "Warlock",
+    "fr": "Occultiste",
+    "fan": true,
+    "domains": [
+      "dread",
+      "grace"
+    ],
+    "hp": 5,
+    "evasion": 11,
+    "hopeAbility": "Faveur du patron",
+    "hopeDesc": "Dépensez 3 Espoirs pour que votre patron vous accorde sa faveur.",
+    "suggestedTraits": {
+      "agility": 1,
+      "strength": -1,
+      "finesse": 0,
+      "instinct": 1,
+      "presence": 2,
+      "knowledge": 0
+    },
+    "questions": [
+      "Qui de votre communauté vous a rejeté après que vous ayez fait un pacte avec votre protecteur ?",
+      "Quelle situation désespérée vous a poussé à promettre votre vie à votre protecteur ?",
+      "Votre protecteur vous a confié une tâche que vous devez accomplir avant toute chose. De quoi s'agit-il, et pourquoi cela vous inquiète-t-il ?"
+    ],
+    "features": [
+      {
+        "name": "Faveur du protecteur",
+        "desc": "Lorsque vous échouez à un jet, vous pouvez dépenser 3 Espoir pour relancer avec avantage."
+      },
+      {
+        "name": "Pacte du protecteur",
+        "desc": "Vous vous êtes engagé auprès d'une entité surnaturelle — telle qu'un dieu, un fée ou un démon — en échange de pouvoir. Notez leur nom sur votre fiche de personnage, puis travaillez avec votre MJ pour déterminer leur sphère d'influence (telle que la Nature, le Chaos, la Sagesse, la Malice, l'Amour, la Guerre, la Justice ou la Mort). Avant d'effectuer un jet d'action en rapport avec la sphère d'influence de votre protecteur, vous pouvez dépenser une Faveur pour invoquer leur aide, en lançant votre Dé du Protecteur et en ajoutant son résultat au total. Votre Dé du Protecteur commence à un [[/r d6]] et passe à un [[/r d8]] au niveau 5."
+      },
+      {
+        "name": "Faveur",
+        "desc": "Vous commencez avec 3 Faveur. Vous pouvez utiliser une action de temps mort pour rendre un hommage à votre protecteur. Décrivez comment et gagnez des Faveurs égales à votre trait Spellcast. De plus, lorsque vous réussissez un jet d'action avec de l'Espoir, vous pouvez choisir de gagner une Faveur à la place d'un Espoir."
+      }
+    ],
+    "subclassIds": [
+      "yA10Wf90HYb0DTbK",
+      "TsJSGjecybUfKfpP"
+    ],
+    "img": "icons/magic/unholy/orb-hands-pink.webp",
+    "desc": "Les occultistes scellent des pactes avec des puissances d'outre-monde, échangeant leur âme contre un pouvoir terrible."
+  },
+  {
+    "id": "5ZnlJ5bEoyOTkUJv",
+    "en": "Seraph",
+    "fr": "Séraphin",
+    "fan": false,
+    "domains": [
+      "valor",
+      "splendor"
+    ],
+    "hp": 7,
+    "evasion": 9,
+    "hopeAbility": "Soutien vital",
+    "hopeDesc": "Dépensez 3 Espoirs pour effacer 1 PV à un allié à Courte portée.",
+    "suggestedTraits": {
+      "agility": 0,
+      "strength": 2,
+      "finesse": 0,
+      "instinct": 1,
+      "presence": 1,
+      "knowledge": -1
+    },
+    "questions": [
+      "À quel dieu vous êtes-vous voué ? Quel exploit incroyable a-t-il accompli pour vous dans un moment de désespoir ?",
+      "Comment votre apparence a-t-elle changé après avoir prêté serment ?",
+      "De quelle étrange ou unique manière communiquez-vous avec votre dieu ?"
+    ],
+    "features": [
+      {
+        "name": "Soutien vital",
+        "desc": "Dépensez 3 Espoir pour effacer un PV sur un allié à Rapprochée."
+      },
+      {
+        "name": "Dés de Prière",
+        "desc": "Au début de chaque session, lancez un nombre de d4 égal au trait Spellcast de votre sous-classe et placez-les sur votre fiche personnelle dans l'espace prévu. Ce sont vos Dés de Prière. Vous pouvez dépenser n'importe quel nombre de Dés de Prière pour aider vous-même ou un allié à Éloignée. Vous pouvez utiliser la valeur d'un dé dépensé pour réduire les dégâts entrants, ajouter au résultat d'un jet après le lancer, ou gagner un Espoir égal au résultat. À la fin de chaque session, effacez tous les Dés de Prière non dépensés."
+      }
+    ],
+    "subclassIds": [
+      "M5mpGoAj8LRkylrY",
+      "y7ERWRIpJsdP9Re4"
+    ],
+    "img": "icons/magic/holy/barrier-shield-winged-cross.webp",
+    "desc": "Les séraphins portent la lumière céleste. Ailes déployées, ils frappent du ciel et protègent leurs alliés d'une aura divine."
+  },
+  {
+    "id": "DchOzHcWIJE9FKcR",
+    "en": "Sorcerer",
+    "fr": "Ensorceleur",
+    "fan": false,
+    "domains": [
+      "arcana",
+      "midnight"
+    ],
+    "hp": 6,
+    "evasion": 10,
+    "hopeAbility": "Magie volatile",
+    "hopeDesc": "Dépensez 3 Espoirs lors d'une attaque infligeant des dégâts magiques pour relancer autant de vos dés de dégâts que vous le souhaitez.",
+    "suggestedTraits": {
+      "agility": 0,
+      "strength": -1,
+      "finesse": 1,
+      "instinct": 2,
+      "presence": 1,
+      "knowledge": 0
+    },
+    "questions": [
+      "Qu'avez-vous fait qui a rendu les gens de votre communauté méfiants à votre égard ?",
+      "Quel mentor vous a enseigné à maîtriser votre magie sauvage, et pourquoi ne peuvent-ils plus vous guider ?",
+      "Vous avez une peur profonde que vous cachez à tout le monde. Qu'est-ce qui vous fait si peur ?"
+    ],
+    "features": [
+      {
+        "name": "Magie Volatile",
+        "desc": "Dépensez 3 Espoir pour relancer n'importe quel nombre de vos dés de dégâts sur une attaque qui inflige des dégâts magiques."
+      },
+      {
+        "name": "Sentir l'Arcane",
+        "desc": "Vous pouvez détecter la présence de personnes et d'objets magiques à Rapprochée."
+      },
+      {
+        "name": "Illusion Mineure",
+        "desc": "Effectuez un jet de Spellcast (10). En cas de succès, vous créez une illusion visuelle mineure pas plus grande que vous-même à Rapprochée. Cette illusion est convaincante pour quiconque se trouve à Rapprochée ou plus loin."
+      },
+      {
+        "name": "Canaliser la Puissance Brute",
+        "desc": "Une fois par long repos, vous pouvez placer une carte de domaine de votre équipement dans votre caveau et choisir soit :\nGagner un Espoir égal au niveau de la carte.\nAméliorer un sort qui inflige des dégâts, obtenant un bonus au jet de dégâts égal au double du niveau de la carte."
+      }
+    ],
+    "subclassIds": [
+      "GLpRVxnY5E82khxH",
+      "wg1H0hROc2acHwZh"
+    ],
+    "img": "icons/magic/symbols/rune-sigil-horned-white-purple.webp",
+    "desc": "Les ensorceleurs manient une magie innée et volatile qui frappe sans prévenir, capable de dévastation spectaculaire comme de rechutes imprévisibles."
+  },
+  {
+    "id": "CvHlkHZfpMiCz5uT",
+    "en": "Rogue",
+    "fr": "Roublard",
+    "fan": false,
+    "domains": [
+      "midnight",
+      "grace"
+    ],
+    "hp": 6,
+    "evasion": 12,
+    "hopeAbility": "Évasion du roublard",
+    "hopeDesc": "Dépensez 3 Espoirs pour obtenir un bonus de +2 à l'Évasion jusqu'à ce qu'une attaque vous touche ou votre prochain repos.",
+    "suggestedTraits": {
+      "agility": 1,
+      "strength": -1,
+      "finesse": 2,
+      "instinct": 0,
+      "presence": 1,
+      "knowledge": 0
+    },
+    "questions": [
+      "Qu'avez-vous été pris à faire qui vous a valu d'être exilé de votre communauté d'origine ?",
+      "Vous aviez une vie différente, mais vous avez essayé de la laisser derrière vous. Qui de votre passé vous poursuit toujours ?",
+      "Qui de votre passé avez-vous été le plus triste de quitter ?"
+    ],
+    "features": [
+      {
+        "name": "Esquive du Voleur",
+        "desc": "Dépensez 3 Espoir pour obtenir un bonus de +2 à votre Évasion jusqu'à la prochaine fois qu'une attaque réussit contre vous. Sinon, ce bonus dure jusqu'à votre prochain repos."
+      },
+      {
+        "name": "Voilé",
+        "desc": "Chaque fois que vous seriez Caché, vous êtes à la place Voilé. En plus des bénéfices de la condition Caché, tant que vous êtes Voilé, vous restez invisible si vous êtes immobile quand un adversaire se déplace vers l'endroit où il vous verrait normalement. Après avoir effectué une attaque ou terminé un déplacement à portée de vue d'un adversaire, vous n'êtes plus Voilé."
+      },
+      {
+        "name": "Ataque sournoise",
+        "desc": "Lorsque vous réussissez un jet d'attaque tout en étant Camouflé ou qu'un allié est à Mêlée de votre cible, ajoutez un nombre de d6 égal à votre rang à votre jet de dégâts.\nNiveau 1 -> Rang 1\nNiveaux 2–4 -> Rang 2\nNiveaux 5–7 -> Rang 3\nNiveaux 8–10 -> Rang 4"
+      }
+    ],
+    "subclassIds": [
+      "h161OSIK24Up4qNd",
+      "95QxNZwgyEm1LqdG"
+    ],
+    "img": "icons/magic/defensive/shield-barrier-blades-teal.webp",
+    "desc": "Les roublards glissent dans les ombres, ouvrent les serrures et les bourses avec une aisance déconcertante."
+  },
+  {
+    "id": "ZNwUTCyGCEcidZFv",
+    "en": "Druid",
+    "fr": "Druide",
+    "fan": false,
+    "domains": [
+      "sage",
+      "arcana"
+    ],
+    "hp": 6,
+    "evasion": 10,
+    "hopeAbility": "Évolution",
+    "hopeDesc": "Dépensez 3 Espoirs pour passer sous Forme bestiale sans cocher de Stress, en augmentant un trait de +1 jusqu'à l'abandon de la forme.",
+    "suggestedTraits": {
+      "agility": 1,
+      "strength": 0,
+      "finesse": 1,
+      "instinct": 2,
+      "presence": -1,
+      "knowledge": 0
+    },
+    "questions": [
+      "Pourquoi la communauté où vous avez grandi était-elle si dépendante de la nature et de ses créatures ?",
+      "Quel a été le premier animal sauvage avec lequel vous avez noué un lien ? Pourquoi ce lien a-t-il pris fin ?",
+      "Qui a tenté de vous chasser ? Que veulent-ils de vous ?"
+    ],
+    "features": [
+      {
+        "name": "Évolution",
+        "desc": "Dépensez 3 Espoir pour vous transformer en une Forme de bête sans marquer de Stress. Lorsque vous le faites, choisissez un trait à augmenter de +1 jusqu'à ce que vous quittiez cette Forme de bête."
+      },
+      {
+        "name": "Forme de bête",
+        "desc": "Marquez un Stress pour vous transformer magiquement en une créature de votre rang ou inférieur de la liste Forme de bête. Vous pouvez quitter cette forme à tout moment. Lorsque vous êtes transformé, vous ne pouvez pas utiliser d'armes ou lancer de sorts depuis des cartes de domaine, mais vous pouvez toujours utiliser les autres caractéristiques ou capacités auxquelles vous avez accès. Les sorts que vous avez lancés avant de vous transformer restent actifs et durent leur durée normale, et vous pouvez parler et communiquer comme d'habitude. De plus, vous bénéficiez des caractéristiques de la Forme de bête, ajoutez son bonus d'Esquive à votre Esquive et utilisez le trait spécifié dans ses statistiques pour votre attaque. Lorsque vous êtes dans une Forme de bête, votre armure fait partie de votre corps et vous marquez des emplacements d'armure comme d'habitude ; lorsque vous quittez une Forme de bête, ces emplacements d'armure marqués le restent. Si vous marquez votre dernier PV, vous quittez automatiquement cette forme."
+      },
+      {
+        "name": "Toucher sauvage",
+        "desc": "Vous pouvez effectuer à volonté des effets inoffensifs et subtils impliquant la nature, tels que faire fleurir rapidement une plante, invoquer une légère brise ou allumer un feu de camp."
+      }
+    ],
+    "subclassIds": [
+      "W9hs5kxOWeY7eA4Q",
+      "xp0XMjYT85Q7E90o"
+    ],
+    "img": "icons/creatures/mammals/wolf-howl-moon-black.webp",
+    "desc": "Les druides puissent dans la puissance du monde naturel. Ils changent de forme, commandent aux bêtes et canalissent la magie primale de la terre."
+  },
+  {
+    "id": "xCUWwJz4WSthvLfy",
+    "en": "Warrior",
+    "fr": "Guerrier",
+    "fan": false,
+    "domains": [
+      "blade",
+      "bone"
+    ],
+    "hp": 6,
+    "evasion": 11,
+    "hopeAbility": "Pas de pitié",
+    "hopeDesc": "Dépensez 3 Espoirs pour gagner un bonus de +1 sur vos jets d'attaque jusqu'à votre prochain repos.",
+    "suggestedTraits": {
+      "agility": 2,
+      "strength": 1,
+      "finesse": 0,
+      "instinct": 1,
+      "presence": -1,
+      "knowledge": 0
+    },
+    "questions": [
+      "Qui vous a appris à combattre, et pourquoi sont-ils restés lorsque vous avez quitté votre foyer ?",
+      "Quelqu'un vous a vaincu au combat il y a des années et vous a laissé pour mort. Qui était-ce, et comment vous ont-ils trahi ?",
+      "Quel lieu légendaire avez-vous toujours voulu visiter, et pourquoi est-il si spécial ?"
+    ],
+    "features": [
+      {
+        "name": "Aucune pitié",
+        "desc": "Dépensez 3 Espoir pour obtenir un bonus de +1 à vos jets d'attaque jusqu'à votre prochain repos."
+      },
+      {
+        "name": "Ataque d'opportunité",
+        "desc": "Si un adversaire à Mêlée tente de quitter cette portée, effectuez un jet de Réaction en utilisant un trait de votre choix contre sa Difficulté. Choisissez un effet en cas de réussite, ou deux si vous réussissez de manière critique :\nIls ne peuvent pas se déplacer de leur position.\nVous leur infligez des dégâts égaux aux dégâts de votre arme principale.\nVous vous déplacez avec eux."
+      },
+      {
+        "name": "Entraînement au combat",
+        "desc": "Vous ignorez l'encombrement lorsque vous équipez des armes. Lorsque vous infligez des dégâts physiques, vous obtenez un bonus à votre jet de dégâts égal à votre niveau."
+      }
+    ],
+    "subclassIds": [
+      "NAFU9roaVG7f3RNJ",
+      "bcNe5qP3o6CKadhK"
+    ],
+    "img": "icons/weapons/swords/sword-broad-crystal-paired.webp",
+    "desc": "Les guerriers vivent pour le combat. Maîtres des armes, ils adaptent leur style : brute éprouvante ou tacticien redoutable."
+  },
+  {
+    "id": "0Qw2heB75eXNV4SM",
+    "en": "Brawler",
+    "fr": "Bagarreur",
+    "fan": true,
+    "domains": [
+      "valor",
+      "bone"
+    ],
+    "hp": 6,
+    "evasion": 10,
+    "hopeAbility": "Prêt au combat",
+    "hopeDesc": "Dépensez 3 Espoirs pour vous préparer : bonus à votre prochaine attaque en Mêlée.",
+    "suggestedTraits": {
+      "agility": 1,
+      "strength": 1,
+      "finesse": 0,
+      "instinct": 2,
+      "presence": 0,
+      "knowledge": -1
+    },
+    "questions": [
+      "Où avez-vous passé vos années formatives qui vous ont appris, directement ou indirectement, à combattre selon le style que vous utilisez ?",
+      "Quelle organisation a juré de vous tuer sur-le-champ, et qu'avez-vous fait pour attirer leur fureur ?",
+      "Contre qui avez-vous récemment perdu un combat et pour quel combat revanche êtes-vous désespéré ?"
+    ],
+    "features": [
+      {
+        "name": "Mettre au défi",
+        "desc": "Dépensez 3 Espoir pour intimider une cible à Rapprochée, la rendant temporairement Vulnérable."
+      },
+      {
+        "name": "Je Suis l'Arme",
+        "desc": "Vos attaques à mains nues sont aussi puissantes que n'importe quelle lame. Vous avez une arme principale appelée Frappe de Bagarreur équipée tant que vous n'avez aucune autre Arme Active. Elle utilise un trait de votre choix, a une portée en Mêlée et inflige d8+d6 dégâts physiques en utilisant votre Maîtrise (le d8 et le d6 augmentent tous deux avec votre Maîtrise). Tant que cette arme est active, vous obtenez un bonus de +1 à votre Évasion."
+      },
+      {
+        "name": "Frappe de Combo",
+        "desc": "Après avoir lancé les dégâts d'une attaque réussie avec une arme en Mêlée, vous pouvez marquer un Stress pour commencer une frappe de combo. Lorsque vous le faites, lancez votre Dé de Combo et notez le résultat, puis continuez à lancer votre Dé de Combo jusqu'à ce que le résultat de votre dernier lancer soit inférieur au lancer qui l'a précédé. Vous infligez des dégâts supplémentaires égaux au total de tous les résultats de Dé de Combo lancés lors de cette attaque. Les résultats ne peuvent être modifiés par aucun moyen.\nVotre Dé de Combo commence comme un d4. Une fois par palier, vous pouvez augmenter votre Dé de Combo d'un cran comme option d'avancement de niveau."
+      }
+    ],
+    "subclassIds": [
+      "QdoKFfErTEgx6326",
+      "9zyjac09CXquXQSo"
+    ],
+    "img": "icons/skills/melee/unarmed-punch-fist-yellow-red.webp",
+    "desc": "Les bagarreurs font de leur corps une arme : coups écrasants, prises de combat et styles de combat variés."
+  },
+  {
+    "id": "HHAmaNZDicgkill5",
+    "en": "Witch",
+    "fr": "Sorcière",
+    "fan": true,
+    "domains": [
+      "sage",
+      "dread"
+    ],
+    "hp": 6,
+    "evasion": 10,
+    "hopeAbility": "Charme de sorcière",
+    "hopeDesc": "Dépensez 3 Espoirs pour charmer une créature.",
+    "suggestedTraits": {
+      "agility": 0,
+      "strength": -1,
+      "finesse": 0,
+      "instinct": 2,
+      "presence": 1,
+      "knowledge": 1
+    },
+    "questions": [
+      "Qui de votre communauté craignait votre artisanat magique ? Quelle rumeur ont-ils répandue à votre sujet, et quelle vérité contenait-elle ?",
+      "Vous avez déjà utilisé votre pouvoir pour aider quelqu'un dans une situation désespérée. Qui était cette personne, et pourquoi est-elle venue vous voir ?",
+      "Votre magie a autrefois ouvert une porte qu'il aurait mieux valu laisser fermée. Qui ou quoi se trouvait de l'autre côté ?"
+    ],
+    "features": [
+      {
+        "name": "Charme de Sorcière",
+        "desc": "Lorsque vous ou un allié à portée Éloignée échouez un jet d'action, vous pouvez dépenser 3 Espoir pour le transformer en un succès avec Peur à la place."
+      },
+      {
+        "name": "Maudit",
+        "desc": "Marquez un Stress pour temporairement maudire une cible à portée Éloignée. Tant qu'elle est Maudite, la cible subit une pénalité à ses jets de dégâts et à sa Difficulté égale à votre palier. Le nombre maximal de créatures que vous pouvez Maudire en même temps est égal à votre trait de Lanceur de Sorts."
+      },
+      {
+        "name": "Communion",
+        "desc": "Une fois par long repos, lors d'un moment de calme, vous pouvez communier avec un ancêtre, une divinité, un esprit ou une autre entité. Posez-lui une question, puis lancez un nombre de [[/r d6]]{d6s} égal à votre trait de Lanceur de Sorts. Choisissez l'un des résultats et reportez-vous au tableau ci-dessous pour l'effet.\n1–3 : Vous goûtez une saveur, sentez une odeur ou ressentez une sensation pertinente pour la réponse.\n4–5 : Vous entendez des sons ou voyez une vision pertinente pour la réponse.\n6 : Vous vivez psychiquement une scène pertinente pour la réponse comme si vous y étiez."
+      }
+    ],
+    "subclassIds": [
+      "7dU2iosTyQaig0Sc",
+      "icIkkMKmVmq1WgRz"
+    ],
+    "img": "icons/magic/light/hand-sparks-smoke-teal.webp",
+    "desc": "Les sorcières tissent des charmes et des maléfices, entre herbes, lunes et savoirs interdits."
+  },
+  {
+    "id": "BTyfve69LKqoOi9S",
+    "en": "Ranger",
+    "fr": "Rôdeur",
+    "fan": false,
+    "domains": [
+      "bone",
+      "sage"
+    ],
+    "hp": 6,
+    "evasion": 12,
+    "hopeAbility": "N'avancez pas",
+    "hopeDesc": "Dépensez 3 Espoirs après une attaque réussie avec une arme pour appliquer le même jet contre deux adversaires supplémentaires à portée.",
+    "suggestedTraits": {
+      "agility": 2,
+      "strength": 0,
+      "finesse": 1,
+      "instinct": 1,
+      "presence": -1,
+      "knowledge": 0
+    },
+    "questions": [
+      "Une terrible créature a blessé votre communauté, et vous avez juré de la pourchasser. Quelle est-elle, et quelle piste ou signe unique laisse-t-elle derrière elle ?",
+      "Votre premier tuerie vous a presque tué aussi. Qu'était-ce, et quelle partie de vous n'a jamais été la même après cet événement ?",
+      "Vous avez traversé de nombreux dangereux territoires, mais quel est le seul endroit où vous refusez d'aller ?"
+    ],
+    "features": [
+      {
+        "name": "Les Tenir Éloignés",
+        "desc": "Dépensez 3 Espoir lorsque vous réussissez une attaque avec une arme pour utiliser ce même jet contre deux adversaires supplémentaires à portée de l'attaque."
+      },
+      {
+        "name": "Focalisation du Ranger",
+        "desc": "Dépensez un Espoir et effectuez une attaque contre une cible. En cas de succès, infligez les dégâts normaux de l'attaque et temporairement rendez la cible de l'attaque votre Focalisation. Jusqu'à ce que cette fonctionnalité se termine ou que vous rendiez une autre créature votre Focalisation, vous bénéficiez des avantages suivants contre votre Focalisation :\nVous savez précisément dans quelle direction elle se trouve.\nLorsque vous lui infligez des dégâts, elle doit marquer un Stress.\nLorsque vous échouez une attaque contre elle, vous pouvez mettre fin à votre fonctionnalité de Focalisation du Ranger pour relancer vos Dés de Dualité."
+      }
+    ],
+    "subclassIds": [
+      "TIUsIlTS1WkK5vr2",
+      "zsUglcU4NgZ8tNgZ"
+    ],
+    "img": "icons/weapons/bows/shortbow-recurve-yellow-blue.webp",
+    "desc": "Les rôdeurs traquent leurs proies à travers les terres sauvages, accompagnés d'un compagnon animal d'une loyauté sans faille."
+  },
+  {
+    "id": "0EFzupppM47Bl6Yw",
+    "en": "Assassin",
+    "fr": "Assassin",
+    "fan": true,
+    "domains": [
+      "blade",
+      "midnight"
+    ],
+    "hp": 5,
+    "evasion": 12,
+    "hopeAbility": "Détermination meurtrière",
+    "hopeDesc": "Marquez une cible : vos alliés gagnent un avantage contre elle. Dépensez 3 Espoirs pour qu'elle subisse des dégâts supplémentaires.",
+    "suggestedTraits": {
+      "agility": 2,
+      "strength": -1,
+      "finesse": 1,
+      "instinct": 0,
+      "presence": 0,
+      "knowledge": 1
+    },
+    "questions": [
+      "Vous avez autrefois tué quelqu'un de proche. Qu'est-il arrivé, et comment cela vous a-t-il changé ?",
+      "Quelle organisation vous a formé à l'art de tuer, et comment êtes-vous devenu membre ?",
+      "Tout au long de votre carrière, une cible vous a toujours échappé. Qui est-elle, et comment a-t-elle failli être prise ?"
+    ],
+    "features": [
+      {
+        "name": "Détermination Mortelle",
+        "desc": "Dépensez 3 Espoir pour effacer 2 Stress."
+      },
+      {
+        "name": "Marqué pour la Mort",
+        "desc": "En cas d'attaque à l'arme réussie, vous pouvez marquer un Stress pour que la cible soit Marquée pour la Mort. Lorsque vous infligez des dégâts à une cible que vous avez Marquée pour la Mort, ajoutez un nombre de d4s égal à votre rang au jet de dégâts.\\nVous ne pouvez avoir qu'un seul adversaire Marqué pour la Mort à la fois. Cet état dure jusqu'à ce que vous fassiez un repos, l'adversaire actuellement Marqué pour la Mort soit vaincu, ou que le GM dépense un nombre de Peur égal à votre rang pour le lever."
+      },
+      {
+        "name": "S'Infiltrer et S'Échapper",
+        "desc": "Dépensez un Espoir pour demander au GM un moyen rapide ou discret d'entrer ou de sortir d'un lieu que vous pouvez voir. Le prochain jet que vous faites qui agit sur cette information a avantage."
+      }
+    ],
+    "subclassIds": [
+      "4x8jiolc2hhs41dt",
+      "F8uUCjTnvw57oNuQ"
+    ],
+    "img": "icons/weapons/daggers/dagger-glowing-white.webp",
+    "desc": "Les assassins éliminent leurs cibles avec une précision létale, dans l'ombre et sans laisser de trace."
+  },
+  {
+    "id": "vegl3bFOq3pcFTWT",
+    "en": "Bard",
+    "fr": "Barde",
+    "fan": false,
+    "domains": [
+      "grace",
+      "codex"
+    ],
+    "hp": 5,
+    "evasion": 10,
+    "hopeAbility": "Faire une scène",
+    "hopeDesc": "Dépensez 3 Espoirs pour Distraire temporairement une cible à Courte portée : malus de −2 à sa Difficulté.",
+    "suggestedTraits": {
+      "agility": 0,
+      "strength": -1,
+      "finesse": 1,
+      "instinct": 0,
+      "presence": 2,
+      "knowledge": 1
+    },
+    "questions": [
+      "Qui de votre communauté vous a appris à avoir autant de confiance en vous ?",
+      "Vous avez été amoureux une fois. Qui avez-vous adoré, et comment vous ont-ils blessé ?",
+      "Vous avez toujours admiré un autre barde. Qui sont-ils, et pourquoi les idolâtrez-vous ?"
+    ],
+    "features": [
+      {
+        "name": "Faire un Scène",
+        "desc": "Dépensez 3 Espoir pour Distraire temporairement une cible à portée Rapprochée, lui donnant une pénalité de -2 à sa Difficulté."
+      },
+      {
+        "name": "Ralliement",
+        "desc": "Une fois par session, décrivez comment vous ralliez le groupe et donnez à vous-même et à chacun de vos alliés un Dé de Ralliement. Au niveau 1, votre Dé de Ralliement est un d6. Un PJ peut dépenser son Dé de Ralliement pour le lancer, ajoutant le résultat à son jet d'action, jet de Réaction, jet de dégâts, ou pour effacer un nombre de Stress égal au résultat. À la fin de chaque session, effacez tous les Dés de Ralliement non dépensés. Au niveau 5, votre Dé de Ralliement passe à un d8."
+      }
+    ],
+    "subclassIds": [
+      "ld8MIvk0xVJydSBz",
+      "XTSODVM8st75Os8M"
+    ],
+    "img": "icons/tools/instruments/harp-red.webp",
+    "desc": "Les bardes sont les plus charismatiques de tous les royaumes. Maîtres de la captivation, ils excellents dans le chant, la musique, le tissage de récits ou l'humour."
+  }
+]

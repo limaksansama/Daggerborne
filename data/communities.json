@@ -1,0 +1,197 @@
+[
+  {
+    "id": "o5AA5J05N7EvH1rN",
+    "en": "Seaborne",
+    "fr": "Liée à la mer",
+    "fan": false,
+    "desc": "Jouez le Rôdeur des Haies si vous voulez utiliser votre artisanat pour vous renforcer et renforcer votre groupe.",
+    "ability": {
+      "en": "Know the Tide",
+      "fr": "Connaître la marée",
+      "desc": "Vous pouvez perceber l'e et le flux de la vie. Lorsque vous effectuez un jet avec Peur, placez un jeton sur votre carte de communauté. Vous pouvez retenir un nombre de jetons égal à votre niveau. Avant d'effectuer un jet d'action, vous pouvez dépenser n'importe lequel de ces jetons pour obtenir un bonus de +1 au jet pour chaque jeton dépensé. À la fin de chaque session, retirez tous les jetons non dépensés."
+    },
+    "img": "icons/environment/settlement/ship.webp"
+  },
+  {
+    "id": "eX0I1ZNMyD3nfaL1",
+    "en": "Underborne",
+    "fr": "Liée aux souterrains",
+    "fan": false,
+    "desc": "Jouez le Marcheur de Nuit si vous voulez manipuler les ombres pour vous déplacer dans l'environnement.",
+    "ability": {
+      "en": "Low-Light Living",
+      "fr": "Vie dans la pénombre",
+      "desc": "Lorsque vous vous trouvez dans une zone de faible luminosité ou d'ombre dense, vous avez avantage sur les jets pour vous cacher, enquêter ou percevoir des détails au sein de cette zone."
+    },
+    "img": "icons/environment/wilderness/cave-entrance-dwarven-hill.webp"
+  },
+  {
+    "id": "XLaNJvrahs9rRraZ",
+    "en": "Freeborne",
+    "fr": "Liée à la liberté",
+    "fan": true,
+    "desc": "Appartenir à une communauté libre signifie que vous venez d'un collectif qui autrefois vivait sous un régime tyrannique mais qui est maintenant libéré.",
+    "ability": {
+      "en": "Unbound",
+      "fr": "Sans attaches",
+      "desc": "Une fois par session, lorsque vous effectuez un jet avec Peur, vous pouvez le changer en un jet avec Espoir à la place."
+    },
+    "img": "icons/environment/settlement/gazebo.webp"
+  },
+  {
+    "id": "wbI1Im48QmZA1UIE",
+    "en": "Hearthborne",
+    "fr": "Liée au foyer",
+    "fan": true,
+    "desc": "Appartenir à une communauté du foyer signifie que vous venez d'origines modestes, ayant vécu dans un village modeste ou à la campagne.",
+    "ability": {
+      "en": "Close-Knit",
+      "fr": "Serrés les uns aux autres",
+      "desc": "Une fois par long repos, vous pouvez dépenser n'importe quel nombre d'Espoir pour accorder à un allié à portée Éloignée un nombre égal d'Espoir."
+    },
+    "img": "icons/environment/settlement/house-farmland-small.webp"
+  },
+  {
+    "id": "rGwCPMqZtky7SE6d",
+    "en": "Slyborne",
+    "fr": "Liée à la ruse",
+    "fan": false,
+    "desc": "Jouez l'Appel du Brave si vous souhaitez utiliser la puissance de vos ennemis pour alimenter votre propre force.",
+    "ability": {
+      "en": "Scoundrel",
+      "fr": "Crapule",
+      "desc": "Vous avez avantage sur les jets pour négocier avec des criminels, détecter des mensonges ou trouver un endroit sûr pour vous cacher."
+    },
+    "img": "icons/environment/settlement/city-night-spire.webp"
+  },
+  {
+    "id": "CRJ5pzJj4FjCtIlx",
+    "en": "Wildborne",
+    "fr": "Liée à la nature",
+    "fan": false,
+    "desc": "Jouez le Troubadour si vous voulez jouer de la musique pour soutenir vos alliés.",
+    "ability": {
+      "en": "Lightfoot",
+      "fr": "Pied léger",
+      "desc": "Votre déplacement est naturellement silencieux. Vous avez avantage sur les jets pour vous déplacer sans être entendu."
+    },
+    "img": "icons/environment/wilderness/tree-oak.webp"
+  },
+  {
+    "id": "fB2lEkodBCuyyMs1",
+    "en": "Warborne",
+    "fr": "Liée à la guerre",
+    "fan": true,
+    "desc": "Appartenir à une communauté guerrière signifie que vous venez d'un lieu qui est ou était ravagé par la guerre.",
+    "ability": {
+      "en": "Brave Face",
+      "fr": "Sang-froid",
+      "desc": "Une fois par session, lorsque vous seriez forcé de marquer un Stress, vous pouvez dépenser un Espoir à la place."
+    },
+    "img": "icons/environment/settlement/watchtower-lit-orange.webp"
+  },
+  {
+    "id": "Mv4TfmbbgKyOj1rt",
+    "en": "Reborne",
+    "fr": "Liée au renouveau",
+    "fan": true,
+    "desc": "Vous étiez autrefois membre d'une autre communauté dont vous ne faites plus partie.",
+    "ability": {
+      "en": "Found Family",
+      "fr": "Famille de cœur",
+      "desc": "Une fois par repos, vous pouvez dépenser un Espoir pour utiliser l'Expérience d'un allié comme si elle était la vôtre. Lorsque vous le faites, décrivez comment votre temps passé avec cet allié vous a préparé pour ce moment.\\nLorsque vous rejoignez une nouvelle communauté ou que vous retrouvez l'ancienne, vous pouvez échanger définitivement cette carte contre celle-ci."
+    },
+    "img": "icons/environment/settlement/hut.webp"
+  },
+  {
+    "id": "82mDY2EIBfLkNwQj",
+    "en": "Wanderborne",
+    "fr": "Liée à l’errance",
+    "fan": false,
+    "desc": "Jouez l'Appel du Tueur si vous voulez abattre des adversaires avec une force immense.",
+    "ability": {
+      "en": "Nomadic Pack",
+      "fr": "Sac de nomade",
+      "desc": "Ajoutez un Sac nomade à votre équipement. Une fois par session, vous pouvez dépenser un Espoir pour fouiller dans ce sac et en sortir un objet banal utile à votre situation. Travaillez avec le MJ pour déterminer quel objet vous sortez."
+    },
+    "img": "icons/environment/settlement/wagon.webp"
+  },
+  {
+    "id": "TY2TejenASXtS484",
+    "en": "Orderborne",
+    "fr": "Liée à l’ordre",
+    "fan": false,
+    "desc": "Les Skykin sont des humanoïdes dont les corps sont faits de chair et d'air.",
+    "ability": {
+      "en": "Dedicated",
+      "fr": "Dévoué",
+      "desc": "Notez trois dictons ou valeurs que votre éducation vous a inculqués. Une fois par repos, lorsque vous décrivez comment vous incarnez l'un de ces principes par votre action actuelle, vous pouvez lancer un d20 comme votre Dé d'Espoir"
+    },
+    "img": "icons/environment/people/infantry-army.webp"
+  },
+  {
+    "id": "YsvlyqYoi8QQ8kwm",
+    "en": "Loreborne",
+    "fr": "Liée au savoir",
+    "fan": false,
+    "desc": "Jouez le Bête-Liée si vous souhaitez nouer un lien profond avec un allié animal.",
+    "ability": {
+      "en": "Well-Read",
+      "fr": "Cultivé",
+      "desc": "Vous avez avantage sur les jets impliquant l'histoire, la culture ou la politique d'une personne ou d'un lieu important."
+    },
+    "img": "icons/sundries/scrolls/scroll-writing-brown-gold.webp"
+  },
+  {
+    "id": "YHfNavuBRxvyqeNO",
+    "en": "Frostborne",
+    "fr": "Liée au gel",
+    "fan": true,
+    "desc": "Appartenir à une communauté gelée signifie que vous venez d'un lieu de neige et de glace.",
+    "ability": {
+      "en": "Hardy",
+      "fr": "Robuste",
+      "desc": "Lorsque vous effectuez un repos, vous restaurez un PV."
+    },
+    "img": "icons/magic/water/barrier-ice-crystal-wall-jagged-blue.webp"
+  },
+  {
+    "id": "DVw2mOCHB8i0XeBz",
+    "en": "Highborne",
+    "fr": "Liée à la noblesse",
+    "fan": false,
+    "desc": "Jouez le Gardien des Éléments si vous souhaitez incarner les éléments naturels de la nature.",
+    "ability": {
+      "en": "Privilege",
+      "fr": "Privilège",
+      "desc": "Vous avez avantage sur les jets pour vous entretenir avec des nobles, négocier des prix ou utiliser votre réputation pour obtenir ce que vous voulez."
+    },
+    "img": "icons/environment/settlement/palast.webp"
+  },
+  {
+    "id": "WHLA4qrdszXQHOuo",
+    "en": "Ridgeborne",
+    "fr": "Liée aux falaises",
+    "fan": false,
+    "desc": "Jouez le Gardien du Renouveau si vous souhaitez utiliser une puissante magie pour guérir votre groupe.",
+    "ability": {
+      "en": "Steady",
+      "fr": "Assuré",
+      "desc": "Vous avez avantage sur les jets pour traverser des falaises et corniches dangereuses, naviguer dans des environnements hostiles et utiliser vos connaissances de survie."
+    },
+    "img": "icons/environment/wilderness/terrain-rocks-brown.webp"
+  },
+  {
+    "id": "7hCkORII05slZW3c",
+    "en": "Duneborne",
+    "fr": "Liée aux dunes",
+    "fan": true,
+    "desc": "Faire partie d'une communauté de duneborn signifie que vous avez fait de votre maison parmi les sables mouvants et le climat aride du désert.",
+    "ability": {
+      "en": "Oasis",
+      "fr": "Oasis",
+      "desc": "Pendant un court repos, vous ou un allié pouvez relancer un dé utilisé pour un mouvement de temps mort et prendre le résultat le plus élevé."
+    },
+    "img": "icons/environment/settlement/tent.webp"
+  }
+]

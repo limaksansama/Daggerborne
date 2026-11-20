@@ -1,0 +1,786 @@
+[
+ {
+  "id": "7dU2iosTyQaig0Sc",
+  "en": "Hedge",
+  "fr": "Sorcière des haies",
+  "classEn": "Witch",
+  "classId": "HHAmaNZDicgkill5",
+  "spellcastTrait": "knowledge",
+  "desc": "Jouez la Sorcière des haies si vous voulez utiliser votre artisanat pour renforcer votre groupe et vous-même.",
+  "features": [
+   {
+    "name": "Remèdes à base de plantes",
+    "desc": "Lorsque vous ou un allié dans la scène effacez 1 ou plusieurs PV ou Stress suite à l'utilisation d'un consommable, augmentez le nombre effacé de 1."
+   },
+   {
+    "name": "Talisman enchanté",
+    "desc": "Une fois par repos, vous pouvez imprégner un petit objet de votre essence protectrice. Dépensez un nombre quelconque d'Espoir pour placer un nombre égal de jetons sur cette carte. Lorsque la personne tenant le talisman subit des dégâts, dépensez un jeton pour réduire d'un le nombre de PV qu'elle marque. Effacez tous les jetons de cette carte lorsque vous effectuez un repos."
+   },
+   {
+    "name": "Marcher entre les mondes",
+    "desc": "Pendant un moment de calme, effectuez un jet d'Incantation (13). Une fois par repos, en cas de succès, vous pouvez marquer un Stress pour franchir le voile de la mort et converser avec tout esprit à proximité. Placez un nombre de jetons égal à votre trait d'Incantation sur cette carte et retirez-en un à chaque fois qu'un esprit répond à une question. Lorsque le dernier jeton est retiré ou à la fin de la scène, vous retournez au Royaume des Mortels au même endroit où vous l'avez quitté."
+   },
+   {
+    "name": "Malédiction dérangeante",
+    "desc": "Vous avez un avantage pour les attaques contre les créatures Maudites."
+   },
+   {
+    "name": "Cercle de pouvoir",
+    "desc": "Une fois par repos, tracez un cercle au sol délimitant une zone Très rapprochée autour de vous, et placez un nombre de jetons égal à votre trait d'Incantation sur cette carte. Tant que vous êtes dans ce cercle, vous et vos alliez obtenez un bonus de +2 aux seuils de dégâts, jets d'attaque et Évasion. Retirez un jeton à chaque fois que vous ou un allié dans le cercle effectue un jet d'action ou esquive une attaque. ce sort dure jusqu'à ce que le dernier jeton soit retiré ou que vous quittiez le cercle."
+   }
+  ],
+  "img": "icons/magic/nature/root-vine-thorned-coil-green.webp"
+ },
+ {
+  "id": "h161OSIK24Up4qNd",
+  "en": "Nightwalker",
+  "fr": "Marchenuit",
+  "classEn": "Rogue",
+  "classId": "CvHlkHZfpMiCz5uT",
+  "spellcastTrait": "finesse",
+  "desc": "Jouez le Marcheur de Nuit si vous voulez manipuler les ombres pour vous déplacer dans l'environnement.",
+  "features": [
+   {
+    "name": "Pas de l'ombre",
+    "desc": "Vous pouvez vous déplacer d'une ombre à l'autre. Lorsque vous vous déplacez dans une zone de ténèbres ou une ombre projetée par une autre créature ou un objet, vous pouvez marquer un Stress pour disparaître de votre position et réapparaître dans une autre ombre à portée Éloignée. Lorsque vous réapparaissez, vous êtes Voilé."
+   },
+   {
+    "name": "Nuage de ténèbres",
+    "desc": "Effectuez un jet d'Incantation (15). En cas de succès, créez un nuage de ténèbres temporaires qui couvre n'importe quelle zone à portée Rapprochée. Quiconque est dans ce nuage ne peut pas voir à l'extérieur, et quiconque est à l'extérieur ne peut pas voir à l'intérieur. Vous êtes considéré comme Voilé pour tout adversaire pour qui le nuage bloque la ligne de vue."
+   },
+   {
+    "name": "Adrénaline",
+    "desc": "Lorsque vous êtes Vulnérable, ajoutez votre niveau à vos jets de dégâts."
+   },
+   {
+    "name": "Ombre fugace",
+    "desc": "Obtenez un bonus permanent de +1 à votre Évasion. Vous pouvez utiliser votre capacité \"Pas de l'ombre\" pour vous déplacer à portée Très éloignée."
+   },
+   {
+    "name": "Numéro",
+    "desc": "Marquez un Stress pour devenir Voilé à tout moment. Lorsque vous êtes Voilé par cette capacité, vous effacez automatiquement la condition Entravé si vous l'avez. Vous restez Voilé de cette manière jusqu'à ce que vous jetiez avec Peur ou jusqu'à votre prochain repos."
+   }
+  ],
+  "img": "icons/magic/control/buff-flight-wings-blue.webp"
+ },
+ {
+  "id": "rKRxFBlkbh9cDK8K",
+  "en": "Stalwart",
+  "fr": "Robuste",
+  "classEn": "Guardian",
+  "classId": "nRAyoC0fOzXPDa4z",
+  "spellcastTrait": null,
+  "desc": "Jouez l'Inébranlable si vous voulez encaisser des coups violents et continuer à combattre.",
+  "features": [
+   {
+    "name": "Inébranlable",
+    "desc": "Obtenez un bonus permanent de +1 à vos seuils de dégâts."
+   },
+   {
+    "name": "Volonté de Fer",
+    "desc": "Lorsque vous subissez des dégâts physiques, vous pouvez marquer un emplacement d'armure supplémentaire pour réduire la gravité."
+   },
+   {
+    "name": "Inébranlable",
+    "desc": "Gagnez un bonus permanent de +2 à vos seuils de dégâts."
+   },
+   {
+    "name": "Allié Dévoué",
+    "desc": "Quand un allié à Très courte portée subit des dégâts, vous pouvez marquer un emplacement d'armure pour réduire la gravité d'un seuil."
+   },
+   {
+    "name": "Ineffable",
+    "desc": "Gagnez un bonus permanent de +3 à vos seuils de dégâts."
+   },
+   {
+    "name": "Protecteur Loyale",
+    "desc": "Quand un allié à courte portée a 2 PV ou moins et doit subir des dégâts, vous pouvez marquer un Stress pour courir à ses côtés et subir les dégâts à sa place."
+   }
+  ],
+  "img": "icons/magic/holy/barrier-shield-winged-blue.webp"
+ },
+ {
+  "id": "qqQlgCqhOivUFoQn",
+  "en": "School Of Knowledge",
+  "fr": "École du savoir",
+  "classEn": "Wizard",
+  "classId": "5LwX4m8ziY3F1ZGC",
+  "spellcastTrait": "knowledge",
+  "desc": "Jouez l'École du Savoir si vous souhaitez avoir une compréhension aiguë du monde qui vous entoure.",
+  "features": [
+   {
+    "name": "Préparé",
+    "desc": "Prenez une carte de domaine supplémentaire de votre niveau ou inférieur d'un domaine auquel vous avez accès."
+   },
+   {
+    "name": "Adepte",
+    "desc": "Lorsque vous Utilisez une Expérience, vous pouvez marquer un Stress au lieu de dépenser un Espoir. Si vous le faites, doublez votre modificateur d'Expérience pour ce jet."
+   },
+   {
+    "name": "Accompli",
+    "desc": "Prenez une carte de domaine supplémentaire de votre niveau ou inférieur d'un domaine auquel vous avez accès."
+   },
+   {
+    "name": "Rappel Parfait",
+    "desc": "Une fois par repos, lorsque vous rappelez une carte de domaine dans votre caveau, vous pouvez réduire son Prix de rappel de 1."
+   },
+   {
+    "name": "Brillant",
+    "desc": "Prenez une carte de domaine supplémentaire de votre niveau ou inférieur d'un domaine auquel vous avez accès."
+   },
+   {
+    "name": "Expert Aiguisé",
+    "desc": "Lorsque vous utilisez une Expérience, lancez un d6. Sur un résultat de 5 ou plus, vous pouvez l'utiliser sans dépenser d'Espoir."
+   }
+  ],
+  "img": "icons/sundries/books/book-tooled-blue-yellow.webp"
+ },
+ {
+  "id": "NAFU9roaVG7f3RNJ",
+  "en": "Call Of The Brave",
+  "fr": "Appel du brave",
+  "classEn": "Warrior",
+  "classId": "xCUWwJz4WSthvLfy",
+  "spellcastTrait": null,
+  "desc": "Jouez l'Appel du Brave si vous souhaitez utiliser la puissance de vos ennemis pour alimenter votre propre force.",
+  "features": [
+   {
+    "name": "Courage",
+    "desc": "Lorsque vous échouez à un jet avec Peur, vous gagnez un Espoir."
+   },
+   {
+    "name": "Rituel de combat",
+    "desc": "Une fois par long repos, avant d'entreprendre quelque chose d'incroyablement dangereux ou d'affronter un adversaire qui vous surclaire de toute évidence, décrivez le rituel que vous effectuez ou les préparatifs que vous faites. Lorsque vous le faites, cochez 2 Stress et gagnez 2 Espoir."
+   },
+   {
+    "name": "S'élever au défi",
+    "desc": "Vous êtes vigilant face au danger croissant. Lorsque vous avez 2 PV ou moins non cochés, vous pouvez lancer un d20 comme votre Dé d'Espoir."
+   },
+   {
+    "name": "Camaraderie",
+    "desc": "Votre bravoure inébranlable est un point de ralliement pour vos alliés. Vous pouvez initier un Jet d'Équipe une fois supplémentaire par session. De plus, lorsque vous initiez un Jet d'Équipe avec un allié, il n'a besoin de dépenser que 2 Espoir pour le faire."
+   }
+  ],
+  "img": "icons/magic/life/heart-cross-strong-flame-purple-orange.webp"
+ },
+ {
+  "id": "ld8MIvk0xVJydSBz",
+  "en": "Troubadour",
+  "fr": "Troubadour",
+  "classEn": "Bard",
+  "classId": "vegl3bFOq3pcFTWT",
+  "spellcastTrait": "presence",
+  "desc": "Jouez le Troubadour si vous voulez jouer de la musique pour soutenir vos alliés.",
+  "features": [
+   {
+    "name": "Artiste accompli",
+    "desc": "Vous pouvez jouer trois types de chansons différents, une fois chacun par long repos ; décrivez comment vous jouez pour obtenir le bénéfice indiqué :\nChanson relaxante : Vous et tous les alliés à portée Rapprochée cochez un PV.\nChanson épique : Rendez une cible à portée Rapprochée temporairement Vulnérable.\nChanson déchirante : Vous et tous les alliés à portée Rapprochée gagnez un Espoir."
+   },
+   {
+    "name": "Maestro",
+    "desc": "Vos chants de ralliement galvanisent le courage de ceux qui écoutent. Lorsque vous donnez un Dé de Ralliement à un allié, il peut gagner un Espoir ou cocher un Stress."
+   },
+   {
+    "name": "Virtuose",
+    "desc": "Vous êtes parmi les plus grands de votre art et votre compétence est sans bornes. Vous pouvez jouer chacune des chansons de votre aptitude \"Artiste accompli\" deux fois par long repos."
+   }
+  ],
+  "img": "icons/tools/instruments/harp-gold-glowing.webp"
+ },
+ {
+  "id": "XTSODVM8st75Os8M",
+  "en": "Wordsmith",
+  "fr": "Génie des mots",
+  "classEn": "Bard",
+  "classId": "vegl3bFOq3pcFTWT",
+  "spellcastTrait": "presence",
+  "desc": "Jouez le Parleur de mots si vous voulez utiliser des jeux de mots astucieux et captiver les foules.",
+  "features": [
+   {
+    "name": "Cœur de poète",
+    "desc": "Après avoir effectué un jet d'action pour impressionner, persuader ou offenser quelqu'un, vous pouvez dépenser un Espoir pour ajouter un d4 au jet."
+   },
+   {
+    "name": "Discours inspirant",
+    "desc": "Une fois par long repos, vous pouvez prononcer un discours inspiré et sincère. Tous les alliés à portée Éloignée cochent 2 Stress."
+   },
+   {
+    "name": "Éloquent",
+    "desc": "Vos paroles touchantes boostent le moral. Une fois par session, lorsque vous encouragez un allié, vous pouvez faire l'une des actions suivantes :\nLui permettre de trouver un objet ordinaire ou un outil dont il a besoin.\nAider un allié sans dépenser d'Espoir.\nLui donner un déplacement de temps mort supplémentaire lors de son prochain repos."
+   },
+   {
+    "name": "Poésie épique",
+    "desc": "Votre Dé de Ralliement augmente à un d10. De plus, lorsque vous Aidez un allié, vous pouvez narrer le moment comme si vous écriviez l'histoire de son héroïsme dans un mémoire. Lorsque vous le faites, lancez un d10 comme votre dé d'avantage."
+   }
+  ],
+  "img": "icons/tools/scribal/ink-quill-red.webp"
+ },
+ {
+  "id": "M5mpGoAj8LRkylrY",
+  "en": "Divine Wielder",
+  "fr": "Arme divine",
+  "classEn": "Seraph",
+  "classId": "5ZnlJ5bEoyOTkUJv",
+  "spellcastTrait": "strength",
+  "desc": "Jouez le Porteur Divin si vous voulez dominer le champ de bataille avec une arme légendaire.",
+  "features": [
+   {
+    "name": "Arme Spirituelle",
+    "desc": "Lorsque vous avez une arme équipée d'une portée de Mêlée ou Très rapprochée, elle peut s'envoler de votre main pour attaquer un adversaire à portée Rapprochée puis revenir vers vous. Vous pouvez marquer un Stress pour cibler un autre adversaire à portée avec le même jet d'attaque."
+   },
+   {
+    "name": "Toucher Clément",
+    "desc": "Une fois par long repos, touchez une créature et effacez 2 PV ou 2 Stress d'elle."
+   },
+   {
+    "name": "Dévot",
+    "desc": "Lorsque vous lancez vos Dés de Prière, vous pouvez lancer un dé supplémentaire et écarter le résultat le plus bas. De plus, vous pouvez utiliser votre capacité \"Toucher Clément\" deux fois au lieu d'une fois par long repos."
+   },
+   {
+    "name": "Résonance Sacrée",
+    "desc": "Lorsque vous lancez des dégâts pour votre capacité \"Arme Spirituelle\", si les résultats des dés correspondent, doublez la valeur de chaque dé correspondant. Par exemple, si vous lancez deux 5, ils comptent comme deux 10."
+   }
+  ],
+  "img": "icons/weapons/swords/sword-gold-holy.webp"
+ },
+ {
+  "id": "bcNe5qP3o6CKadhK",
+  "en": "Call Of The Slayer",
+  "fr": "Appel du tueur",
+  "classEn": "Warrior",
+  "classId": "xCUWwJz4WSthvLfy",
+  "spellcastTrait": null,
+  "desc": "Jouez l'Appel du Tueur si vous voulez abattre des adversaires avec une force immense.",
+  "features": [
+   {
+    "name": "Tueur",
+    "desc": "Vous obtenez un pool de dés appelés Dés de Tueur. Sur un jet avec Espoir, vous pouvez placer un d6 sur cette carte au lieu de gagner un Espoir, ajoutant le dé au pool. Vous pouvez stocker un nombre de Dés de Tueur égal à votre Maîtrise. Lorsque vous effectuez un jet d'attaque ou un jet de dégâts, vous pouvez dépenser n'importe quel nombre de ces Dés de Tueur, en les lançant et en ajoutant leur résultat au jet. À la fin de chaque session, effacez tous les Dés de Tueur non dépensés sur cette carte et gagnez un Espoir par dé effacé."
+   },
+   {
+    "name": "Spécialiste en Armes",
+    "desc": "Vous pouvez manier plusieurs armes avec une facilité redoutable. Lorsque vous réussissez une attaque, vous pouvez dépenser un Espoir pour ajouter un dé de dégâts de votre arme secondaire au jet de dégâts. De plus, une fois par long repos lorsque vous lancez vos Dés de Tueur, relancez tous les 1."
+   },
+   {
+    "name": "Préparation Martiale",
+    "desc": "Vous êtes un guerrier inspirant pour tous ceux qui voyagent avec vous. Votre groupe obtient l'accès à la capacité de temps mort Préparation Martiale. Pour utiliser cette capacité pendant un repos, décrivez comment vous instruez et entraînez votre groupe. Vous et chaque allié choisissant cette capacité de temps mort obtiennent un dé de Tueur d6. Un PJ avec un dé de Tueur peut le dépenser pour lancer le dé et ajouter le résultat à un jet d'attaque ou de dégâts de son choix."
+   }
+  ],
+  "img": "icons/skills/melee/weapons-crossed-swords-yellow.webp"
+ },
+ {
+  "id": "QdoKFfErTEgx6326",
+  "en": "Martial Artist",
+  "fr": "Artiste martial",
+  "classEn": "Brawler",
+  "classId": "0Qw2heB75eXNV4SM",
+  "spellcastTrait": null,
+  "desc": "Jouez le Artiste Martial si vous voulez utiliser une variété de styles de combat pour éliminer vos ennemis.",
+  "features": [
+   {
+    "name": "Combattant en Posture",
+    "desc": "Vous pouvez canaliser votre résolution intérieure pour adopter des postures martiales qui vous confèrent des bénéfices spéciaux au combat.\nPrenez la feuille des Postures Martiales et choisissez deux postures de Niveau 1. Chaque fois que vous montez de niveau votre personnage, choisissez une posture supplémentaire de votre niveau ou inférieur.\nActuellement, l'implémentation consiste simplement à prendre les postures que vous voulez depuis le Compendium —> Sous-Classes —> Capacités de Sous-Classe —> Postures Martiales"
+   },
+   {
+    "name": "Défenses Aiguisées",
+    "desc": "Lorsque vous êtes la cible d'une attaque, vous pouvez dépenser une Concentration pour obtenir un bonus à votre Évasion égal à votre niveau contre l'attaque."
+   },
+   {
+    "name": "Canon de Concentration",
+    "desc": "Dépensez une Concentration pour effectuer un jet d'Instinct contre un adversaire à portée Éloignée. En cas de succès, infligez d20+3 dégâts magiques en utilisant votre Maîtrise."
+   },
+   {
+    "name": "Briseur de Limites",
+    "desc": "Une fois par repos, vous pouvez accomplir un exploit athlétique incroyable, comme courir sur l'eau, sauter entre des toits éloignés ou escalader un bâtiment sans avoir à lancer de dé. Lorsque vous le faites, gagnez un Espoir et effacez un Stress."
+   },
+   {
+    "name": "État de Flux",
+    "desc": "Vous pouvez marquer un Stress au lieu de dépenser une Concentration pour changer de posture. De plus, vous pouvez dépenser une Concentration au lieu de marquer un Stress pour initier une frappe combo."
+   }
+  ],
+  "img": "icons/magic/holy/meditation-chi-focus-blue.webp"
+ },
+ {
+  "id": "TIUsIlTS1WkK5vr2",
+  "en": "Beastbound",
+  "fr": "Compagnon des bêtes",
+  "classEn": "Ranger",
+  "classId": "BTyfve69LKqoOi9S",
+  "spellcastTrait": "agility",
+  "desc": "Jouez le Bête-Liée si vous souhaitez nouer un lien profond avec un allié animal.",
+  "features": [
+   {
+    "name": "Compagnon",
+    "desc": "Vous avez un compagnon animal de votre choix (à la discrétion du MJ). Il reste à vos côtés à moins que vous ne lui en disiez autrement. Prenez la fiche de Compagnon Ranger. Lorsque vous montez de niveau avec votre personnage, choisissez une option de montée de niveau pour votre compagnon sur cette fiche également."
+   },
+   {
+    "name": "Entraînement d'expert",
+    "desc": "Choisissez une option de montée de niveau supplémentaire pour votre compagnon."
+   },
+   {
+    "name": "Lien de combat",
+    "desc": "Quand un adversaire vous attaque alors qu'il est à portée Mêlée de votre compagnon, vous obtenez un bonus de +2 à votre Évitement contre l'attaque."
+   },
+   {
+    "name": "Entraînement avancé",
+    "desc": "Choisissez deux options de montée de niveau supplémentaires pour votre compagnon."
+   },
+   {
+    "name": "Ami loyal",
+    "desc": "Une fois par long repos, lorsque les dégâts d'une attaque marqueraient le dernier Stress de votre compagnon ou votre dernier PV et que vous êtes à portée Rapprochée l'un de l'autre, vous ou votre compagnon pouvez vous précipiter vers l'autre et subir ces dégâts à sa place."
+   }
+  ],
+  "img": "icons/creatures/mammals/elk-moose-marked-green.webp"
+ },
+ {
+  "id": "y7ERWRIpJsdP9Re4",
+  "en": "Winged Sentinel",
+  "fr": "Sentinelle ailée",
+  "classEn": "Seraph",
+  "classId": "5ZnlJ5bEoyOTkUJv",
+  "spellcastTrait": "strength",
+  "desc": "Jouez le Sentinelier Ailé si vous souhaitez prendre votre envol et assener des coups dévastateurs depuis le ciel.",
+  "features": [
+   {
+    "name": "Ailes de lumière",
+    "desc": "Vous pouvez voler. En volant, vous pouvez faire ce qui suit :\nMarquer un Stress pour soulever et transporter une autre créature consentante d'une taille à peu près la vôtre ou plus petite.\nDépenser un Espoir pour infliger 1d8 dégâts supplémentaires sur une attaque réussie."
+   },
+   {
+    "name": "Visage éthéré",
+    "desc": "Votre apparence surnaturelle inspire l'admiration et la peur. En volant, vous avez un avantage sur les jets de Présence. Quand vous réussissez avec de l'Espoir sur un jet de Présence, vous pouvez retirer une Peur du pool de Peur du MJ au lieu de gagner de l'Espoir."
+   },
+   {
+    "name": "Ascension",
+    "desc": "Obtenez un bonus permanent de +4 à votre seuil de dégâts Grave."
+   },
+   {
+    "name": "Puissance des dieux",
+    "desc": "En volant, vous infligez 1d12 dégâts supplémentaires au lieu de 1d8 grâce à votre aptitude \\\"Ailes de lumière\\\"."
+   }
+  ],
+  "img": "icons/magic/holy/angel-winged-humanoid-blue.webp"
+ },
+ {
+  "id": "W9hs5kxOWeY7eA4Q",
+  "en": "Warden of the Elements",
+  "fr": "Protecteur des éléments",
+  "classEn": "Druid",
+  "classId": "ZNwUTCyGCEcidZFv",
+  "spellcastTrait": "instinct",
+  "desc": "Jouez le Gardien des Éléments si vous souhaitez incarner les éléments naturels de la nature.",
+  "features": [
+   {
+    "name": "Incarnation élémentaire",
+    "desc": "Marquez un Stress pour Incarner l'un des éléments suivants jusqu'à subir des dégâts Graves ou jusqu'à votre prochain repos :\nFeu : Quand un adversaire à portée Mêlée vous inflige des dégâts, il subit 1d10 dégâts magiques.\nTerre : Obtenez un bonus à vos seuils de dégâts égal à votre Maîtrise.\nEau : Quand vous infligez des dégâts à un adversaire à portée Mêlée, tous les autres adversaires à portée Très rapprochée doivent marquer un Stress.\nAir : Vous pouvez vous maintenir en suspension, obtenant un avantage sur les jets d'Agilité."
+   },
+   {
+    "name": "Aura élémentaire",
+    "desc": "Une fois par repos en Incarnant, vous pouvez assumer une aura correspondant à votre élément. L'aura affecte les cibles à portée Rapprochée jusqu'à la fin de votre Incarnation.\nFeu : Quand un adversaire marque 1 ou plusieurs PV, il doit également marquer un Stress.\nTerre : Vos alliés obtiennent un bonus de +1 en Force.\nEau : Quand un adversaire vous inflige des dégâts, vous pouvez marquer un Stress pour le déplacer n'importe où à portée Très rapprochée de sa position actuelle.\nAir : Quand vous ou un allié subissez des dégâts d'une attaque au-delà de la portée Mêlée, réduisez les dégâts de 1d8."
+   },
+   {
+    "name": "Domination élémentaire",
+    "desc": "Vous incarnez davantage votre élément. Lorsque vous Canalisez, vous bénéficiez des effets suivants :\nFeu : Vous obtenez un bonus de +1 à votre Maîtrise pour les attaques et sorts infligeant des dégâts.\nTerre : Lorsque vous marquez des PV, lancez un d6 par PV marqué. Pour chaque résultat de 6, réduisez de 1 le nombre de PV que vous marquez.\nEau : Lorsqu'une attaque contre vous réussit, vous pouvez marquer un Stress pour rendre l'attaquant temporairement Vulnérable.\nAir : Vous obtenez un bonus de +1 à votre Esquive et vous pouvez voler."
+   }
+  ],
+  "img": "icons/magic/nature/root-vines-face-glow-green.webp"
+ },
+ {
+  "id": "xp0XMjYT85Q7E90o",
+  "en": "Warden of Renewal",
+  "fr": "Protecteur du renouveau",
+  "classEn": "Druid",
+  "classId": "ZNwUTCyGCEcidZFv",
+  "spellcastTrait": "instinct",
+  "desc": "Jouez le Gardien du Renouveau si vous souhaitez utiliser une puissante magie pour guérir votre groupe.",
+  "features": [
+   {
+    "name": "Pureté de la Nature",
+    "desc": "Une fois par long repos, vous pouvez créer un espace de sérénité naturelle à portée Rapprochée. Lorsque vous passez quelques minutes à vous reposer dans l'espace, effacez un Stress égal à votre Instinct, réparti comme vous le souhaitez entre vous et vos alliés."
+   },
+   {
+    "name": "Régénération",
+    "desc": "Touchez une créature et dépensez 3 Espoir. Cette créature efface 1d4 PV."
+   },
+   {
+    "name": "Portée régénérante",
+    "desc": "Vous pouvez cibler des créatures à portée Très rapprochée avec votre aptitude « Régénération »."
+   },
+   {
+    "name": "Protection du gardien",
+    "desc": "Une fois par long repos, dépensez 2 Espoir pour effacer 2 PV sur 1d4 alliés à portée Rapprochée."
+   },
+   {
+    "name": "Défenseur",
+    "desc": "Votre transformation en animal incarne un esprit gardien guérisseur. Lorsque vous êtes en Forme de bête et qu'un allié à portée Rapprochée marque 2 PV ou plus, vous pouvez marquer un Stress pour réduire de 1 le nombre de PV qu'il marque."
+   }
+  ],
+  "img": "icons/magic/nature/leaf-juggle-humanoid-green.webp"
+ },
+ {
+  "id": "zsUglcU4NgZ8tNgZ",
+  "en": "Wayfinder",
+  "fr": "Explorateur",
+  "classEn": "Ranger",
+  "classId": "BTyfve69LKqoOi9S",
+  "spellcastTrait": "agility",
+  "desc": "Jouez le Guide si vous voulez traquer votre proie et frapper avec une force mortelle.",
+  "features": [
+   {
+    "name": "Prédateur impitoyable",
+    "desc": "Lorsque vous effectuez un jet de dégâts, vous pouvez marquer un Stress pour obtenir un bonus de +1 à votre Compétence. De plus, lorsque vous infligez des dégâts Grave à un adversaire, celui-ci doit marquer un Stress."
+   },
+   {
+    "name": "Piste en avant",
+    "desc": "Lorsque vous vous rendez dans un lieu que vous avez déjà visité ou que vous transportez un objet qui s'y trouvait auparavant, vous pouvez déterminer le chemin le plus court et le plus direct vers votre destination."
+   },
+   {
+    "name": "Prédateur insaisissable",
+    "desc": "Lorsque votre Focalisation vous attaque, vous obtenez un bonus de +2 à votre Évitement contre l'attaque."
+   },
+   {
+    "name": "Prédateur suprême",
+    "desc": "Avant d'effectuer un jet d'attaque contre votre Focalisation, vous pouvez dépenser un Espoir. En cas d'attaque réussie, vous retirez une Peur du pool de Peur du MJ."
+   }
+  ],
+  "img": "icons/environment/wilderness/mine-interior-dungeon-door.webp"
+ },
+ {
+  "id": "9zyjac09CXquXQSo",
+  "en": "Juggernaut",
+  "fr": "Colosse",
+  "classEn": "Brawler",
+  "classId": "0Qw2heB75eXNV4SM",
+  "spellcastTrait": null,
+  "desc": "Jouez le Juggernaut si vous voulez réduire vos adversaires en bouillie avec des coups écrasants.",
+  "features": [
+   {
+    "name": "Rustique",
+    "desc": "Obtenez un bonus permanent de +3 à votre seuil de dégâts Grave."
+   },
+   {
+    "name": "Submerger",
+    "desc": "Lorsque vous réussissez un jet d'action contre une cible, vous pouvez dépenser un Espoir pour projeter la cible dans une portée Rapprochée ou pour lui faire marquer un Stress."
+   },
+   {
+    "name": "Cerné",
+    "desc": "Lorsque vous effectuez une attaque avec une arme de Mêlée, vous pouvez dépenser un nombre quelconque d'Espoir pour cibler un nombre égal de créatures supplémentaires dans la portée de Mêlée."
+   },
+   {
+    "name": "Œil pour Œil",
+    "desc": "Une fois par repos, lorsqu'un adversaire dans la portée de Mêlée vous force à marquer un nombre quelconque de PV, vous pouvez marquer un Stress pour le forcer à marquer le même nombre de PV."
+   },
+   {
+    "name": "Frapjoie",
+    "desc": "Lorsque vous réussissez un jet d'action avec une arme de Mêlée, vous gagnez un Espoir supplémentaire, vous effacez un Stress supplémentaire et vous obtenez un bonus de +1 à votre Maîtrise pour cette attaque."
+   },
+   {
+    "name": "Pas encore terminé",
+    "desc": "Lorsque vous subissez des dégâts Majeurs, vous pouvez gagner un Espoir ou effacer un Stress."
+   }
+  ],
+  "img": "icons/creatures/magical/construct-iron-stomping-yellow.webp"
+ },
+ {
+  "id": "4x8jiolc2hhs41dt",
+  "en": "Poisoners Guild",
+  "fr": "Guilde des empoisonneurs",
+  "classEn": "Assassin",
+  "classId": "0EFzupppM47Bl6Yw",
+  "spellcastTrait": "knowledge",
+  "desc": "Jouez la Guilde des Empoisonneurs si vous souhaitez affaiblir vos cibles avec des afflictions punitives.",
+  "features": [
+   {
+    "name": "Concoctions Toxiques",
+    "desc": "Marquez un Stress pour placer 1d4+1 jetons sur cette carte. Lorsque vous effectuez une attaque à l'arme réussie, vous pouvez dépenser un jeton pour affliger la cible d'un poison. Vous connaissez ces poisons :\nPétale Fantôme : La cible devient temporairement Vulnérable.\nSporde Tombe : La cible doit aussi marquer un Stress.\nHerbe Sangsue : Vous infligez 1d6 dégâts supplémentaires sur cette attaque.\nLorsque vous effectuez un long repos, effacez tous les jetons non dépensés."
+   },
+   {
+    "name": "Compendium de Poisons",
+    "desc": "Vous connaissez aussi ces poisons :\nVigne de Minuit : La cible a un désavantage sur ses jets d'attaque jusqu'à ce qu'elle marque un Stress pour effacer cet état.\nRacine Gorgone : La cible devient temporairement Entravée."
+   },
+   {
+    "name": "Double Crochet",
+    "desc": "Lorsque vous affligez une cible Marquée à Mort d'un poison que vous connaissez, vous pouvez dépenser un jeton supplémentaire pour aussi infliger l'effet d'un deuxième poison que vous connaissez."
+   },
+   {
+    "name": "Veninomancien",
+    "desc": "Vous connaissez aussi ces poisons :\nGraine de Fléau : La cible subit une pénalité de -3 à ses seuils de dégâts jusqu'à la fin de la scène. Cet effet ne peut pas s'accumuler.\nFeuille de Peur : Vous infligez des dégâts supplémentaires égaux au résultat de votre Dé de Peur sur cette attaque.\nÉpine de Cadavre : La cible a un désavantage sur ses jets de Réaction jusqu'à la fin de la scène."
+   },
+   {
+    "name": "Bénédiction de l'Adder",
+    "desc": "Vous êtes immunisé contre les poisons et autres toxines."
+   }
+  ],
+  "img": "icons/skills/toxins/cup-goblet-poisoned-spilled.webp"
+ },
+ {
+  "id": "GLpRVxnY5E82khxH",
+  "en": "Primal Origin",
+  "fr": "Origine primordiale",
+  "classEn": "Sorcerer",
+  "classId": "DchOzHcWIJE9FKcR",
+  "spellcastTrait": "instinct",
+  "desc": "Jouez l'Origine Primale si vous souhaitez étendre la polyvalence de vos sorts de puissantes manières.",
+  "features": [
+   {
+    "name": "Charge Arcanique",
+    "desc": "Vous pouvez accumuler de l'énergie magique pour améliorer vos capacités. Lorsque vous subissez des dégâts magiques, vous devenu Chargé. Alternativement, vous pouvez dépenser 2 Espoir pour devenir Chargé. Lorsque vous effectuez avec succès une attaque qui inflige des dégâts magiques tout en étant Chargé, vous pouvez effacer votre Charge pour soit obtenir un bonus de +10 au jet de dégâts, soit obtenir un bonus de +3 à la Difficulté d'un jet de Réaction que le sort impose à la cible. Vous n'êtes plus Chargé à votre prochain long repos."
+   },
+   {
+    "name": "Aide enchantée",
+    "desc": "Vous pouvez améliorer la magie des autres avec votre essence. Lorsque vous Aidez un Allié avec un jet d'Incantation, vous pouvez lancer un d8 comme votre dé d'avantage. Une fois par long repos, après qu'un allié a effectué un jet d'Incantation avec votre aide, vous pouvez échanger les résultats de leurs Dés de Dualité."
+   },
+   {
+    "name": "Manipuler la magie",
+    "desc": "Votre origine primale vous permet de modifier l'essence même de la magie. Après avoir lancé un sort ou effectué une attaque avec une arme infligeant des dégâts magiques, vous pouvez marquer un Stress pour faire l'une des actions suivantes :\nÉtendre la portée du sort ou de l'attaque d'une portée\nGagner un bonus de +2 au résultat du jet d'action\nDoublez un dé de dégâts de votre choix\nToucher une cible supplémentaire dans la portée"
+   }
+  ],
+  "img": "icons/magic/fire/flame-burning-hand-purple.webp"
+ },
+ {
+  "id": "4y9Ph7RsCIAbkwTk",
+  "en": "School Of War",
+  "fr": "École de la guerre",
+  "classEn": "Wizard",
+  "classId": "5LwX4m8ziY3F1ZGC",
+  "spellcastTrait": "knowledge",
+  "desc": "Jouez l'École de Guerre si vous souhaitez utiliser la magie entraînée pour la violence.",
+  "features": [
+   {
+    "name": "Mage de guerre",
+    "desc": "Vous avez concentré vos études pour devenir une force inarrêtable sur le champ de bataille. Gagnez un emplacement de PV supplémentaire."
+   },
+   {
+    "name": "Affrontez votre peur",
+    "desc": "Lorsque vous réussissez avec de la Peur sur un jet d'attaque, vous infligez 1d10 dégâts magiques supplémentaires."
+   },
+   {
+    "name": "Conjurer un bouclier",
+    "desc": "Vous pouvez maintenir un bouclier protectif de magie. Tant que vous avez au moins 2 Espoir, vous ajoutez votre Compétence à votre Évitement."
+   },
+   {
+    "name": "Alimenté par la peur",
+    "desc": "Les dégâts magiques supplémentaires de votre aptitude « Affrontez votre peur » augmentent à 2d10."
+   },
+   {
+    "name": "S'épanouir dans le chaos",
+    "desc": "Lorsque vous réussissez une attaque, vous pouvez marquer un Stress après avoir lancé les dégâts pour forcer la cible à marquer un PV supplémentaire."
+   },
+   {
+    "name": "Aucune peur",
+    "desc": "Les dégâts magiques supplémentaires de votre aptitude « Affrontez votre peur » augmentent à 3d10."
+   }
+  ],
+  "img": "icons/magic/fire/dagger-rune-enchant-flame-strong-blue.webp"
+ },
+ {
+  "id": "icIkkMKmVmq1WgRz",
+  "en": "Moon",
+  "fr": "Lune",
+  "classEn": "Witch",
+  "classId": "HHAmaNZDicgkill5",
+  "spellcastTrait": "instinct",
+  "desc": "Jouez la Lune si vous souhaitez incarner un pouvoir céleste pour amplifier votre magie.",
+  "features": [
+   {
+    "name": "Glamour de la nuit",
+    "desc": "Effectuez un Jet d'Incantation (13) pour vous voiler d'un fascinant déguisement. Tant que vous êtes Voilé, vous avez l'avantage sur les jets qui exploitent votre apparence illusoire. De plus, les adversaires à portée Rapprochée doivent marquer un Stress pour vous attaquer.\nSauf si vous marquez un Stress pour maintenir votre Voile, il disparaît lorsque vous marquez un PV ou infligez des dégâts."
+   },
+   {
+    "name": "Rayon lunaire",
+    "desc": "Une fois par session, vous pouvez convoquer un pilier de lune qui éclaire la zone à portée Rapprochée jusqu'à la fin de la scène. Alors que vous et vos alliés êtes baignés de cette lune, vous gagnez un bonus de +1 aux Jets d'Incantation et pouvez voir à travers les illusions."
+   },
+   {
+    "name": "Iris de la lumière pâle",
+    "desc": "Quand une créature Maudite à portée Très éloignée rate une attaque, elle doit marquer un Stress."
+   },
+   {
+    "name": "Phases lunaires",
+    "desc": "Au début de chaque session, lancez un [[/r d6]] et posez-le sur cette carte. Vous bénéficiez de l'effet correspondant jusqu'à la fin de la session.\nLance\nPhase\nEffet\n1\nNouvelle\nDépensez un Espoir pour annuler des dégâts Majeurs.\n2–3\nCroissante\n+2 aux jets de dégâts\n4\nPleine\n+3 aux seuils de dégâts\n5–6Décroissante\n+1 à l'Évitement\nUne fois par repos, vous pouvez dépenser un Espoir pour augmenter la valeur de ce dé de un. Si vous augmentez la valeur d'un 6, il devient un 1."
+   }
+  ],
+  "img": "icons/magic/nature/moon-crescent.webp"
+ },
+ {
+  "id": "F8uUCjTnvw57oNuQ",
+  "en": "Executioners Guild",
+  "fr": "Guilde des exécuteurs",
+  "classEn": "Assassin",
+  "classId": "0EFzupppM47Bl6Yw",
+  "spellcastTrait": "agility",
+  "desc": "Jouez la Guilde des Exécuteurs si vous souhaitez abattre vos cibles avec une précision mortelle.",
+  "features": [
+   {
+    "name": "Premier Coup",
+    "desc": "La première fois dans une scène où vous réussissez un jet d'attaque, vous infligez des dégâts doubles."
+   },
+   {
+    "name": "Embuscade",
+    "desc": "Votre aptitude « Marqué pour la Mort » utilise des dés d6 au lieu de dés d4."
+   },
+   {
+    "name": "Coup de Mort",
+    "desc": "Lorsque vous infligez des dégâts Grave à une créature, vous pouvez marquer un Stress pour l'obliger à marquer un PV supplémentaire."
+   },
+   {
+    "name": "Poison du Scorpion",
+    "desc": "Vous obtenez un bonus de +2 à votre Évasion contre les attaques effectuées par une créature que vous avez « Marqué pour la Mort »."
+   },
+   {
+    "name": "Vraie Visée",
+    "desc": "Une fois par long repos, lorsque vous ratez une attaque, vous pouvez dépenser un Espoir pour la transformer en succès."
+   },
+   {
+    "name": "Coup de Poignard",
+    "desc": "Votre aptitude « Marqué pour la Mort » utilise des dés d8 au lieu de dés d6."
+   }
+  ],
+  "img": "icons/skills/melee/strike-dagger-blood-red.webp"
+ },
+ {
+  "id": "wg1H0hROc2acHwZh",
+  "en": "Elemental Origin",
+  "fr": "Origine élémentaire",
+  "classEn": "Sorcerer",
+  "classId": "DchOzHcWIJE9FKcR",
+  "spellcastTrait": "instinct",
+  "desc": "Jouez l'Origine Élémentaire si vous souhaitez canaliser de la magie brute pour\nprendre la forme d'un élément spécifique.",
+  "features": [
+   {
+    "name": "Élémentaliste",
+    "desc": "Choisissez l'un des éléments suivants à la création du personnage : air, terre, feu, foudre, eau.\nVous pouvez façonner cet élément en des effets inoffensifs. De plus, dépensez un Espoir et décrivez comment votre maîtrise de cet élément aide un jet d'action que vous êtes sur le d'effectuer. Vous obtenez alors soit un bonus de +2 au jet, soit un bonus de +3 aux dégâts du jet."
+   },
+   {
+    "name": "Esquive Naturelle",
+    "desc": "Vous pouvez invoquer votre élément pour vous protéger du danger. Lorsqu'un jet d'attaque contre vous réussit, vous pouvez marquer un Stress et décrire comment vous utilisez votre élément pour vous défendre. Lorsque vous le faites, lancez un d6 et ajoutez son résultat à votre Évasion contre l'attaque."
+   },
+   {
+    "name": "Transcendance",
+    "desc": "Une fois par long repos, vous pouvez vous transformer en manifestation physique de votre élément. Lorsque vous le faites, décrivez votre transformation et choisissez deux des avantages suivants à obtenir jusqu'à votre prochain repos :\n+4 bonus à votre seuil de dégâts Grave\n+1 bonus à un trait de personnage de votre choix\n+1 bonus à votre Maîtrise\n+2 bonus à votre Évasion"
+   }
+  ],
+  "img": "icons/magic/water/orb-water-ice-pink.webp"
+ },
+ {
+  "id": "SUo8NPBPO8aN193u",
+  "en": "Vengeance",
+  "fr": "Vengeur",
+  "classEn": "Guardian",
+  "classId": "nRAyoC0fOzXPDa4z",
+  "spellcastTrait": null,
+  "desc": "Jouez la Vengeance si vous souhaitez abattre les ennemis qui vous ou vos alliés font du tort.",
+  "features": [
+   {
+    "name": "À l'Aise",
+    "desc": "Gagnez un emplacement de Stress supplémentaire."
+   },
+   {
+    "name": "Vengeance",
+    "desc": "Lorsqu'un adversaire à portée Mêlée réussit une attaque contre vous, vous pouvez marquer 2 Stress pour obliger l'attaquant à marquer un PV."
+   },
+   {
+    "name": "Acte de Riposte",
+    "desc": "Quand un adversaire blesse un allié à portée de Mêlée, vous obtenez un bonus de +1 à votre Compétence pour votre prochaine attaque réussie contre cet adversaire."
+   },
+   {
+    "name": "Némésis",
+    "desc": "Dépensez 2 Espoir pour Prioriser un adversaire jusqu'à votre prochain repos. Lorsque vous effectuez une attaque contre votre adversaire Prioritaire, vous pouvez échanger les résultats de vos Dés d'Espoir et de Peur. Vous ne pouvez Prioriser qu'un adversaire à la fois."
+   }
+  ],
+  "img": "icons/magic/unholy/silhouette-evil-horned-giant.webp"
+ },
+ {
+  "id": "95QxNZwgyEm1LqdG",
+  "en": "Syndicate",
+  "fr": "Syndicat",
+  "classEn": "Rogue",
+  "classId": "CvHlkHZfpMiCz5uT",
+  "spellcastTrait": "finesse",
+  "desc": "Jouez le Syndic si vous voulez disposer d'un réseau de contacts partout où vous allez.",
+  "features": [
+   {
+    "name": "Bien Connecté",
+    "desc": "Quand vous arrivez dans une ville ou un environnement notoire, vous connaissez quelqu'un qui appelle cet endroit son foyer. Donnez-lui un nom, notez en quoi il pourrait être utile et choisissez un fait parmi la liste suivante :\\nIls me doivent une faveur, mais ils seront difficiles à trouver.\\nIls demanderont quelque chose en échange.\\nIls sont toujours dans de sacrés ennuis.\\nNous étions ensemble autrefois. C'est une longue histoire.\\nNous ne nous sommes pas quittés sur de bonnes bases."
+   },
+   {
+    "name": "Contacts Partout",
+    "desc": "Une fois par session, vous pouvez brièvement faire appel à un contact douteux. Choisissez l'un des avantages suivants et décrivez ce qui l'a amené à vous aider dans ce moment :\\nIls vous fournissent  poignées d'or, un outil unique ou un objet banal que la situation requiert.\\nSur votre prochain jet d'action, leur aide vous octroie un bonus de +3 au résultat de votre Dé d'Espoir ou de Peur.\\nLa prochaine fois que vous infligerez des dégâts, ils tirent dans l'ombre, ajoutant 2d8 à votre jet de dégâts."
+   },
+   {
+    "name": "Appui Fiable",
+    "desc": "Vous pouvez utiliser votre fonctionnalité \"Contacts Partout\" trois fois par session. Les options suivantes sont ajoutées à la liste des avantages que vous pouvez choisir lorsque vous utilisez cette fonctionnalité :\\nQuand vous marquez 1 PV ou plus, ils peuvent se précipiter pour vous protéger, réduisant les PV marqués de 1.\\nLorsque vous effectuez un jet de Présence en conversation, ils vous soutiennent. Vous pouvez lancer un d20 comme votre Dé d'Espoir."
+   }
+  ],
+  "img": "icons/environment/settlement/city-hall.webp"
+ },
+ {
+  "id": "yA10Wf90HYb0DTbK",
+  "en": "Pact of the Endless",
+  "fr": "Pacte de l'Interminable",
+  "classEn": "Warlock",
+  "classId": "cgq9QzytVs6uyaBW",
+  "spellcastTrait": "presence",
+  "desc": "Jouez le Pacte de l'Infini si vous voulez tenir bon contre les ennemis et éviter la mort.",
+  "features": [
+   {
+    "name": "Manteau du Patron",
+    "desc": "Dépensez une Faveur pour vous envelopper d'un aspect terrifiant de votre Patron qui dure jusqu'à ce que vous subissiez des dégâts Graves ou que la scène se termine. Tandis que cet effet est actif, vous obtenez un bonus à vos seuils de dégâts égal à votre rang et vous avez l'avantage sur les jets d'action pour intimider une cible."
+   },
+   {
+    "name": "Étreinte de la Mort",
+    "desc": "Une fois par repos, dépensez autant de Faveur que vous le souhaitez pour lancer un nombre égal de Dés de Patron. Pour chaque résultat de 4 ou plus, effacez un PV."
+   },
+   {
+    "name": "Invocation Harassante",
+    "desc": "Quand un adversaire vous cible ou un allié à Très courte portée avec une attaque, vous pouvez dépenser une Faveur pour lui donner un désavantage sur le jet. Si l'adversaire rate le jet, il doit également marquer un Stress."
+   },
+   {
+    "name": "Puits de Dégâts",
+    "desc": "Une fois par repos, vous pouvez dépenser une Faveur pour réduire de moitié les dégâts entrants."
+   },
+   {
+    "name": "Égide Ténébreuse",
+    "desc": "Une fois par long repos, lorsque vous subissez des dégâts, vous pouvez dépenser une Faveur au lieu de marquer des PV."
+   },
+   {
+    "name": "Fléau Draineur",
+    "desc": "Quand un adversaire vous cible ou un allié à Très courte portée avec une attaque, vous pouvez dépenser une Faveur pour le Drainer. Lorsque vous le faites, il doit marquer un Stress, et vous pouvez effacer un Stress. Tant qu'il est Drainé, la cible utilise un d12 au lieu d'un d20 pour ses jets d'attaque (y compris pour l'avantage ou le désavantage) jusqu'à ce qu'il rate un jet."
+   }
+  ],
+  "img": "icons/magic/death/hand-undead-skeleton-fire-pink.webp"
+ },
+ {
+  "id": "TsJSGjecybUfKfpP",
+  "en": "Pact of the Wrathful",
+  "fr": "Pacte du Courroucé",
+  "classEn": "Warlock",
+  "classId": "cgq9QzytVs6uyaBW",
+  "spellcastTrait": "presence",
+  "desc": "Jouez le Pacte de la Colère si vous voulez anéantir ceux qui agissent contre vous.",
+  "features": [
+   {
+    "name": "Fureur du Protecteur",
+    "desc": "Dépensez une Faveur pour imprégner vos attaques de la puissance de votre Protecteur jusqu'à ce que vous infligiez des dégâts Graves ou que la scène se termine. Lorsque vous lancez les dégâts avec cet effet actif, vous lancez également un nombre de Dés de Protecteur égal à votre rang et ajoutez leur total aux dégâts infligés."
+   },
+   {
+    "name": "Vengeance Mortelle",
+    "desc": "Lorsque vous marquez un nombre de PV par une attaque, vous pouvez dépenser une Faveur pour lancer un nombre égal de Dés de Protecteur. Pour chaque résultat de 4 ou plus, l'attaquant marque un PV."
+   },
+   {
+    "name": "Portée Intimidante",
+    "desc": "Dépensez une Faveur pour augmenter la portée de votre arme principale d'un cran (par exemple de Mêlée à Très rapprochée ou de Très rapprochée à Rapprochée) jusqu'à un maximum de portée Très éloignée. Cet effet se termine lorsque vous effectuez une attaque réussie avec cette arme."
+   },
+   {
+    "name": "Affaiblir Mes Ennemis",
+    "desc": "Lorsque vous réussissez avec Espoir sur un jet d'action contre une cible, vous pouvez dépenser un nombre quelconque de Faveurs pour forcer la cible à marquer un nombre égal de Stress."
+   },
+   {
+    "name": "Atterrante Attaque",
+    "desc": "Dépensez une Faveur pour relancer un nombre quelconque de vos dés de dégâts. Vous pouvez continuer de dépenser des Faveurs pour utiliser cette faculté sur le même jet de dégâts."
+   },
+   {
+    "name": "Courrouce Autresmondes",
+    "desc": "Une fois par repos lorsque vous subissez des dégâts, vous pouvez dépenser un nombre quelconque de Faveurs pour lancer ce nombre de Dés de Protecteur et cibler un nombre de créatures à portée Rapprochée égal au résultat le plus élevé. Chaque cible doit marquer un PV."
+   }
+  ],
+  "img": "icons/magic/unholy/hand-claw-glow-orange.webp"
+ }
+]

@@ -1,0 +1,550 @@
+/* Assistant de création de personnage — 9 étapes guidées */
+import { $, $$, el, esc, go, T, data, toast, uid, newCharacter, saveChar, getState, setState } from '../core.js';
+
+const STEPS = [
+  { id: 'class', title: 'Classe' },
+  { id: 'subclass', title: 'Sous-classe' },
+  { id: 'ancestry', title: 'Ascendance' },
+  { id: 'community', title: 'Communauté' },
+  { id: 'traits', title: 'Traits' },
+  { id: 'equipment', title: 'Équipement' },
+  { id: 'cards', title: 'Cartes' },
+  { id: 'experiences', title: 'Expériences' },
+  { id: 'identity', title: 'Identité' },
+];
+
+const MODS = [2, 1, 1, 0, 0, -1];
+
+let wiz = null;
+
+function initWiz() {
+  return {
+    step: 0,
+    classId: null, subclassId: null,
+    ancestryId: null, communityId: null,
+    traits: { agility: null, strength: null, finesse: null, instinct: null, presence: null, knowledge: null },
+    primaryWeaponId: null, secondaryWeaponId: null, armorId: null, twoHanded: false,
+    cardIds: [],
+    experiences: [{ name: '', mod: 2 }, { name: '', mod: 2 }],
+    name: '', pronouns: '', answers: {}, notes: '',
+    transformation: '',
+  };
+}
+
+let mainRef = null;
+
+export async function render(main, params) {
+  main.classList.add('wide');
+  mainRef = main;
+  if (!wiz) wiz = initWiz();
+  if (params === 'reset') { wiz = initWiz(); go('create'); return; }
+  await draw(main);
+}
+
+function getMain() { return mainRef && mainRef.isConnected ? mainRef : document.querySelector('#main'); }
+
+async function draw(main) {
+  if (!main || !main.isConnected) return;
+  const step = STEPS[wiz.step];
+  // guard against stale draws after navigation away (root removed from DOM)
+  const myView = `<div class="view" id="wiz"></div>`;
+  main.innerHTML = myView;
+  const root = $('#wiz', main);
+  if (!root || !root.isConnected) return;
+
+  root.innerHTML = `
+    <p class="page-sub" style="margin-top:.4rem">Étape ${wiz.step + 1} sur ${STEPS.length} — ${step.title}</p>
+    <div class="wizard-steps">
+      ${STEPS.map((s, i) => `
+        <div class="wstep ${i === wiz.step ? 'active' : i < wiz.step ? 'done' : ''}" data-step="${i}">
+          <span class="n">${i < wiz.step ? '✓' : i + 1}</span>
+          <span>${s.title}</span>
+        </div>`).join('')}
+    </div>
+    <div id="step-body"></div>
+    <div class="wizard-nav">
+      ${wiz.step > 0 ? '<button class="btn ghost" id="w-prev">← Retour</button>' : ''}
+      <button class="btn ghost" id="w-reset" title="Effacer la création en cours et repartir de zéro">↺ Recommencer</button>
+      ${wiz.step < STEPS.length - 1
+        ? '<button class="btn" id="w-next">Continuer →</button>'
+        : '<button class="btn" id="w-finish">✦ Créer le personnage</button>'}
+    </div>`;
+
+  const body = $('#step-body', root);
+  const renderers = { class: stepClass, subclass: stepSubclass, ancestry: stepAncestry, community: stepCommunity, traits: stepTraits, equipment: stepEquipment, cards: stepCards, experiences: stepExperiences, identity: stepIdentity };
+  await renderers[step.id](body);
+  // stop if the user navigated away during async rendering
+  if (!root.isConnected) return;
+
+  $$('.wstep', root).forEach(w => w.addEventListener('click', () => {
+    const i = +w.dataset.step;
+    if (i < wiz.step) { wiz.step = i; draw(main); }
+  }));
+  $('#w-prev', root)?.addEventListener('click', () => { wiz.step--; draw(main); });
+  $('#w-reset', root)?.addEventListener('click', () => {
+    if (confirm('Recommencer la création ? Les choix en cours seront perdus.')) {
+      wiz = initWiz();
+      draw(main);
+    }
+  });
+  $('#w-next', root)?.addEventListener('click', async () => {
+    const ok = await validate(main, step.id);
+    if (ok) { wiz.step++; draw(main); window.scrollTo({ top: 0 }); }
+  });
+  $('#w-finish', root)?.addEventListener('click', async () => {
+    if (await validate(main, 'identity')) finish(main);
+  });
+}
+
+async function validate(main, stepId) {
+  const need = {
+    class: [wiz.classId, 'Choisissez une classe pour continuer.'],
+    subclass: [wiz.subclassId, 'Choisissez une sous-classe.'],
+    ancestry: [wiz.ancestryId, 'Choisissez une ascendance.'],
+    community: [wiz.communityId, 'Choisissez une communauté.'],
+    traits: [Object.values(wiz.traits).every(v => v !== null), 'Répartissez tous les modificateurs de trait (+2, +1, +1, 0, 0, −1).'],
+    equipment: [wiz.primaryWeaponId && wiz.armorId, 'Choisissez au moins une arme principale et une armure.'],
+    cards: [wiz.cardIds.length === 2, `Sélectionnez exactement 2 cartes de domaine de niveau 1 (${wiz.cardIds.length}/2).`],
+    experiences: [wiz.experiences.every(e => e.name.trim()), 'Nommez vos deux Expériences.'],
+    identity: [wiz.name.trim(), 'Donnez un nom à votre personnage.'],
+  };
+  const [ok, msg] = need[stepId] || [true, ''];
+  if (!ok) { toast(msg); return false; }
+  return true;
+}
+
+/* ================= STEP 1: CLASS ================= */
+async function stepClass(body) {
+  const classes = await data('classes');
+  const domains = await data('domains');
+  const sorted = [...classes].sort((a, b) => a.fr.localeCompare(b.fr, 'fr'));
+  body.innerHTML = `<p class="page-sub" style="margin-bottom:.8rem">Votre classe définit vos domaines, vos points de vie et votre aptitude d'Espoir.</p>
+  <div class="choice-grid" id="grid"></div>`;
+  const grid = $('#grid', body);
+  for (const c of sorted) {
+    const domNames = c.domains.map(d => domains[d].fr).join(' · ');
+    const btn = el(`<button class="choice ${wiz.classId === c.id ? 'selected' : ''}" data-id="${c.id}">
+      <div class="ch-head">
+        <span class="ch-name">${esc(c.fr)}</span>
+        ${c.fan ? '<span class="tag fan">Hope & Fear</span>' : ''}
+      </div>
+      <div class="ch-sub">${domNames}</div>
+      <div class="ch-stats">
+        <span class="stat-chip">PV <b>${c.hp}</b></span>
+        <span class="stat-chip">Évasion <b>${c.evasion}</b></span>
+      </div>
+      <div class="ch-desc">${esc(c.desc)}</div>
+      <div class="ch-desc"><b style="color:var(--golden)">✦ ${esc(c.hopeAbility)} :</b> ${esc(c.hopeDesc)}</div>
+    </button>`);
+    btn.addEventListener('click', () => {
+      /* re-clic sur la même classe : garde la sélection (pas de toggle-off piégeux) */
+      if (wiz.classId !== c.id) { wiz.classId = c.id; wiz.subclassId = null; }
+      draw(getMain());
+    });
+    grid.appendChild(btn);
+  }
+}
+
+/* ================= STEP 2: SUBCLASS ================= */
+async function stepSubclass(body) {
+  const classes = await data('classes');
+  const subclasses = await data('subclasses');
+  const cl = classes.find(c => c.id === wiz.classId);
+  const subs = subclasses.filter(s => s.classId === wiz.classId).sort((a, b) => a.fr.localeCompare(b.fr, 'fr'));
+  body.innerHTML = `
+    <p class="page-sub" style="margin-bottom:.8rem">Classe : <b style="color:var(--golden)">${esc(cl.fr)}</b> — choisissez la voie qui façonne vos aptitudes.</p>
+    <div class="choice-grid" id="grid"></div>`;
+  const grid = $('#grid', body);
+  for (const s of subs) {
+    const btn = el(`<button class="choice ${wiz.subclassId === s.id ? 'selected' : ''}" data-id="${s.id}">
+      <div class="ch-head">
+        <span class="ch-name">${esc(s.fr)}</span>
+        ${s.spellcastTrait ? `<span class="stat-chip">Incantation : <b>${T.traits[s.spellcastTrait] || '—'}</b></span>` : ''}
+      </div>
+      <div class="ch-desc">${esc(s.desc)}</div>
+      ${s.features.length ? `<div class="ch-desc" style="font-size:.78rem"><b style="color:var(--golden)">Aptitudes de base :</b> ${s.features.map(f => esc(f.name)).join(' · ')}</div>` : ''}
+    </button>`);
+    btn.addEventListener('click', () => {
+      wiz.subclassId = s.id; /* re-clic : conserve la sélection */
+      draw(getMain());
+    });
+    grid.appendChild(btn);
+  }
+}
+
+/* ================= STEP 3: ANCESTRY ================= */
+async function stepAncestry(body) {
+  const ancestries = await data('ancestries');
+  const sorted = [...ancestries].sort((a, b) => a.fr.localeCompare(b.fr, 'fr'));
+  body.innerHTML = `<p class="page-sub" style="margin-bottom:.8rem">Votre ascendance est la lignée de votre personnage : elle accorde deux aptitudes d'ascendance.</p>
+  <div class="choice-grid" id="grid"></div>`;
+  const grid = $('#grid', body);
+  for (const a of sorted) {
+    const btn = el(`<button class="choice ${wiz.ancestryId === a.id ? 'selected' : ''}" data-id="${a.id}">
+      <div class="ch-head"><span class="ch-name">${esc(a.fr)}</span>${a.fan ? '<span class="tag fan">Hope & Fear</span>' : ''}</div>
+      <div class="ch-desc">${esc(a.desc)}</div>
+      ${a.abilities.map(ab => `<div class="ch-desc" style="font-size:.78rem"><b style="color:var(--golden)">${esc(ab.fr)}.</b> ${esc(ab.desc)}</div>`).join('')}
+    </button>`);
+    btn.addEventListener('click', () => {
+      wiz.ancestryId = a.id; /* re-clic : conserve la sélection */
+      draw(getMain());
+    });
+    grid.appendChild(btn);
+  }
+}
+
+/* ================= STEP 4: COMMUNITY ================= */
+async function stepCommunity(body) {
+  const communities = await data('communities');
+  const sorted = [...communities].sort((a, b) => a.fr.localeCompare(b.fr, 'fr'));
+  body.innerHTML = `<p class="page-sub" style="margin-bottom:.8rem">La communauté représente la culture dans laquelle votre personnage a grandi : elle accorde une aptitude.</p>
+  <div class="choice-grid" id="grid"></div>`;
+  const grid = $('#grid', body);
+  for (const c of sorted) {
+    const btn = el(`<button class="choice ${wiz.communityId === c.id ? 'selected' : ''}" data-id="${c.id}">
+      <div class="ch-head"><span class="ch-name">${esc(c.fr)}</span>${c.fan ? '<span class="tag fan">Hope & Fear</span>' : ''}</div>
+      <div class="ch-desc">${esc(c.desc)}</div>
+      ${c.ability ? `<div class="ch-desc" style="font-size:.78rem"><b style="color:var(--golden)">${esc(c.ability.fr)}.</b> ${esc(c.ability.desc)}</div>` : ''}
+    </button>`);
+    btn.addEventListener('click', () => {
+      wiz.communityId = c.id; /* re-clic : conserve la sélection */
+      draw(getMain());
+    });
+    grid.appendChild(btn);
+  }
+}
+
+/* ================= STEP 5: TRAITS ================= */
+async function stepTraits(body) {
+  const classes = await data('classes');
+  const cl = classes.find(c => c.id === wiz.classId);
+  const traits = ['agility', 'strength', 'finesse', 'instinct', 'presence', 'knowledge'];
+  const used = traits.filter(t => wiz.traits[t] !== null).map(t => wiz.traits[t]);
+  const available = [...MODS];
+  for (const u of used) { const i = available.indexOf(u); if (i >= 0) available.splice(i, 1); }
+
+  body.innerHTML = `
+    <p class="page-sub" style="margin-bottom:.8rem">Répartissez vos modificateurs de départ : <b style="color:var(--golden)">+2, +1, +1, 0, 0, −1</b>. La suggestion de la classe ${esc(cl.fr)} est affichée sous chaque trait.</p>
+    <div class="mod-pool">
+      ${MODS.map(m => `<span class="chip ${used.filter(u => u === m).length >= MODS.filter(x => x === m).length ? 'used' : ''}">${m > 0 ? '+' + m : m}</span>`).join('')}
+    </div>
+    <div id="traits"></div>
+    <div style="margin-top:1rem"><button class="btn ghost small" id="suggest">⚡ Utiliser les traits suggérés (${esc(cl.fr)})</button></div>`;
+
+  const wrap = $('#traits', body);
+  for (const t of traits) {
+    const sug = cl.suggestedTraits?.[t];
+    const opts = [null, ...MODS];
+    const row = el(`<div class="trait-row">
+      <div>
+        <div class="tr-name">${T.traits[t]}</div>
+        <div class="tr-verbs">${T.traitVerbs[t]}${sug !== undefined ? ` · suggéré : ${sug > 0 ? '+' + sug : sug}` : ''}</div>
+      </div>
+      <select data-trait="${t}">
+        <option value="">—</option>
+        ${opts.map(m => `<option value="${m}" ${wiz.traits[t] === m ? 'selected' : ''} ${m !== null && !availHas(m) && wiz.traits[t] !== m ? 'disabled' : ''}>${m === null ? '—' : m > 0 ? '+' + m : String(m)}</option>`).join('')}
+      </select>
+    </div>`);
+    function availHas(m) { return available.includes(m) || wiz.traits[t] === m; }
+    row.querySelector('select').addEventListener('change', (e) => {
+      wiz.traits[t] = e.target.value === '' ? null : +e.target.value;
+      draw(getMain());
+    });
+    wrap.appendChild(row);
+  }
+  $('#suggest', body).addEventListener('click', () => {
+    if (!cl.suggestedTraits) return;
+    // suggested traits may not use the exact +2/+1/+1/0/0/-1 spread; normalize by assigning closest
+    const pool = [...MODS];
+    for (const t of traits) {
+      const sug = cl.suggestedTraits[t];
+      let best = pool[0], bi = 0;
+      pool.forEach((p, i) => { if (Math.abs(p - sug) < Math.abs(best - sug)) { best = p; bi = i; } });
+      pool.splice(bi, 1);
+      wiz.traits[t] = best;
+    }
+    draw(getMain());
+    toast('Traits suggérés appliqués (ajustés au palier +2/+1/+1/0/0/−1).');
+  });
+}
+
+/* ================= STEP 6: EQUIPMENT ================= */
+async function stepEquipment(body) {
+  const classes = await data('classes');
+  const weapons = await data('weapons');
+  const armors = await data('armors');
+  const subclasses = await data('subclasses');
+  const cl = classes.find(c => c.id === wiz.classId);
+  const sub = subclasses.find(s => s.id === wiz.subclassId);
+  const hasSpellcast = !!sub?.spellcastTrait;
+
+  const primaries = weapons.filter(w => !w.secondary && w.tier === 1 && (!w.mag || true));
+  const secondaries = weapons.filter(w => w.secondary && w.tier === 1);
+  const armorList = armors.filter(a => a.tier === 1);
+  const primary = weapons.find(w => w.id === wiz.primaryWeaponId);
+
+  body.innerHTML = `
+    <div class="section-title" style="margin-top:0">Arme principale</div>
+    <p class="page-sub" style="margin-bottom:.7rem">Une arme à deux mains, ou une arme à une main + une arme secondaire. ${hasSpellcast ? 'Votre sous-classe donne accès aux armes magiques.' : 'Les armes magiques nécessitent un trait d’Incantation.'}</p>
+    <div class="choice-grid" id="wgrid"></div>
+    <div id="sec-block" style="display:${primary && primary.burden === 'oneHanded' ? 'block' : 'none'}">
+      <div class="section-title">Arme secondaire</div>
+      <div class="choice-grid" id="sgrid"></div>
+    </div>
+    <div class="section-title">Armure</div>
+    <p class="page-sub" style="margin-bottom:.7rem">L'armure définit votre Valeur d'armure et vos seuils de dégâts (auxquels s'ajoute votre niveau).</p>
+    <div class="choice-grid" id="agrid"></div>`;
+
+  const wgrid = $('#wgrid', body);
+  for (const w of primaries) {
+    const isMag = w.dmgType === 'mag';
+    if (isMag && !hasSpellcast) continue;
+    const b = el(`<button class="choice ${wiz.primaryWeaponId === w.id ? 'selected' : ''}" data-id="${w.id}">
+      <div class="ch-head"><span class="ch-name">${esc(w.fr)}</span>
+        <span class="stat-chip">${T.burden[w.burden]}</span></div>
+      <div class="ch-stats">
+        <span class="stat-chip">${T.traits[w.trait] || '—'}</span>
+        <span class="stat-chip">Portée <b>${esc(w.range)}</b></span>
+        <span class="stat-chip">Dégâts <b>${w.dice}</b> ${w.dmgType === 'mag' ? 'mag' : 'phy'}</span>
+      </div>
+    </button>`);
+    b.addEventListener('click', () => {
+      wiz.primaryWeaponId = w.id; /* re-clic : conserve la sélection */
+      if (wiz.primaryWeaponId && w.burden === 'twoHanded') wiz.secondaryWeaponId = null;
+      draw(getMain());
+    });
+    wgrid.appendChild(b);
+  }
+  const sgrid = $('#sgrid', body);
+  for (const w of secondaries) {
+    const isMag = w.dmgType === 'mag';
+    if (isMag && !hasSpellcast) continue;
+    const b = el(`<button class="choice ${wiz.secondaryWeaponId === w.id ? 'selected' : ''}" data-id="${w.id}">
+      <div class="ch-head"><span class="ch-name">${esc(w.fr)}</span></div>
+      <div class="ch-stats">
+        <span class="stat-chip">${T.traits[w.trait] || '—'}</span>
+        <span class="stat-chip"><b>${w.dice}</b> ${w.dmgType === 'mag' ? 'mag' : 'phy'}</span>
+      </div>
+    </button>`);
+    b.addEventListener('click', () => {
+      wiz.secondaryWeaponId = w.id; /* re-clic : conserve la sélection */
+      draw(getMain());
+    });
+    sgrid.appendChild(b);
+  }
+  const agrid = $('#agrid', body);
+  for (const a of armorList) {
+    const b = el(`<button class="choice ${wiz.armorId === a.id ? 'selected' : ''}" data-id="${a.id}">
+      <div class="ch-head"><span class="ch-name">${esc(a.fr)}</span></div>
+      <div class="ch-stats">
+        <span class="stat-chip">Valeur d'armure <b>${a.armorScore}</b></span>
+        <span class="stat-chip">Seuils <b>${a.major}/${a.severe}</b></span>
+        ${a.heavy ? '<span class="stat-chip">Lourd</span>' : ''}
+      </div>
+    </button>`);
+    b.addEventListener('click', () => {
+      wiz.armorId = a.id; /* re-clic : conserve la sélection */
+      draw(getMain());
+    });
+    agrid.appendChild(b);
+  }
+}
+
+/* ================= STEP 7: DOMAIN CARDS ================= */
+async function stepCards(body) {
+  const classes = await data('classes');
+  const cards = await data('domainCards');
+  const domains = await data('domains');
+  const cl = classes.find(c => c.id === wiz.classId);
+  const lvl1 = cards.filter(c => c.level === 1 && cl.domains.includes(c.domain))
+    .sort((a, b) => a.domain.localeCompare(b.domain) || a.fr.localeCompare(b.fr, 'fr'));
+
+  body.innerHTML = `
+    <p class="page-sub" style="margin-bottom:.8rem">Choisissez <b style="color:var(--golden)">2 cartes de niveau 1</b> parmi les domaines de la classe ${esc(cl.fr)} (${cl.domains.map(d => esc(domains[d].fr)).join(' et ')}). Sélection ${wiz.cardIds.length}/2.</p>
+    <div class="choice-grid" id="grid"></div>`;
+  const grid = $('#grid', body);
+  for (const c of lvl1) {
+    const sel = wiz.cardIds.includes(c.id);
+    const btn = el(`<button class="choice ${sel ? 'selected' : ''}" data-id="${c.id}">
+      <div class="ch-head">
+        <img src="assets/icons/domain-card/${c.domain}.png" alt="" style="width:22px;height:22px">
+        <span class="ch-name">${esc(c.fr)}</span>
+        ${c.fan ? '<span class="tag fan">trad. amateur</span>' : ''}
+      </div>
+      <div class="ch-sub">${T.cardType[c.type]} · ${esc(domains[c.domain].fr)} · Prix de rappel ${c.recall}</div>
+      <div class="ch-desc">${esc(c.desc)}</div>
+    </button>`);
+    btn.addEventListener('click', () => {
+      if (sel) wiz.cardIds = wiz.cardIds.filter(x => x !== c.id);
+      else if (wiz.cardIds.length < 2) wiz.cardIds.push(c.id);
+      else toast('Vous ne pouvez prendre que 2 cartes au niveau 1.');
+      draw(getMain());
+    });
+    grid.appendChild(btn);
+  }
+}
+
+/* ================= STEP 8: EXPERIENCES ================= */
+async function stepExperiences(body) {
+  body.innerHTML = `
+    <p class="page-sub" style="margin-bottom:.8rem">Les Expériences résument le vécu de votre personnage. Chacune commence avec un modificateur de <b style="color:var(--golden)">+2</b>. Soyez spécifique : « Bretteur du Syndicat » vaut mieux que « Talentueux ».</p>
+    <div class="card">
+      ${wiz.experiences.map((e, i) => `
+      <div class="field">
+        <label>Expérience ${i + 1}</label>
+        <input type="text" data-exp="${i}" value="${esc(e.name)}" placeholder="${i === 0 ? 'Ex. : Vétéran des guerres côtières' : 'Ex. : Conteur de légendes anciennes'}">
+      </div>`).join('')}
+      <div class="ch-desc" style="font-size:.78rem;color:var(--text-faint)">Sources d'inspiration — Background : Assassin, Marchand, Pirate… · Caractéristique : Charmant, Loup solitaire… · Spécialité : Bretteur, Guérisseur, Tacticien… · Don : Main leste, Viser juste…</div>
+    </div>`;
+  $$('input[data-exp]', body).forEach(inp => {
+    inp.addEventListener('input', (e) => {
+      wiz.experiences[+inp.dataset.exp].name = e.target.value;
+    });
+  });
+}
+
+/* ================= STEP 9: IDENTITY ================= */
+async function stepIdentity(body) {
+  const classes = await data('classes');
+  const subclasses = await data('subclasses');
+  const ancestries = await data('ancestries');
+  const communities = await data('communities');
+  const transformations = await data('transformations');
+  const cl = classes.find(c => c.id === wiz.classId);
+  const sub = subclasses.find(s => s.id === wiz.subclassId);
+  const anc = ancestries.find(a => a.id === wiz.ancestryId);
+  const com = communities.find(c => c.id === wiz.communityId);
+
+  body.innerHTML = `
+    <div class="card" style="margin-bottom:1rem">
+      <div class="field"><label>Nom du personnage *</label>
+        <input type="text" id="f-name" value="${esc(wiz.name)}" placeholder="Ex. : Vex du Clan Ambervelde"></div>
+      <div class="field"><label>Pronoms</label>
+        <input type="text" id="f-pronouns" value="${esc(wiz.pronouns)}" placeholder="iel · elle · il"></div>
+      <div class="field"><label>Transformation (optionnelle — SRD 2.0)</label>
+        <select id="f-transformation" style="background:var(--panel-3);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:.55rem .7rem;width:100%">
+          <option value="">Aucune</option>
+          ${transformations.map(t => `<option value="${esc(t.fr)}" ${wiz.transformation === t.fr ? 'selected' : ''}>${esc(t.fr)} (${esc(t.en)})</option>`).join('')}
+        </select>
+        <p class="page-sub" style="font-size:.72rem;margin:.3rem 0 0">Une transformation est un aspect optionnel de l'identité accordé par le MJ — elle ne compte pas dans votre kit. Consultez ses features dans le Compendium.</p>
+      </div>
+    </div>
+    <div class="section-title">Questions de background (${esc(cl.fr)})</div>
+    <p class="page-sub" style="margin-bottom:.8rem">Répondez à celles qui vous inspirent — c'est purement narratif, mais c'est ce qui donne vie à votre personnage.</p>
+    <div class="card">
+      ${cl.questions.map((q, i) => `
+      <div class="field"><label>Question ${i + 1}</label>
+        <textarea data-q="${i}" placeholder="${esc(q)}">${esc(wiz.answers[i] || '')}</textarea></div>`).join('')}
+    </div>
+    <div class="section-title">Récapitulatif</div>
+    <div class="card">
+      <div class="cc-meta" style="gap:.4rem 1.2rem">
+        <span>Classe : <b style="color:var(--golden)">${esc(cl.fr)}</b></span>
+        <span>Sous-classe : <b style="color:var(--golden)">${esc(sub?.fr || '—')}</b></span>
+        <span>Ascendance : <b style="color:var(--golden)">${esc(anc?.fr || '—')}</b></span>
+        <span>Communauté : <b style="color:var(--golden)">${esc(com?.fr || '—')}</b></span>
+        <span>Transformation : <b style="color:var(--golden)">${esc(wiz.transformation || '—')}</b></span>
+        <span>PV : <b>${cl.hp}</b></span>
+        <span>Évasion : <b>${cl.evasion}</b></span>
+        <span>Stress : <b>6</b></span>
+        <span>Espoir : <b>2</b></span>
+      </div>
+    </div>`;
+
+  $('#f-name', body).addEventListener('input', e => { wiz.name = e.target.value; });
+  $('#f-pronouns', body).addEventListener('input', e => { wiz.pronouns = e.target.value; });
+  $('#f-transformation', body).addEventListener('change', e => { wiz.transformation = e.target.value; });
+  $$('textarea[data-q]', body).forEach(t => {
+    t.addEventListener('input', e => { wiz.answers[+t.dataset.q] = e.target.value; });
+  });
+}
+
+/* ================= FINISH ================= */
+async function finish(main) {
+  const classes = await data('classes');
+  const ancestries = await data('ancestries');
+  const armors = await data('armors');
+  const weapons = await data('weapons');
+  const cl = classes.find(c => c.id === wiz.classId);
+  const anc = ancestries.find(a => a.id === wiz.ancestryId);
+  const communities = await data('communities');
+  const com = communities.find(c => c.id === wiz.communityId);
+  const subclasses = await data('subclasses');
+  const sub = subclasses.find(s => s.id === wiz.subclassId);
+  const armor = armors.find(a => a.id === wiz.armorId);
+
+  const hpMax = cl.hp + (anc?.fr === 'Géant' ? 1 : 0);
+  const stressMax = 6 + (anc?.fr === 'Humain' ? 1 : 0);
+  const evade = cl.evasion + (anc?.fr === 'Simiah' ? 1 : 0);
+
+  const c = newCharacter({
+    name: wiz.name.trim(),
+    pronouns: wiz.pronouns.trim(),
+    classId: wiz.classId,
+    subclassId: wiz.subclassId,
+    ancestry: anc ? { id: anc.id, fr: anc.fr, abilities: anc.abilities } : null,
+    community: com ? { id: com.id, fr: com.fr, ability: com.ability } : null,
+    subclassName: sub?.fr || null,
+    /* champs affichés par la fiche : pré-remplis depuis les choix du wizard
+       (newCharacter() les initialise vides, la migration ne comblerait pas) */
+    heritage: anc?.fr || '',
+    subclassText: sub?.fr || '',
+    transformation: wiz.transformation || '',
+    traits: { ...wiz.traits },
+    experiences: wiz.experiences.map(e => ({ name: e.name.trim(), mod: 2 })),
+    hp: { max: hpMax, current: hpMax },
+    stress: { max: stressMax, current: 0 },
+    hope: { max: 6, current: 2 },
+    evasion: evade,
+    thresholds: { major: (armor?.major || 0) + 1, severe: (armor?.severe || 0) + 1 },
+    armorSlots: { max: armor?.armorScore || 0, used: 0 },
+    primaryWeaponId: wiz.primaryWeaponId,
+    secondaryWeaponId: wiz.secondaryWeaponId,
+    armorId: wiz.armorId,
+    /* cartes d'arme directes : la fiche lit c.weapons/c.armorCard — sans ça,
+       newCharacter() les initialise vides et la migration ne les reconstruit pas
+       (elles existent mais sont vides, pas absentes) */
+    weapons: [
+      ...(weapons.find(w => w.id === wiz.primaryWeaponId) ? [{
+        uid: uid(), compendiumId: wiz.primaryWeaponId,
+        name: weapons.find(w => w.id === wiz.primaryWeaponId).fr,
+        trait: weapons.find(w => w.id === wiz.primaryWeaponId).trait,
+        range: weapons.find(w => w.id === wiz.primaryWeaponId).range,
+        dice: weapons.find(w => w.id === wiz.primaryWeaponId).dice,
+        dmgType: weapons.find(w => w.id === wiz.primaryWeaponId).dmgType,
+        feature: '',
+        hands: weapons.find(w => w.id === wiz.primaryWeaponId).burden === 'twoHanded' ? 'two' : 'one',
+        state: 'active', primary: true, secondary: false,
+      }] : []),
+      ...(wiz.secondaryWeaponId && weapons.find(w => w.id === wiz.secondaryWeaponId) ? [{
+        uid: uid(), compendiumId: wiz.secondaryWeaponId,
+        name: weapons.find(w => w.id === wiz.secondaryWeaponId).fr,
+        trait: weapons.find(w => w.id === wiz.secondaryWeaponId).trait,
+        range: weapons.find(w => w.id === wiz.secondaryWeaponId).range,
+        dice: weapons.find(w => w.id === wiz.secondaryWeaponId).dice,
+        dmgType: weapons.find(w => w.id === wiz.secondaryWeaponId).dmgType,
+        feature: '',
+        hands: weapons.find(w => w.id === wiz.secondaryWeaponId).burden === 'twoHanded' ? 'two' : 'one',
+        state: 'active', primary: false, secondary: true,
+      }] : []),
+    ],
+    armorCard: armor
+      ? { compendiumId: armor.id, name: armor.fr, baseScore: armor.armorScore, baseMajor: armor.major, baseSevere: armor.severe, feature: '' }
+      : { compendiumId: null, name: '', baseScore: 0, baseMajor: 0, baseSevere: 0, feature: '' },
+    domainCards: wiz.cardIds.map((id, i) => ({ cardId: id, inHand: i < 5 })),
+    goldTrack: { handfuls: 2, bags: 0, chests: 0 },
+    journal: [],
+    inventory: [
+      { name: 'Torche', qty: 1, desc: "Vous pouvez allumer cette torche magique à volonté. Sa flamme éclaire une surface bien plus large qu'elle ne le devrait." },
+      { name: 'Corde (15 m)', qty: 1, desc: 'Utile pour escalader un mur ou descendre une falaise en rappel.' },
+      { name: 'Fournitures de base', qty: 1, desc: 'Tente, lit, boîte à amadou, rations…' },
+      { name: 'Potion de santé mineure', qty: 1, desc: 'Effacez 1d4 PV.', itemId: 'tPfKtKRRjv8qdSqy' },
+    ],
+    backgroundAnswers: { ...wiz.answers },
+    className: cl.fr, hopeAbility: { name: cl.hopeAbility, desc: cl.hopeDesc },
+  });
+  saveChar(c);
+  wiz = null;
+  toast(`✦ ${c.name} est prêt pour l'aventure !`);
+  go('sheet', c.id);
+}

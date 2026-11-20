@@ -1,0 +1,639 @@
+/* Layout fiche — placement calqué sur la feuille officielle Daggerheart.
+   Thème sombre de l'app conservé ; on ne déplace que la structure :
+   header identité+niveau · bande Évasion/Armure+traits · 2 colonnes
+   (gauche : Dégâts&Santé/Espoir/Expériences/Or/Aptitude · droite : Armes/Armure/Inventaire)
+   Mobile : onglets Combat / Stats & Ressources / Équipement / Plus. */
+
+/* ===== EN-TÊTE identité + niveau ===== */
+.dh-header {
+  display: flex; flex-wrap: wrap; align-items: stretch; gap: .7rem;
+  background:
+    radial-gradient(ellipse 90% 140% at 0% 0%, rgba(243,194,103,.07), transparent 55%),
+    linear-gradient(180deg, var(--panel-2), var(--panel));
+  border: 1px solid var(--border-gold); border-radius: 16px;
+  padding: .8rem .9rem; margin-bottom: .55rem;
+}
+.dh-brand { display: flex; flex-direction: column; justify-content: center; padding-right: .9rem; border-right: 1px solid var(--border); }
+.dh-brand .b1 { font-family: var(--font-title); font-weight: 800; font-size: 1.15rem; color: var(--golden); letter-spacing: .04em; }
+.dh-brand .b2 { font-size: .62rem; text-transform: uppercase; letter-spacing: .14em; color: var(--text-faint); margin-top: .15rem; }
+/* grille identité : 2 rangées comme la feuille officielle */
+.dh-idfields {
+  flex: 1; min-width: 250px;
+  display: grid; grid-template-columns: 2fr 1.4fr; gap: .45rem .6rem;
+  align-items: stretch;
+}
+.dh-idf {
+  display: flex; flex-direction: column; gap: .18rem; min-width: 0;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+  padding: .3rem .55rem .35rem;
+}
+.dh-idf span {
+  font-size: .56rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--text-faint);
+}
+.dh-idf input {
+  background: none; border: none; outline: none; color: var(--text);
+  font-family: var(--font-title); font-weight: 700; font-size: .92rem;
+  width: 100%; padding: 0; min-width: 0;
+}
+.dh-idf input::placeholder { color: var(--text-faint); font-weight: 400; font-family: inherit; }
+/* badge NIVEAU façon écusson */
+.dh-level { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .4rem; }
+.dh-lv-shield {
+  width: 64px; height: 74px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  position: relative; padding-bottom: 8px;
+}
+/* fond SVG : le polygone porte le remplissement ET le contour → pas de bordure tronquée */
+.dh-lv-shield > svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }
+.dh-lv-shield > .dh-lv-num, .dh-lv-shield > .dh-lv-lbl { position: relative; z-index: 1; }
+.dh-lv-shield > svg polygon { fill: url(#dhShieldGrad); stroke: var(--golden-60); stroke-width: 2; vector-effect: non-scaling-stroke; }
+.dh-lv-num { font-family: var(--font-title); font-size: 1.7rem; font-weight: 800; color: var(--golden); line-height: 1; }
+.dh-lv-lbl { font-size: .56rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--text-dim); margin-top: .2rem; }
+.dh-lv-btns { display: flex; gap: .35rem; }
+.dh-lv-btns button {
+  height: 26px; padding: 0 .6rem; border-radius: 8px; font-size: .85rem; font-weight: 800;
+  border: 1px solid var(--border); color: var(--text); background: var(--panel-3);
+}
+.dh-lv-btns #dh-levelup {
+  border-color: var(--golden-60); color: var(--golden); background: var(--golden-10);
+  font-size: .72rem; letter-spacing: .03em; white-space: nowrap;
+}
+.dh-lv-btns #dh-levelup:hover { border-color: var(--golden); }
+
+/* ===== barre d'outils ===== */
+.dh-actions {
+  display: flex; flex-wrap: wrap; align-items: center; gap: .4rem;
+  margin-bottom: .6rem;
+}
+.dh-actions .dh-who { font-size: .78rem; font-weight: 700; color: var(--text-dim); margin-right: .3rem; }
+.dh-actions .dh-sp { flex: 1; }
+
+/* ===== BANDE DÉFENSES : Évasion · Armure + 12 cases · 6 TRAITS ===== */
+.dh-defstrip {
+  display: grid; grid-template-columns: 264px 1fr; gap: .7rem;
+  margin-bottom: .7rem; align-items: stretch;
+}
+.dh-shield-block {
+  display: grid; grid-template-columns: 1fr 1fr; gap: .35rem .45rem;
+  align-content: start; padding-right: .7rem; border-right: 1px dotted var(--border);
+}
+/* écussons Évasion / Armure */
+.dh-shield {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .1rem;
+  padding: .55rem .3rem .8rem; position: relative;
+}
+.dh-shield > svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }
+.dh-shield > .dh-sh-lbl, .dh-shield > .dh-sh-val { position: relative; z-index: 1; }
+.dh-shield > svg polygon {
+  fill: url(#dhShieldGrad); stroke-width: 2; vector-effect: non-scaling-stroke;
+  stroke-linejoin: round;
+}
+.dh-shield.eva > svg polygon { stroke: #7d8ea0; }
+.dh-shield.arm > svg polygon { stroke: var(--golden-60); }
+.dh-sh-lbl {
+  font-size: .56rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--text-dim); background: var(--panel); border: 1px solid var(--border);
+  border-radius: 999px; padding: .08rem .5rem;
+}
+.dh-sh-val {
+  width: 46px; text-align: center; background: none; border: none; outline: none;
+  font-family: var(--font-title); font-size: 1.35rem; font-weight: 800; color: var(--text);
+  -moz-appearance: textfield; appearance: textfield;
+}
+.dh-sh-val::-webkit-outer-spin-button, .dh-sh-val::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+/* 12 emplacements d'armure — cellules fluides minmax(0,48px) : ne déborde jamais,
+   zone tactile ≥36×36px. Pentagone en SVG : fill + stroke évoluent avec l'état .on */
+.dh-aspots {
+  grid-column: 1 / -1;
+  display: grid; grid-template-columns: repeat(6, minmax(0, 48px)); gap: .32rem .42rem;
+  justify-content: center; padding-top: .3rem;
+}
+.dh-aspip {
+  width: 100%; height: 36px; min-width: 0; padding: 0; background: transparent; border: none;
+  display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+  touch-action: manipulation; position: relative;
+}
+.dh-aspip > svg { width: 22px; height: 26px; display: block; }
+.dh-aspip > svg polygon {
+  fill: url(#dhAspipOff); stroke: #9fb3ca; stroke-width: 1.5;
+  vector-effect: non-scaling-stroke; stroke-linejoin: round;
+}
+.dh-aspip.on > svg polygon {
+  fill: url(#dhAspipOn); stroke: #cdd9e6;
+}
+.dh-aspip:active > svg { transform: scale(.9); }
+
+/* ===== 6 cartes de traits ===== */
+.dh-traitrow { display: grid; grid-template-columns: repeat(6, 1fr); gap: .45rem; }
+.dh-trait {
+  display: flex; flex-direction: column; align-items: stretch;
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  border: 1px solid var(--border); border-radius: 12px;
+  padding: 0 0 .45rem; cursor: pointer; min-width: 0; text-align: center;
+  transition: border-color .15s, transform .1s;
+  color: var(--text); /* <button> n'hérite pas color : modificateur/verbes noirs sinon */
+}
+.dh-trait:hover { border-color: var(--golden-40); }
+.dh-trait:active { transform: scale(.98); }
+.dh-tr-head {
+  display: flex; align-items: center; justify-content: space-between; gap: .2rem;
+  background: #221d33; border-bottom: 1px solid var(--border);
+  border-radius: 12px 12px 0 0; padding: .3rem .4rem;
+}
+.dh-tr-name {
+  font-size: .6rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--golden); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+/* indicateur discret de palier (remplace l'ancien doublon du modificateur) */
+.dh-tr-mark {
+  flex: none; width: 16px; height: 16px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: .58rem; font-weight: 800; color: var(--text-faint);
+  border: 1px dashed var(--border);
+}
+.dh-tr-mark.on {
+  color: var(--golden); border: 1px solid var(--golden-60); background: var(--golden-10);
+}
+.dh-trait.marked .dh-tr-mark.on { box-shadow: 0 0 5px var(--golden-40); }
+.dh-tr-body {
+  font-family: var(--font-title); font-size: 1.3rem; font-weight: 800; color: var(--text);
+  padding: .3rem 0 .15rem;
+}
+.dh-tr-verbs {
+  font-size: .58rem; color: var(--text-dim); line-height: 1.5;
+  border-top: 1px dotted var(--border); padding-top: .25rem; margin: 0 .35rem;
+}
+
+/* ===== 2 COLONNES ===== */
+.dh-main { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; align-items: start; }
+.dh-col { display: flex; flex-direction: column; gap: .7rem; min-width: 0; }
+
+/* panneaux + bannières capsule façon feuille officielle */
+.dh-panel {
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  border: 1px solid var(--border); border-radius: 14px; padding: .7rem .75rem .8rem;
+}
+.dh-banner { display: flex; align-items: center; gap: .5rem; margin-bottom: .6rem; }
+.dh-banner i { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--border-gold)); }
+.dh-banner i:last-child { background: linear-gradient(90deg, var(--border-gold), transparent); }
+.dh-banner span {
+  font-family: var(--font-title); font-size: .78rem; font-weight: 800;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--golden);
+  border: 1px solid var(--border-gold); border-radius: 999px;
+  padding: .18rem .9rem; white-space: nowrap;
+}
+
+/* ===== Dégâts & Santé : seuils ===== */
+.dh-thrrow { display: flex; align-items: stretch; gap: .3rem; }
+.dh-thrbar {
+  flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  border-radius: 6px; padding: .3rem .2rem; text-align: center;
+}
+.dh-thrbar span { font-size: .58rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; line-height: 1.25; }
+.dh-thrbar em { font-style: normal; font-size: .55rem; opacity: .75; margin-top: .1rem; }
+.dh-thrbar.minor { background: #2e2a1a; border: 1px solid #9fe0b033; color: #9fe0b0; }
+.dh-thrbar.major { background: #32241a; border: 1px solid #ff9d6f33; color: #ff9d6f; }
+.dh-thrbar.severe { background: #331a1a; border: 1px solid #ff6b6b33; color: #ff6b6b; }
+.dh-thrval {
+  align-self: center; width: 34px; height: 34px; flex: none; border-radius: 8px;
+  background: var(--panel); border: 1.5px solid var(--golden-60);
+  color: var(--golden); font-family: var(--font-title); font-weight: 800; font-size: .95rem;
+  cursor: pointer;
+}
+.dh-thrval:hover { border-color: var(--golden); }
+.dh-help { font-size: .66rem; color: var(--text-faint); line-height: 1.5; margin: .45rem 0 0; }
+
+/* ===== jauges PV / Stress : cases pleines + déblocables pointillées ===== */
+.dh-gauge { margin-top: .6rem; }
+.dh-g-head { display: flex; align-items: center; gap: .5rem; margin-bottom: .3rem; }
+.dh-g-lbl { font-size: .64rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim); }
+.dh-g-nums { font-family: var(--font-title); font-size: .82rem; color: var(--text-dim); }
+.dh-g-nums b { color: var(--text); font-size: 1rem; }
+.dh-g-lock {
+  margin-left: auto; width: 26px; height: 26px; border-radius: 7px; font-size: .8rem;
+  border: 1px solid var(--border); color: var(--text-faint); background: var(--panel-3);
+}
+.dh-boxrow { display: flex; flex-wrap: wrap; gap: .28rem; }
+.dh-box {
+  width: 26px; height: 20px; border-radius: 5px; padding: 0;
+  background: var(--panel); border: 1.5px solid #a0303066;
+}
+.dh-box.dash { border-style: dashed; border-color: var(--border); background: transparent; }
+.dh-box.xtra { border-color: #a0303066; }
+.dh-box.on { background: var(--gradient-hp); border-color: #a03030; }
+.dh-box.stress { border-color: #c0783066; }
+.dh-box.stress.on { background: var(--gradient-stress); border-color: #c07830; }
+
+/* ===== Espoir : 6 losanges ===== */
+.dh-hopetrack {
+  display: flex; gap: .45rem; justify-content: center; align-items: center;
+  background: #221d33; border: 1px solid var(--border-gold); border-radius: 999px;
+  padding: .5rem 1rem;
+}
+.dh-diamond {
+  width: 18px; height: 18px; padding: 0; transform: rotate(45deg); border-radius: 3px;
+  background: var(--panel); border: 1.5px solid var(--golden-60);
+}
+.dh-diamond.on { background: linear-gradient(180deg, #ffe1a1, var(--golden-secondary)); border-color: var(--golden); box-shadow: 0 0 8px var(--golden-40); }
+
+/* ===== Expériences : 5 lignes + ruban modificateur ===== */
+.dh-exprow { display: flex; align-items: center; gap: .45rem; margin-bottom: .45rem; }
+.dh-exprow:last-child { margin-bottom: 0; }
+.dh-exp-name {
+  flex: 1; min-width: 0;
+  background: none; border: none; border-bottom: 1px solid var(--border); outline: none;
+  color: var(--text); font-size: .86rem; padding: .3rem .1rem;
+}
+.dh-exp-name::placeholder { color: var(--text-faint); }
+.dh-ribbon {
+  width: 44px; flex: none; text-align: center; padding: .3rem 0;
+  background: var(--panel-3); border: 1px solid var(--border-gold); border-radius: 6px 6px 10px 10px;
+  color: var(--golden); font-family: var(--font-title); font-weight: 800; font-size: .9rem;
+  -moz-appearance: textfield; appearance: textfield;
+}
+.dh-ribbon::-webkit-outer-spin-button, .dh-ribbon::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.dh-exp-roll {
+  width: 34px; height: 32px; flex: none; border-radius: 8px; font-size: .9rem;
+  border: 1px solid var(--border); background: var(--panel-3); color: var(--text);
+}
+
+/* ===== Or : 3 paliers — pastilles creuses, dorées quand .on ===== */
+.dh-gold { display: flex; gap: .55rem; }
+.dh-goldgrp { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: .3rem; }
+.dh-goldgrp.chest { flex: 0 0 auto; }
+.dh-goldgrp.chest .dh-gpips { justify-content: center; }
+.dh-gpips { display: flex; flex-wrap: wrap; gap: .22rem; justify-content: center; }
+.dh-gpips .gpip {
+  width: 14px; height: 14px; padding: 0; border-radius: 50%; cursor: pointer;
+  background: transparent; border: 1.5px solid var(--border);
+}
+.dh-gpips .gpip.g1 { border-color: #b98c2e80; }
+.dh-gpips .gpip.g2 { border-color: #9c762080; }
+.dh-gpips .gpip.g3 { border-color: #7a5c1480; }
+.dh-gpips .gpip.on {
+  background: radial-gradient(circle at 35% 30%, #ffe9ad, var(--golden));
+  border-color: #b98c2e; box-shadow: 0 0 5px #f3c26740;
+}
+.dh-gpips .gpip.g2.on { background: radial-gradient(circle at 35% 30%, #ffe9ad, #d9a81a); border-color: #9c7620; box-shadow: inset 0 -2px 3px rgba(0,0,0,.25), 0 0 5px #f3c26740; }
+.dh-gpips .gpip.g3.on { background: radial-gradient(circle at 35% 30%, #ffe9ad, #b8860b); border-color: #7a5c14; box-shadow: inset 0 -3px 4px rgba(0,0,0,.35), 0 0 5px #f3c26740; }
+.dh-gold-lbl { display: flex; align-items: center; gap: .55rem; flex-wrap: wrap; justify-content: center; }
+.dh-gold-lbl > span { font-size: .6rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--text-dim); }
+.dh-gold-lbl .dh-gold-n { font-family: var(--font-title); font-size: .72rem; color: var(--golden); }
+.dh-gold-btns { display: inline-flex; gap: .45rem; }
+.dh-gold-btns button {
+  min-width: 40px; height: 40px; border-radius: 10px; font-size: 1.05rem; font-weight: 800;
+  border: 1px solid var(--border); color: var(--text-dim); background: var(--panel-3);
+  display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+  touch-action: manipulation;
+}
+.dh-gold-btns button:hover { color: var(--golden); border-color: var(--golden-40); }
+.dh-gold-foot {
+  display: flex; align-items: center; justify-content: space-between; gap: .5rem;
+  margin-top: .55rem; flex-wrap: wrap;
+}
+.dh-gold-foot > span { font-size: .62rem; color: var(--text-faint); }
+.dh-gold-foot b { color: var(--golden); font-family: var(--font-title); }
+
+/* ===== Aptitude de classe : grande zone ===== */
+.dh-cf textarea {
+  width: 100%; min-height: 110px; resize: vertical;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+  color: var(--text); font-size: .84rem; line-height: 1.55; padding: .55rem .65rem;
+}
+
+/* ===== trait coché (amélioré ce palier) ===== */
+.dh-trait.marked { border-color: #9fe0b055; }
+.dh-trait.marked .dh-tr-head { background: #1d2b22; }
+.dh-trait.marked .dh-tr-name::after { content: ' ✓'; color: #9fe0b0; }
+
+/* ===== Assistant MONTÉE DE NIVEAU ===== */
+/* ===== WIZARD MONTÉE DE NIVEAU (5 étapes) ===== */
+.dh-lvlup { max-width: 640px; max-height: 92dvh; display: flex; flex-direction: column; padding: 0; overflow: hidden; }
+.dh-lvlup .lu-head { position: sticky; top: 0; z-index: 3; background: linear-gradient(180deg, var(--panel-2), var(--panel)); padding: 1rem 1.1rem .7rem; border-bottom: 1px solid var(--border); }
+.dh-lvlup .lu-head h3 { margin-bottom: .15rem; }
+.dh-lvlup .lu-body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: .9rem 1.1rem .5rem; }
+/* barre de progression */
+.dh-lvlup .lu-prog { display: flex; align-items: center; gap: .3rem; margin-top: .55rem; }
+.dh-lvlup .lu-pseg { flex: 1; height: 4px; border-radius: 2px; background: var(--border); }
+.dh-lvlup .lu-pseg.on { background: linear-gradient(90deg, var(--golden-secondary), var(--golden)); }
+.dh-lvlup .lu-pseg.cur { box-shadow: 0 0 6px var(--golden-60); }
+.dh-lvlup .lu-plbl { flex: none; font-size: .64rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--golden); margin-left: .5rem; white-space: nowrap; }
+/* pied sticky */
+.dh-lvlup .lu-foot { position: sticky; bottom: 0; z-index: 3; display: flex; gap: .5rem; justify-content: space-between; padding: .75rem 1.1rem calc(var(--safe-bottom, 0px) + .9rem); background: var(--panel-2); border-top: 1px solid var(--border); }
+.dh-lvlup .lu-foot .btn { min-height: 44px; min-width: 44px; flex: 1; justify-content: center; }
+/* compteurs */
+.dh-lvlup .lu-count { font-size: .85rem; color: var(--text); background: var(--panel-2); border: 1px solid var(--border-gold); border-radius: 10px; padding: .55rem .75rem; margin-bottom: .6rem; }
+.dh-lvlup .lu-count b { color: var(--golden); }
+.dh-lvlup .lu-hint { font-size: .72rem; color: var(--text-faint); margin: .35rem 0 .6rem; line-height: 1.5; }
+/* récompense (étape 1) */
+.dh-lvlup .lu-reward {
+  background: var(--golden-10); border: 1px solid var(--golden-40); border-radius: 12px; padding: .65rem .75rem; margin-bottom: .7rem;
+}
+.dh-lvlup .lu-r-head {
+  font-family: var(--font-title); font-size: .8rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--golden); margin-bottom: .35rem;
+}
+.dh-lvlup .lu-r-list { margin: 0; padding-left: 1.1rem; font-size: .8rem; color: var(--text-dim); line-height: 1.7; }
+.dh-lvlup .lu-r-list b { color: var(--text); }
+/* saisie directe (nouvelle Expérience) */
+.dh-lvlup .lu-input {
+  width: 100%; min-height: 44px; box-sizing: border-box; background: var(--panel); border: 1px solid var(--border);
+  border-radius: 10px; color: var(--text); font-size: .9rem; padding: .55rem .7rem;
+}
+.dh-lvlup .lu-input:focus { outline: none; border-color: var(--golden); }
+/* options (étape 2) */
+.dh-lvlup .lu-opts { display: flex; flex-direction: column; gap: .4rem; }
+.dh-lvlup .lu-opt {
+  display: flex; align-items: center; gap: .6rem; text-align: left; min-height: 44px;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+  color: var(--text-dim); font-size: .8rem; padding: .55rem .7rem; cursor: pointer;
+}
+.dh-lvlup .lu-opt:hover:not(:disabled) { border-color: var(--golden-40); }
+.dh-lvlup .lu-opt:disabled { opacity: .4; cursor: not-allowed; }
+.dh-lvlup .lu-opt.sel { border-color: var(--golden); background: var(--golden-10); }
+.dh-lvlup .lo-check {
+  flex: none; width: 22px; height: 22px; border: 1.5px solid var(--border-gold); border-radius: 7px;
+  display: inline-flex; align-items: center; justify-content: center; color: var(--golden); font-size: .8rem; font-weight: 800;
+}
+.dh-lvlup .lu-opt.sel .lo-check { border-color: var(--golden); background: var(--golden-10); }
+.dh-lvlup .lo-txt { flex: 1; display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; }
+.dh-lvlup .lo-use { flex: none; color: var(--text-faint); font-size: .68rem; white-space: nowrap; }
+/* sous-blocs dépliables (sélecteurs intégrés) */
+.dh-lvlup .lu-sub { margin: .55rem 0 .65rem; padding: .6rem .7rem; background: var(--panel-2); border: 1px dashed var(--border); border-radius: 11px; }
+.dh-lvlup .lu-sub-lbl { font-size: .66rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--text-faint); margin-bottom: .45rem; }
+.dh-lvlup .lu-traitpick, .dh-lvlup .lu-exppick, .dh-lvlup .lu-swaplist { display: flex; flex-wrap: wrap; gap: .4rem; }
+.dh-lvlup .lu-tp {
+  min-height: 44px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+  color: var(--text-dim); font-size: .78rem; padding: .45rem .7rem; cursor: pointer;
+}
+.dh-lvlup .lu-tp.sel { border-color: var(--golden); color: var(--golden); background: var(--golden-10); }
+.dh-lvlup .lu-tp:disabled { opacity: .35; text-decoration: line-through; }
+/* filtres rapides (étape 3) */
+.dh-lvlup .lu-filters { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem; margin: .55rem 0 .65rem; }
+.dh-lvlup .lu-chip { min-height: 44px; background: var(--panel); border: 1px solid var(--border); border-radius: 999px; color: var(--text-dim); font-size: .72rem; padding: .35rem .75rem; cursor: pointer; }
+.dh-lvlup .lu-chip.on { border-color: var(--golden); color: var(--golden); background: var(--golden-10); }
+.dh-lvlup .lu-fsep { flex: 1; }
+/* cartes en accordéon — corps défilant unique, aucun scroll interne */
+.dh-lvlup .lu-cards { display: flex; flex-direction: column; gap: .4rem; margin-bottom: .4rem; }
+.dh-lvlup .lu-card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.dh-lvlup .lu-card.sel { border-color: var(--golden); background: var(--golden-10); }
+.dh-lvlup .lu-card.open { border-color: var(--golden-40); }
+.dh-lvlup .lu-card .lc-row { display: flex; align-items: center; gap: .6rem; padding: .55rem .7rem; min-height: 44px; cursor: pointer; }
+.dh-lvlup .lu-card .lc-lvl { flex: none; font-size: .6rem; font-weight: 800; color: var(--text-faint); border: 1px solid var(--border); border-radius: 6px; padding: .2rem .4rem; }
+.dh-lvlup .lu-card .lc-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.dh-lvlup .lu-card .lc-body b { font-size: .8rem; }
+.dh-lvlup .lu-card .lc-body small { font-size: .64rem; color: var(--text-faint); }
+.dh-lvlup .lu-card .lc-add {
+  flex: none; width: 44px; height: 44px; margin: -.55rem -.7rem -.55rem 0; display: inline-flex; align-items: center; justify-content: center;
+  color: var(--golden); font-size: 1.05rem; font-weight: 800; background: transparent; border: none; cursor: pointer;
+}
+.dh-lvlup .lu-card .lc-detail { padding: .6rem .8rem .7rem; border-top: 1px dashed var(--border); font-size: .78rem; color: var(--text-dim); line-height: 1.65; }
+.dh-lvlup .lc-tags { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .5rem; }
+.dh-lvlup .lc-tag { font-size: .64rem; font-weight: 700; color: var(--golden); background: var(--golden-10); border: 1px solid var(--golden-40); border-radius: 999px; padding: .15rem .55rem; }
+/* échange (étape 4) */
+.dh-lvlup .lu-swapbox { border-style: solid; }
+/* récapitulatif (étape 5) */
+.dh-lvlup .lu-recap .lu-rec-line { font-size: .8rem; color: var(--text-dim); padding: .4rem 0 .4rem .85rem; border-left: 2px solid var(--golden-40); margin: 0 0 .3rem .2rem; line-height: 1.55; }
+.dh-lvlup .lu-recap .lu-rec-line b { color: var(--text); }
+.dh-lvlup .lu-recap .lu-r-head { margin-top: .75rem; }
+.dh-lvlup .lu-recap .lu-r-head:first-child { margin-top: 0; }
+
+
+/* ===== ONGLETS DU BAS (Cartes / Aptitudes / Background / Journal) ===== */
+.dh-morewrap .tabbar {
+  display: flex; gap: .35rem; margin-bottom: .8rem; padding: .3rem;
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  border: 1px solid var(--border-gold); border-radius: 14px;
+  overflow-x: auto; scrollbar-width: thin;
+}
+.dh-morewrap .tabbar .tb {
+  flex: 1; white-space: nowrap; background: none; border: 1px solid transparent;
+  border-radius: 10px; color: var(--text-faint);
+  font-family: var(--font-title); font-size: .74rem; font-weight: 800;
+  letter-spacing: .05em; text-transform: uppercase;
+  padding: .55rem .8rem; cursor: pointer;
+  transition: color .15s, background .15s, border-color .15s;
+}
+.dh-morewrap .tabbar .tb:hover { color: var(--text-dim); border-color: var(--border); }
+.dh-morewrap .tabbar .tb.active {
+  color: var(--golden); background: var(--golden-10); border-color: var(--golden-60);
+}
+.dh-morewrap .panel { margin-bottom: .8rem; }
+
+/* ===== Maîtrise ===== */
+.dh-prof { display: flex; align-items: center; gap: .5rem; margin-bottom: .6rem; flex-wrap: wrap; }
+.dh-prof-pips { display: flex; gap: .3rem; }
+.dh-profpip {
+  width: 16px; height: 16px; border-radius: 50%; padding: 0;
+  background: var(--panel); border: 1.5px solid var(--golden-60);
+}
+.dh-profpip.on { background: radial-gradient(circle at 35% 30%, #ffe9ad, var(--golden-secondary)); border-color: var(--golden); }
+
+/* ===== cartes d'arme ===== */
+.dh-wcard {
+  border: 1px solid var(--border); border-radius: 12px;
+  background: var(--panel); padding: .55rem .6rem .65rem; margin-bottom: .6rem;
+}
+.dh-wcard:last-child { margin-bottom: 0; }
+.dh-wcard.inv { opacity: .6; }
+.dh-wtop { display: flex; align-items: center; gap: .45rem; flex-wrap: wrap; margin-bottom: .5rem; }
+.dh-wswitch, .dh-whands { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.dh-wswitch .ws, .dh-whands .wh {
+  background: var(--panel-3); border: none; color: var(--text-faint);
+  font-size: .68rem; font-weight: 800; padding: .3rem .55rem; white-space: nowrap;
+}
+.dh-wswitch .ws.on { background: var(--golden-10); color: var(--golden); }
+.dh-whands .wh.on { background: var(--golden-10); color: var(--golden); }
+.dh-wrole { display: inline-flex; gap: .45rem; margin-left: auto; }
+.dh-wrole label {
+  display: inline-flex; align-items: center; gap: .25rem;
+  font-size: .68rem; font-weight: 800; color: var(--text-dim);
+}
+.dh-wrole input { accent-color: var(--golden); width: 15px; height: 15px; }
+.dh-wdel { margin-left: .2rem; }
+.dh-wgrid { display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: .4rem .5rem; align-items: end; }
+.dh-wgrid.armor { grid-template-columns: 1.6fr 1fr 1fr 1fr; }
+.dh-wgrid .dh-wdmg { justify-self: start; min-height: 34px; }
+/* champs compacts */
+.dh-fl { display: flex; flex-direction: column; gap: .15rem; min-width: 0; }
+.dh-fl span {
+  font-size: .54rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--text-faint);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.dh-fl input, .dh-fl select {
+  background: var(--panel-3); border: 1px solid var(--border); border-radius: 8px;
+  color: var(--text); font-size: .8rem; font-weight: 600; padding: .35rem .5rem;
+  width: 100%; min-width: 0; outline: none;
+}
+.dh-fl input:focus, .dh-fl select:focus { border-color: var(--golden-60); }
+.dh-fl input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+.dh-fl input[type=number]::-webkit-outer-spin-button, .dh-fl input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.dh-fl.w2 { grid-column: span 1; }
+.dh-wcard .dh-fl.w2 { grid-column: span 1; }
+.dh-wadd {
+  width: 100%; margin-top: .1rem; padding: .5rem; border-radius: 10px;
+  border: 1.5px dashed var(--border); background: none; color: var(--text-dim);
+  font-weight: 700; font-size: .8rem;
+}
+.dh-wadd:hover { border-color: var(--golden-40); color: var(--golden); }
+
+/* ===== inventaire compact ===== */
+.dh-invadd { display: flex; gap: .45rem; margin-top: .55rem; }
+.dh-invadd input {
+  flex: 1; min-width: 0; background: var(--panel-3); border: 1px solid var(--border);
+  border-radius: 10px; color: var(--text); padding: .45rem .6rem; font-size: .82rem; outline: none;
+}
+
+/* ===== « PLUS » (cartes, aptitudes, background, journal) ===== */
+.dh-morewrap { margin-top: .8rem; }
+
+/* ===== OVERLAY dés ===== */
+.dh-roll .dhr-dice { display: flex; align-items: center; justify-content: center; gap: .8rem; margin: .9rem 0; }
+.dh-roll .dhr-die {
+  display: flex; flex-direction: column; align-items: center; gap: .2rem;
+  width: 92px; padding: .6rem 0 .7rem; border-radius: 14px;
+  background: linear-gradient(180deg, #2b2440, #1a1628); border: 2px solid var(--border-gold);
+}
+.dh-roll .dhr-die.hope { border-color: var(--golden); }
+.dh-roll .dhr-die.fear { border-color: #a778b1; }
+.dh-roll .dhr-die .l { font-size: .6rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim); }
+.dh-roll .dhr-die .v { font-family: var(--font-title); font-size: 2rem; font-weight: 800; color: var(--text); }
+.dh-roll .dhr-die.rolling .v { animation: dhr-shake .12s infinite; }
+@keyframes dhr-shake { 0% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } 100% { transform: rotate(-3deg); } }
+.dh-roll .dhr-vs { font-family: var(--font-title); font-size: 1.4rem; color: var(--text-faint); }
+.dh-roll .dhr-mods { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+.dh-roll .dhr-mods select {
+  background: var(--panel-3); border: 1px solid var(--border); border-radius: 10px;
+  color: var(--text); padding: .5rem; font-weight: 700; font-size: .8rem; outline: none;
+}
+.dh-roll .dhr-hopespend {
+  display: flex; align-items: center; gap: .45rem; margin-top: .6rem;
+  font-size: .78rem; color: var(--text-dim); font-weight: 600;
+}
+.dh-roll .dhr-hopespend input { accent-color: var(--golden); width: 16px; height: 16px; }
+.dh-roll .dhr-toggles { display: flex; gap: .5rem; margin-top: .55rem; }
+.dh-roll .dhr-toggles .btn.sel { border-color: var(--golden); color: var(--golden); background: var(--golden-10); }
+.dh-roll .dhr-result { display: flex; align-items: center; justify-content: center; gap: .7rem; min-height: 54px; margin-top: .7rem; flex-wrap: wrap; }
+.dh-roll .dhr-result .total { font-family: var(--font-title); font-size: 2.1rem; font-weight: 800; color: var(--text); }
+.dh-roll .dhr-result .outcome { font-size: .9rem; font-weight: 800; padding: .25rem .7rem; border-radius: 999px; }
+.dh-roll .dhr-result .outcome.hope { background: var(--golden-10); color: var(--golden); }
+.dh-roll .dhr-result .outcome.fear { background: #a778b133; color: #c9a3d3; }
+.dh-roll .dhr-result .outcome.crit { background: #40a64033; color: #9fe0b0; }
+.dh-roll .dhr-sub { font-size: .72rem; color: var(--text-faint); }
+.dh-roll .dhr-btns { display: flex; gap: .5rem; justify-content: flex-end; margin-top: .8rem; }
+.dh-roll .dhr-dice.dmg { flex-direction: column; gap: .5rem; }
+.dh-roll .dhr-dice-row { display: flex; flex-wrap: wrap; gap: .4rem; justify-content: center; }
+.dh-roll .dhr-dice-row:empty::after { content: 'Lancez pour voir les dés'; font-size: .72rem; color: var(--text-faint); }
+.dh-roll .dhr-total { font-family: var(--font-title); font-size: 1.3rem; font-weight: 800; color: var(--text); }
+.dh-roll .dhr-total b { color: var(--golden); font-size: 1.6rem; }
+
+/* modal seuils : valeurs calculées */
+.dh-thr-live {
+  font-family: var(--font-title); font-size: 1.5rem; font-weight: 800; color: var(--golden);
+  background: var(--panel-3); border: 1px solid var(--border); border-radius: 10px;
+  padding: .45rem .6rem; text-align: center;
+}
+
+/* picker armes */
+.dh-picker .wp-list { max-height: 320px; overflow-y: auto; display: flex; flex-direction: column; gap: .35rem; }
+
+/* ===== RESPONSSIF : desktop ≥1000px = 2 colonnes ===== */
+@media (min-width: 1000px) {
+  .dh-mtabs { display: none; }
+  .dh-morewrap { display: block; }
+  .dh-main { grid-template-columns: 1.05fr 1fr; }
+}
+
+/* tablette paysage : colonne défenses élargie → 6 cartes de traits en 3×2 */
+@media (min-width: 1000px) and (max-width: 1199px) {
+  .dh-traitrow { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ===== MOBILE : onglets Combat / Stats / Équipement / Plus ===== */
+@media (max-width: 999px) {
+  .dh-mtabs {
+    display: flex; gap: .3rem; margin-bottom: .7rem;
+    border: 1px solid var(--border); border-radius: 12px; padding: .25rem;
+    background: var(--panel); position: sticky; top: 52px; z-index: 40;
+  }
+  .dh-mtabs .mt {
+    flex: 1; background: none; border: none; color: var(--text-faint);
+    font-size: .68rem; font-weight: 800; letter-spacing: .02em; text-transform: uppercase;
+    padding: .5rem .2rem; border-radius: 9px; white-space: nowrap;
+  }
+  .dh-mtabs .mt.active { background: var(--golden-10); color: var(--golden); }
+
+  /* navigation par onglets : la racine .dh-sheet porte data-mtab */
+  .dh-sheet[data-mtab="combat"] .dh-defstrip { display: grid; grid-template-columns: 1fr; }
+  .dh-sheet[data-mtab="stats"] .dh-defstrip,
+  .dh-sheet[data-mtab="equip"] .dh-defstrip,
+  .dh-sheet[data-mtab="more"] .dh-defstrip { display: none; }
+  .dh-sheet[data-mtab="combat"] .dh-main .dh-col > section.s-combat,
+  .dh-sheet[data-mtab="stats"] .dh-main .dh-col > section.s-stats,
+  .dh-sheet[data-mtab="equip"] .dh-main .dh-col > section.s-equip { display: block; }
+  .dh-sheet[data-mtab="combat"] .dh-main .dh-col > section:not(.s-combat),
+  .dh-sheet[data-mtab="stats"] .dh-main .dh-col > section:not(.s-stats),
+  .dh-sheet[data-mtab="equip"] .dh-main .dh-col > section:not(.s-equip) { display: none; }
+  .dh-sheet[data-mtab="more"] .dh-main { display: none; }
+  .dh-sheet[data-mtab="more"] .dh-morewrap { display: block; }
+  .dh-sheet:not([data-mtab="more"]) .dh-morewrap { display: none; }
+  /* une seule colonne verticale : les .dh-col s'empilent */
+  .dh-sheet:not([data-mtab="more"]) .dh-main { display: block; }
+  .dh-sheet:not([data-mtab="more"]) .dh-main .dh-col { display: flex; flex-direction: column; gap: .7rem; margin-bottom: .7rem; }
+
+  /* bande défenses en colonne sur mobile */
+  .dh-defstrip .dh-shield-block { border-right: none; border-bottom: 1px dotted var(--border); padding: 0 0 .6rem; }
+  .dh-traitrow { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: .6rem; }
+  .dh-thrrow { flex-wrap: wrap; }
+  .dh-thrbar { flex: 1 1 45%; }
+  .dh-thrval { width: 30px; height: 30px; }
+  .dh-wgrid { grid-template-columns: 1fr 1fr; }
+  .dh-wgrid.armor { grid-template-columns: 1fr 1fr; }
+  .dh-gold { flex-direction: column; gap: .7rem; }
+  .dh-goldgrp { flex-direction: row; justify-content: space-between; flex-wrap: wrap; }
+  .dh-goldgrp .dh-gpips { justify-content: flex-start; }
+  .dh-wtop { gap: .35rem; }
+  .dh-wrole { margin-left: 0; }
+}
+
+/* très petit écran : traits en 2 colonnes */
+@media (max-width: 420px) {
+  .dh-traitrow { grid-template-columns: repeat(2, 1fr); }
+  .dh-box { width: 22px; height: 18px; }
+  .dh-idfields { grid-template-columns: 1fr; }
+  .dh-brand { border-right: none; border-bottom: 1px solid var(--border); padding: 0 0 .5rem; }
+  .dh-header { flex-direction: column; }
+  .dh-level { flex-direction: row; justify-content: space-between; width: 100%; padding-top: .4rem; }
+  .dh-lv-btns { flex-direction: row; }
+}
+
+/* barre d'outils : compacte sur mobile, 2 lignes max */
+@media (max-width: 640px) {
+  .dh-actions { flex-wrap: wrap; justify-content: center; gap: .35rem .45rem; }
+  .dh-actions .btn.small { padding: .38rem .6rem; font-size: .74rem; }
+  .dh-actions .dh-sp { display: none; }
+}
+
+/* accessibility: respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .dh-roll .dhr-die.rolling .v { animation: none; }
+}
+
+/* Feature d'Espoir : texte complet lisible (multi-lignes, pas de troncature) */
+.dh-fl-hope { width: 100%; }
+.dh-fl-hope textarea {
+  width: 100%; min-height: 96px; resize: vertical;
+  background: var(--panel-3); border: 1px solid var(--border); border-radius: 8px;
+  color: var(--text); font-size: .8rem; font-weight: 500; line-height: 1.55;
+  padding: .45rem .55rem; outline: none; white-space: pre-wrap; overflow-wrap: break-word;
+}
+.dh-fl-hope textarea:focus { border-color: var(--golden-60); }
+
+/* dégradés partagés des boucliers SVG (défs injectés par la vue fiche) */
+.dh-svgdefs { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+/* Fix 4 — chevron d'accordéon sur les lignes de cartes du wizard */
+.dh-lvlup .lu-card .lc-chev {
+  flex: none; width: 22px; text-align: center; color: var(--text-faint);
+  font-size: 1rem; line-height: 1; transition: transform .15s ease, color .15s ease;
+}
+.dh-lvlup .lu-card.open .lc-chev { color: var(--golden); }

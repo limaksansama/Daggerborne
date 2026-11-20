@@ -1,0 +1,482 @@
+[
+  {
+    "id": "J1hX7nBBc5jQiHli",
+    "en": "Fungril",
+    "fr": "Fongile",
+    "fan": false,
+    "desc": "Jouez le Rôdeur des Haies si vous voulez utiliser votre artisanat pour vous renforcer et renforcer votre groupe.",
+    "abilities": [
+      {
+        "en": "Fungril Network",
+        "fr": "Réseau fongile",
+        "desc": "Faites un jet d'Instinct (12) pour utiliser votre réseau mycélien pour communiquer avec d'autres de votre lignée. En cas de succès, vous pouvez communiquer sur n'importe quelle distance."
+      },
+      {
+        "en": "Death Connection",
+        "fr": "Connexion avec la mort",
+        "desc": "En touchant un cadavre récemment décédé, vous pouvez marquer un Stress pour extraire un souvenir du cadavre lié à une émotion ou une sensation de votre choix."
+      }
+    ],
+    "img": "icons/commodities/biological/suckers-green.webp"
+  },
+  {
+    "id": "2yMLxxn7CHEvmShj",
+    "en": "Simiah",
+    "fr": "Simiah",
+    "fan": false,
+    "desc": "Jouez le Marcheur de Nuit si vous voulez manipuler les ombres pour vous déplacer dans l'environnement.",
+    "abilities": [
+      {
+        "en": "Natural Climber",
+        "fr": "Grimpeur né",
+        "desc": "Vous avez l'avantage sur les jets d'Agilité qui impliquent de l'équilibre et de l'escalade."
+      },
+      {
+        "en": "Nimble",
+        "fr": "Leste",
+        "desc": "Gagnez un bonus permanent de +1 à votre Évasion à la création du personnage."
+      }
+    ],
+    "img": "icons/magic/nature/tree-bare-glow-yellow.webp"
+  },
+  {
+    "id": "wtJ5V5qRppLQn61n",
+    "en": "Human",
+    "fr": "Humain",
+    "fan": false,
+    "desc": "Jouez l'Inébranlable si vous voulez encaisser des coups violents et continuer à combattre.",
+    "abilities": [
+      {
+        "en": "High Stamina",
+        "fr": "Résilience élevée",
+        "desc": "Gagnez un emplacement de Stress supplémentaire à la création du personnage."
+      },
+      {
+        "en": "Adaptability",
+        "fr": "Adaptabilité",
+        "desc": "Lorsque vous échouez à un jet qui a utilisé l'une de vos Expériences, vous pouvez marquer un Stress pour relancer."
+      }
+    ],
+    "img": "icons/skills/social/diplomacy-handshake-yellow.webp"
+  },
+  {
+    "id": "3U8CncG92a7ERIJ0",
+    "en": "Giant",
+    "fr": "Géant",
+    "fan": false,
+    "desc": "Jouez l'École du Savoir si vous souhaitez avoir une compréhension aiguë du monde qui vous entoure.",
+    "abilities": [
+      {
+        "en": "Endurance",
+        "fr": "Endurance",
+        "desc": "Gagnez un emplacement de PV supplémentaire à la création du personnage."
+      },
+      {
+        "en": "Reach",
+        "fr": "Allonge",
+        "desc": "Traitez n'importe quelle arme, capacité, sort ou autre fonction ayant une portée de Mêlée comme si elle avait une portée Très rapprochée à la place."
+      }
+    ],
+    "img": "icons/creatures/magical/construct-iron-stomping-yellow.webp"
+  },
+  {
+    "id": "XzJVbb5NT9k79ykR",
+    "en": "Faerie",
+    "fr": "Fée",
+    "fan": false,
+    "desc": "Jouez l'Appel du Brave si vous souhaitez utiliser la puissance de vos ennemis pour alimenter votre propre force.",
+    "abilities": [
+      {
+        "en": "Luckbender",
+        "fr": "Torseur de chance",
+        "desc": "Une fois par session, après que vous ou un allié volontaire à portée Rapprochée ayez fait un jet d'action, vous pouvez dépenser 3 Espoir pour relancer les Dés de Dualité."
+      },
+      {
+        "en": "Wings",
+        "fr": "Ailes",
+        "desc": "Vous pouvez voler. En volant, vous pouvez marquer un Stress après qu'un adversaire ait effectué une attaque contre vous pour obtenir un bonus de +2 à votre Évasion contre cette attaque."
+      }
+    ],
+    "img": "icons/magic/nature/leaf-drip-light-green.webp"
+  },
+  {
+    "id": "CtL2jDjvPOJxNJKm",
+    "en": "Halfling",
+    "fr": "Halfelin",
+    "fan": false,
+    "desc": "Jouez le Troubadour si vous voulez jouer de la musique pour soutenir vos alliés.",
+    "abilities": [
+      {
+        "en": "Luckbringer",
+        "fr": "Porte-chance",
+        "desc": "Au début de chaque session, tous les membres de votre groupe gagnent un Espoir."
+      },
+      {
+        "en": "Internal Compass",
+        "fr": "Boussole interne",
+        "desc": "Lorsque vous lancez un 1 sur votre Dé d'Espoir, vous pouvez le relancer."
+      }
+    ],
+    "img": "icons/tools/navigation/compass-brass-blue-red.webp"
+  },
+  {
+    "id": "hzKmydI8sR3uk4CO",
+    "en": "Firbolg",
+    "fr": "Firbolg",
+    "fan": false,
+    "desc": "Jouez le Parleur de mots si vous voulez utiliser des jeux de mots astucieux et captiver les foules.",
+    "abilities": [
+      {
+        "en": "Charge",
+        "fr": "Charge",
+        "desc": "Lorsque vous réussissez un jet d'Agilité pour vous déplacer d'une portée Éloignée ou Très éloignée à portée de Mêlée avec une ou plusieurs cibles, vous pouvez marquer un Stress pour infliger 1d12 dégâts physiques à toutes les cibles à portée de Mêlée."
+      },
+      {
+        "en": "Unshakeable",
+        "fr": "Inébranlable",
+        "desc": "Lorsque vous êtes sur le point de marquer un Stress, lancez un d6. Sur un résultat de 6, ne le marquez pas."
+      }
+    ],
+    "img": "icons/commodities/leather/fur-blue.webp"
+  },
+  {
+    "id": "D1RbUsRV9HpTrPuF",
+    "en": "Orc",
+    "fr": "Orc",
+    "fan": false,
+    "desc": "Les Orques sont des humanoïdes que l'on reconnaît le plus facilement à leurs traits carrés et à leurs défenses de sanglier qui dépassent de leur mâchoire inférieure.",
+    "abilities": [
+      {
+        "en": "Sturdy",
+        "fr": "Solide",
+        "desc": "Lorsque vous ne vous avez plus qu'1 PV, les attaques contre vous ont désavantage."
+      },
+      {
+        "en": "Tusks",
+        "fr": "Défenses",
+        "desc": "Lorsque vous réussissez une attaque contre une cible à portée de Mêlée, vous pouvez dépenser un Espoir pour percer la cible avec vos défenses, infligeant 1d6 dégâts supplémentaires."
+      }
+    ],
+    "img": "icons/commodities/bones/horn-drinking-white.webp"
+  },
+  {
+    "id": "VLeOEqkLS0RbF0tB",
+    "en": "Drakona",
+    "fr": "Drakona",
+    "fan": false,
+    "desc": "Jouez l'Appel du Tueur si vous voulez abattre des adversaires avec une force immense.",
+    "abilities": [
+      {
+        "en": "Scales",
+        "fr": "Écailles",
+        "desc": "Vos écailles agissent comme une protection naturelle. Lorsque vous êtes sur le point de subir des dégâts Graves, vous pouvez marquer un Stress pour marquer 1 PV de moins."
+      },
+      {
+        "en": "Elemental Breath",
+        "fr": "Souffle élémentaire",
+        "desc": "Choisissez un élément pour votre souffle (tel que l'électricité, le feu ou la glace). Vous pouvez utiliser cette souffle contre une cible ou un groupe de cibles à portée Très rapprochée, en le traitant comme une arme d'Instinct qui inflige d8 dégâts magiques en utilisant votre Compétence."
+      }
+    ],
+    "img": "icons/creatures/reptiles/dragon-horned-blue.webp"
+  },
+  {
+    "id": "8j6sTY4Y2hfeUHyi",
+    "en": "Skykin",
+    "fr": "Célestin",
+    "fan": true,
+    "desc": "Les Skykin sont des humanoïdes dont les corps sont faits de chair et d'air.",
+    "abilities": [
+      {
+        "en": "Gale Force",
+        "fr": "Force du vent",
+        "desc": "Marquez un Stress pour convoquer une rafale de vent qui vous transporte ou à un allié Très proche jusqu'à une portée Très éloignée. De plus, vous pouvez toujours contrôler la vitesse à laquelle vous tombez."
+      },
+      {
+        "en": "Eye of the Storm",
+        "fr": "Œil du cyclone",
+        "desc": "Dépensez 2 Espoir pour vous accorder ou à un allié à portée de Mêlée un bonus de +1 à l'Évasion jusqu'à ce que vous subissiez des dégâts Graves ou que vous utilisiez cette fonctionnalité à nouveau."
+      }
+    ],
+    "img": "icons/magic/air/air-pressure-shield-blue.webp"
+  },
+  {
+    "id": "HaYhe6WqoXW5EbRl",
+    "en": "Faun",
+    "fr": "Faune",
+    "fan": false,
+    "desc": "Jouez le Bête-Liée si vous souhaitez nouer un lien profond avec un allié animal.",
+    "abilities": [
+      {
+        "en": "Caprine Leap",
+        "fr": "Saut caprin",
+        "desc": "Vous pouvez sauter n'importe où à portée Rapprochée comme si vous utilisiez un mouvement normal, vous permettant de franchir des obstacles, de sauter au-dessus de crevasses ou d'escalader des barrières avec facilité."
+      },
+      {
+        "en": "Kick",
+        "fr": "Coup de pied",
+        "desc": "Lorsque vous réussissez une attaque contre une cible à portée de Mêlée, vous pouvez marquer un Stress pour vous propulser en arrière, infligeant 2d6 dégâts supplémentaires et repoussant soit vous-même, soit la cible à portée Très rapprochée."
+      }
+    ],
+    "img": "icons/magic/nature/leaf-flower-wreath-glow-green-blue.webp"
+  },
+  {
+    "id": "MOe9Lf4CeK3FKNyL",
+    "en": "Aetheris",
+    "fr": "Éthérien",
+    "fan": true,
+    "desc": "Les Aetheris sont des humanoïdes que l'on reconnaît le plus facilement à leurs ailes et à leurs marques sacrées.",
+    "abilities": [
+      {
+        "en": "Hallowed Aura",
+        "fr": "Aura sanctifiée",
+        "desc": "Une fois par long repos, lorsqu'un allié à Rapprochée effectue un jet avec Peur, vous pouvez le changer en un jet avec Espoir à la place."
+      },
+      {
+        "en": "Celestial Wings",
+        "fr": "Ailes célestes",
+        "desc": "Vous avez des ailes qui vous permettent de voler. Une fois par scène en volant, vous pouvez dépenser un Espoir au lieu de marquer un emplacement d'armure."
+      }
+    ],
+    "img": "icons/magic/holy/angel-winged-humanoid-blue.webp"
+  },
+  {
+    "id": "yyW0UM8srD9WuwW7",
+    "en": "Katari",
+    "fr": "Shatari",
+    "fan": false,
+    "desc": "Jouez le Gardien des Éléments si vous souhaitez incarner les éléments naturels de la nature.",
+    "abilities": [
+      {
+        "en": "Feline Instincts",
+        "fr": "Instincts félins",
+        "desc": "Lorsque vous effectuez un jet d'Agilité, vous pouvez dépenser 2 Espoir pour relancer votre Dé d'Espoir."
+      },
+      {
+        "en": "Retracting Claws",
+        "fr": "Griffes rétractiles",
+        "desc": "Effectuez un jet d'Agilité pour gratter une cible à Mêlée. En cas de succès, elle devient temporairement Vulnérable."
+      }
+    ],
+    "img": "icons/creatures/claws/claw-straight-orange.webp"
+  },
+  {
+    "id": "HwOoBKXOL9Tf5j85",
+    "en": "Ribbet",
+    "fr": "Côa",
+    "fan": false,
+    "desc": "Jouez le Gardien du Renouveau si vous souhaitez utiliser une puissante magie pour guérir votre groupe.",
+    "abilities": [
+      {
+        "en": "Amphibious",
+        "fr": "Amphibie",
+        "desc": "Vous pouvez respirer et vous déplacer naturellement sous l'eau."
+      },
+      {
+        "en": "Long Tongue",
+        "fr": "Longue langue",
+        "desc": "Vous pouvez utiliser votre longue langue pour saisir des choses à Rapprochée. Marquez un Stress pour utiliser votre langue comme une arme de Finesse à Rapprochée qui inflige d12 dégâts physiques en utilisant votre Compétence."
+      }
+    ],
+    "img": "icons/creatures/amphibians/bullfrog-glass-teal.webp"
+  },
+  {
+    "id": "moNuI4qFehGE1ZgV",
+    "en": "Emberkin",
+    "fr": "Braiselin",
+    "fan": true,
+    "desc": "Les Emberkin sont des humanoïdes dont le corps est fait de chair et de feu.",
+    "abilities": [
+      {
+        "en": "Fireproof",
+        "fr": "Ignifuge",
+        "desc": "Vous êtes immunisé contre les dégâts provenant du feu magique ou ordinaire."
+      },
+      {
+        "en": "Ignition",
+        "fr": "Allumage",
+        "desc": "Marquez un Stress pour envelopper votre arme principale de flammes jusqu'à la fin de la scène. Tandis que l'arme est Enflammée, elle émet une lumière vive, et vous obtenez un bonus de 1d6 aux jets de dégâts avec cette arme."
+      }
+    ],
+    "img": "icons/magic/fire/elemental-fire-humanoid.webp"
+  },
+  {
+    "id": "pDt6fI6otv2E2odf",
+    "en": "Dwarf",
+    "fr": "Nain",
+    "fan": false,
+    "desc": "Les Nains sont facilement reconnaissables comme des humanoïdes de petite taille, à la carrure carrée, à la musculature dense et aux cheveux épais.",
+    "abilities": [
+      {
+        "en": "Thick Skin",
+        "fr": "Épiderme épais",
+        "desc": "Lorsque vous subissez des dégâts Majeurs, vous pouvez marquer 2 Stress au lieu de marquer un PV."
+      },
+      {
+        "en": "Increased Fortitude",
+        "fr": "Vigueur accrue",
+        "desc": "Dépensez 3 Espoir pour réduire de moitié les dégâts physiques entrants."
+      }
+    ],
+    "img": "icons/equipment/head/helm-norman-engraved.webp"
+  },
+  {
+    "id": "eZNG5Iv0yfbHs5CO",
+    "en": "Galapa",
+    "fr": "Galapa",
+    "fan": false,
+    "desc": "Jouez la Guilde des Empoisonneurs si vous souhaitez affaiblir vos cibles avec des afflictions punitives.",
+    "abilities": [
+      {
+        "en": "Shell",
+        "fr": "Carapace",
+        "desc": "Vous obtenez un bonus à vos seuils de dégâts égal à votre Compétence."
+      },
+      {
+        "en": "Retract",
+        "fr": "Se rétracter",
+        "desc": "Marquez un Stress pour vous rétracter dans votre carapace. Tandis que vous êtes dans votre carapace, vous avez une résistance aux dégâts physiques, vous avez désavantage sur les jets d'action, et vous ne pouvez pas vous déplacer.\n(Lorsque marqué, activez manuellement l'effet Rétracté sur Actif dans l'onglet des effets et marquez désavantage lorsque vous effectuez des jets d'action. Désactivez manuellement l'effet Rétracté sur Inactif dans l'onglet des effets lorsque vous n'êtes plus rétracté dans votre carapace.)"
+      }
+    ],
+    "img": "icons/creatures/reptiles/turtle-shell-glowing-green.webp"
+  },
+  {
+    "id": "whKWzHY0cC4fAsLs",
+    "en": "Tidekin",
+    "fr": "Maréen",
+    "fan": true,
+    "desc": "Les Tidekin sont des humanoïdes dont le corps est fait de chair et d'eau.",
+    "abilities": [
+      {
+        "en": "Amphibious",
+        "fr": "Amphibie",
+        "desc": "Vous pouvez respirer et vous déplacer naturellement sous l'eau."
+      },
+      {
+        "en": "Lifespring",
+        "fr": "Source de vie",
+        "desc": "Une fois par repos, lorsque vous avez accès à un peu d'eau, vous pouvez marquer un Stress pour soigner un PV sur vous-même ou sur un allié à Très rapprochée."
+      }
+    ],
+    "img": "icons/magic/water/wave-water-teal.webp"
+  },
+  {
+    "id": "hyxcuF2I0xcZSGkm",
+    "en": "Infernis",
+    "fr": "Infernis",
+    "fan": false,
+    "desc": "Jouez l'École de Guerre si vous souhaitez utiliser la magie entraînée pour la violence.",
+    "abilities": [
+      {
+        "en": "Fearless",
+        "fr": "Intrépide",
+        "desc": "Lorsque vous effectuez un jet avec Peur, vous pouvez marquer 2 Stress pour le changer en un jet avec Espoir à la place."
+      },
+      {
+        "en": "Dread Visage",
+        "fr": "Visage effrayant",
+        "desc": "Vous avez avantage sur les jets d'intimidation envers les créatures hostiles."
+      }
+    ],
+    "img": "icons/creatures/unholy/demon-female-succubus-orange.webp"
+  },
+  {
+    "id": "ed8BoLR4SHOpeV00",
+    "en": "Clank",
+    "fr": "Clank",
+    "fan": false,
+    "desc": "Jouez la Lune si vous souhaitez incarner un pouvoir céleste pour amplifier votre magie.",
+    "abilities": [
+      {
+        "en": "Purposeful Design",
+        "fr": "Conception réfléchie",
+        "desc": "Décidez qui vous a créé et dans quel but. À la création du personnage, choisissez une de vos Expériences qui correspond le mieux à ce but et obtenez un bonus permanent +1 à celle-ci.\nNote : L'automatisation n'est pas implémentée pour le bonus permanent. Augmentez manuellement l'expérience dans le champ d'édition correspondant."
+      },
+      {
+        "en": "Efficient",
+        "fr": "Efficace",
+        "desc": "Lorsque vous prenez un court repos, vous pouvez choisir une capacité de long repos à la place d'une capacité de court repos."
+      }
+    ],
+    "img": "icons/creatures/magical/construct-golem-stone-blue.webp"
+  },
+  {
+    "id": "RkSFOANAzYlAVv91",
+    "en": "Gnome",
+    "fr": "Gnome",
+    "fan": true,
+    "desc": "Les Gnomes sont généralement de petits humanoïdes à la tête conique et capables de se téléporter sur de courtes distances.",
+    "abilities": [
+      {
+        "en": "Nimble Fingers",
+        "fr": "Doigts agiles",
+        "desc": "Lorsque vous effectuez un jet de Finesse, vous pouvez dépenser 2 Espoir pour relancer votre Dé d'Espoir."
+      },
+      {
+        "en": "Flicker Step",
+        "fr": "Pas vacillant",
+        "desc": "Une fois par scène, vous pouvez vous téléporter vers un autre point que vous pouvez voir à Éloignée."
+      }
+    ],
+    "img": "icons/magic/movement/trail-streak-zigzag-teal.webp"
+  },
+  {
+    "id": "q2l6g3Ssa04K84GO",
+    "en": "Elf",
+    "fr": "Elfe",
+    "fan": false,
+    "desc": "Jouez l'Origine Élémentaire si vous souhaitez canaliser de la magie brute pour\nprendre la forme d'un élément spécifique.",
+    "abilities": [
+      {
+        "en": "Quick Reactions",
+        "fr": "Réactions rapides",
+        "desc": "Marquez un Stress pour obtenir un avantage sur un jet de Réaction."
+      },
+      {
+        "en": "Celestial Trance",
+        "fr": "Transe céleste",
+        "desc": "Pendant un repos, vous pouvez tomber en transe pour choisir un mouvement de temps mort supplémentaire."
+      }
+    ],
+    "img": "icons/weapons/ammunition/arrows-fletching.webp"
+  },
+  {
+    "id": "UfSkmzJu8trnSbJW",
+    "en": "Earthkin",
+    "fr": "Tellurien",
+    "fan": true,
+    "desc": "Les Terriens sont des humanoïdes dont les corps sont faits de chair et de terre.",
+    "abilities": [
+      {
+        "en": "Stoneskin",
+        "fr": "Peau de pierre",
+        "desc": "Gagnez un bonus permanent de +1 à votre Score d'armure et aux seuils de dégâts à la création du personnage."
+      },
+      {
+        "en": "Immovable",
+        "fr": "Immobile",
+        "desc": "Tant que vous touchez le sol, vous ne pouvez pas être soulevé ou déplacé contre votre volonté."
+      }
+    ],
+    "img": "icons/magic/defensive/armor-stone-skin.webp"
+  },
+  {
+    "id": "EKPEdIz9lA9grPqH",
+    "en": "Goblin",
+    "fr": "Gobelin",
+    "fan": false,
+    "desc": "Jouez le Syndic si vous voulez disposer d'un réseau de contacts partout où vous allez.",
+    "abilities": [
+      {
+        "en": "Surefooted",
+        "fr": "Pied sûr",
+        "desc": "Vous ignorez le désavantage sur les jets d'Agilité."
+      },
+      {
+        "en": "Danger Sense",
+        "fr": "Pressentir le danger",
+        "desc": "Une fois par repos, marquez un Stress pour forcer un adversaire à relancer une attaque contre vous ou un allié à Très courte portée."
+      }
+    ],
+    "img": "icons/magic/symbols/arrowhead-green.webp"
+  }
+]
