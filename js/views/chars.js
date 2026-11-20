@@ -22,7 +22,7 @@ export async function render(main, params) {
   } else {
     for (const c of [...st.characters].sort((a, b) => b.updatedAt - a.updatedAt)) {
       const card = el(`<button class="char-card" data-id="${c.id}">
-        <span class="ava">${esc((c.name || '?')[0].toUpperCase())}</span>
+        <span class="ava">${c.portrait ? `<img src="${esc(c.portrait)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block">` : esc((c.name || '?')[0].toUpperCase())}</span>
         <span class="cc-body">
           <span class="cc-name">${esc(c.name || 'Sans nom')}</span>
           <span class="cc-meta">

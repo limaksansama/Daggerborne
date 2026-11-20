@@ -93,7 +93,7 @@ export function newCharacter(base) {
     id: uid(),
     createdAt: Date.now(),
     updatedAt: Date.now(),
-    name: '', pronouns: '', ancestry: null, community: null,
+    name: '', pronouns: '', portrait: '', ancestry: null, community: null,
     classId: null, subclassId: null,
     heritage: '', subclassText: '',
     traits: { agility: 0, strength: 0, finesse: 0, instinct: 0, presence: 0, knowledge: 0 },

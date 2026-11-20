@@ -35,6 +35,7 @@ function migrate(c, weapons, armors, subclasses) {
     if (subName) { c.subclassText = subName; dirty = true; }
   }
   if (c.transformation === undefined) { c.transformation = ''; dirty = true; }
+  if (c.portrait === undefined) { c.portrait = ''; dirty = true; }
   if (!Array.isArray(c.experiences)) { c.experiences = []; dirty = true; }
   while (c.experiences.length < 5) { c.experiences.push({ name: '', mod: 2 }); dirty = true; }
   if (c.hp.active === undefined) { c.hp.active = c.hp.max || 6; c.hp.unlocked = 0; dirty = true; }
@@ -138,9 +139,18 @@ export async function render(main, params) {
       </defs>
     </svg>
 
-    <!-- ===== EN-TÊTE : bannière + identité + badge NIVEAU ===== -->
+    <!-- ===== EN-TÊTE : portrait + identité + classe/niveau ===== -->
     <header class="dh-header">
-      <div class="dh-brand" title="Classe principale"><span class="b1">${esc(c.className || 'Classe')}</span></div>
+      <div class="dh-portrait ${c.portrait ? 'has-img' : ''}" id="dh-portrait" role="button" tabindex="0" title="${c.portrait ? 'Changer le portrait du personnage' : 'Ajouter un portrait'}">
+        ${c.portrait
+          ? `<img src="${esc(c.portrait)}" alt="${esc(c.name || 'Portrait')}" class="dh-portrait-img">
+             <button type="button" class="dh-portrait-del" id="dh-portrait-del" title="Retirer le portrait" aria-label="Retirer le portrait">×</button>
+             <span class="dh-portrait-edit" aria-hidden="true">✎</span>`
+          : `<svg class="dh-portrait-ph" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="4"/><path d="M4.5 20.5c.6-4.2 3.7-6.5 7.5-6.5s6.9 2.3 7.5 6.5"/></svg>
+             <span class="dh-portrait-lbl">Portrait</span>
+             <span class="dh-portrait-add">＋ Photo</span>`}
+        <input type="file" id="portrait-file" accept="image/*" style="display:none">
+      </div>
       <div class="dh-idfields">
         <label class="dh-idf w2"><span>Nom</span><input data-f="name" value="${esc(c.name)}" placeholder="Nom du personnage"></label>
         <label class="dh-idf"><span>Pronoms</span><input data-f="pronouns" value="${esc(c.pronouns)}" placeholder="iel · elle · il"></label>
@@ -150,6 +160,7 @@ export async function render(main, params) {
         <datalist id="transf-list">${(await data('transformations')).map(t => `<option value="${esc(t.fr)}">`).join('')}</datalist>
       </div>
       <div class="dh-level" title="Niveau ${c.level} — les seuils de dégâts l'utilisent">
+        <div class="dh-class-top" title="Classe principale">${esc(c.className || 'Classe')}</div>
         <span class="dh-lv-shield">
           <svg viewBox="0 0 64 74" preserveAspectRatio="none" aria-hidden="true"><polygon points="1,1 63,1 63,50 32,73 1,50"/></svg>
           <span class="dh-lv-num">${c.level}</span>
@@ -533,6 +544,59 @@ function weaponCardHTML(w, i, c) {
 function bindAll(root, c, ctx) {
   const { main, params } = ctx;
   const refresh = () => { saveChar(c); render(main, params); };
+
+  /* --- portrait du personnage (redimensionné côté client pour localStorage) --- */
+  const portBox = $('#dh-portrait', root);
+  const portIn = $('#portrait-file', root);
+  if (portBox && portIn) {
+    portBox.addEventListener('click', (e) => {
+      if (e.target.closest('#dh-portrait-del') || e.target === portIn) return;
+      portIn.click();
+    });
+    portBox.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); portIn.click(); }
+    });
+    $('#dh-portrait-del', root)?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      c.portrait = '';
+      refresh();
+      toast('Portrait retiré.');
+    });
+    portIn.addEventListener('change', (e) => {
+      const f = e.target.files?.[0];
+      e.target.value = '';
+      if (!f) return;
+      if (!f.type.startsWith('image/')) { toast('Fichier image invalide.'); return; }
+      const url = URL.createObjectURL(f);
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const maxSide = 360;
+          const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+          const w = Math.max(1, Math.round(img.width * scale));
+          const h = Math.max(1, Math.round(img.height * scale));
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          const c2d = canvas.getContext('2d');
+          c2d.fillStyle = '#141122';
+          c2d.fillRect(0, 0, w, h);
+          c2d.drawImage(img, 0, 0, w, h);
+          c.portrait = canvas.toDataURL('image/jpeg', 0.84);
+          refresh();
+          toast('Portrait mis à jour.');
+        } catch (err) {
+          toast('Impossible de charger ce portrait (stockage plein ou image invalide).');
+        } finally {
+          URL.revokeObjectURL(url);
+        }
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        toast('Fichier image invalide.');
+      };
+      img.src = url;
+    });
+  }
 
   /* --- niveau --- */
   $('[data-lvl="-1"]', root)?.addEventListener('click', () => {
