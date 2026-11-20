@@ -170,27 +170,34 @@ async function rollDuality({ mod = 0, label = '', charId = null, weaponUid = nul
   }
 }
 
-/* ---------- jet de dés standards (notation dn) — thème nebula-gold ---------- */
+/* ---------- jet de dés standards (notation ndX ou ndX+Y) — thème nebula-gold ---------- */
 async function rollDice(notation, { label = '' } = {}) {
   if (busy) return null;
   busy = true;
   try {
+    const clean = String(notation || '1d6').replace(/\s+/g, '');
+    const modMatch = clean.match(/([+-]\d+)$/);
+    const flatMod = modMatch ? parseInt(modMatch[1], 10) : 0;
+    const dicePart = modMatch ? clean.slice(0, -modMatch[1].length) : clean;
+
     const db = await ensureInit();
-    const rolls = await db.roll(notation);
+    const rolls = await db.roll(dicePart);
     /* lecture sûre : fallback local si la physique n'a pas pu lire une face (dice-box #74) */
-    const sidesOf = r => parseInt(r?.dieType?.replace('d', '') || (notation.match(/d(\d+)/) || [])[1] || '6', 10);
+    const sidesOf = r => parseInt(r?.dieType?.replace('d', '') || (dicePart.match(/d(\d+)/) || [])[1] || '6', 10);
     const values = rolls.map(r => safeValue(r, sidesOf(r)));
-    const total = values.reduce((a, b) => a + b, 0);
+    const diceSum = values.reduce((a, b) => a + b, 0);
+    const total = diceSum + flatMod;
+    const modTxt = flatMod ? ` (${flatMod > 0 ? '+' + flatMod : flatMod})` : '';
     setState(s => {
-      s.rolls.unshift({ id: 'r' + Date.now(), t: Date.now(), notation, total, label: label || notation, hope: null, fear: null, result: 'plain' });
+      s.rolls.unshift({ id: 'r' + Date.now(), t: Date.now(), notation: clean, total, label: label || clean, hope: null, fear: null, result: 'plain' });
       s.rolls = s.rolls.slice(0, 60);
     });
     showBanner(`
       <div class="d3d-total">${total}</div>
-      <div class="d3d-status plain">${esc(label || notation)}</div>
-      <div class="d3d-detail">${esc(notation)} : ${values.join(' + ')} = ${total}</div>`,
+      <div class="d3d-status plain">${esc(label || clean)}</div>
+      <div class="d3d-detail">${esc(clean)} : ${values.join(' + ')}${modTxt} = ${total}</div>`,
       { buttons: [{ id: 'close', label: 'Fermer', cls: 'ghost', action: () => { try { diceBox?.clear(); } catch (e) { /* noop */ } closeBanner(); } }] });
-    return { total, rolls: values };
+    return { total, rolls: values, mod: flatMod };
   } catch (e) {
     console.error('rollDice:', e);
     closeBanner();
@@ -208,7 +215,8 @@ export async function rollDamage(charId, weaponUid) {
   if (!w) return null;
   const n = c.proficiency;                                  /* Maîtrise */
   const face = parseInt((w.dice || 'd6').replace('d', ''), 10) || 6;
-  const notation = `${n}d${face}`;
+  const bonus = parseInt(w.dmgBonus, 10) || 0;
+  const notation = bonus ? `${n}d${face}${bonus > 0 ? '+' + bonus : bonus}` : `${n}d${face}`;
   return rollDice(notation, { label: `Dégâts — ${w.name}` });
 }
 

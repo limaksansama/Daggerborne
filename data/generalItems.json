@@ -2660,5 +2660,50 @@
     "img": "icons/consumables/drinks/coconut-fruit-milk.webp",
     "fan": false,
     "descFr": "Après avoir consommé ce lait, la prochaine fois que vous effacez 1 ou plusieurs PV, vous effacez un PV supplémentaire."
+  },
+  {
+    "id": "33lsDyMuZZSBWKAo",
+    "en": "Dynamite",
+    "fr": "Dynamite",
+    "type": "consumable",
+    "rarity": "Courant",
+    "campaign": "western",
+    "fan": false,
+    "descEn": "You can light this dynamite and toss it within Close range. All creatures within Very Close range of where the dynamite lands must make a Reaction Roll (14). Targets who fail take 1d20+5 physical damage. Targets who succeed must mark a Stress. Dynamite deals double damage to inanimate objects or structures.",
+    "descFr": "Vous pouvez allumer cette dynamite et la lancer à portée Courte. Toutes les créatures à portée Très courte du point d'impact font un jet de Réaction (14) : en cas d'échec, elles subissent 1d20+5 dégâts physiques ; en cas de réussite, elles marquent 1 Stress. Inflige le double des dégâts aux objets inanimés et structures.",
+    "img": "icons/weapons/thrown/bomb-fuse-lit.webp"
+  },
+  {
+    "id": "z3qzQoThgcZafEZr",
+    "en": "Torch",
+    "fr": "Torche",
+    "type": "loot",
+    "rarity": "Courant",
+    "fan": false,
+    "descEn": "A standard adventuring torch providing light in dark places.",
+    "descFr": "Torche d'aventure classique permettant d'éclairer les lieux sombres.",
+    "img": "icons/sundries/lights/torch-brown-lit.webp"
+  },
+  {
+    "id": "ocBTBdfvjTqIehtf",
+    "en": "50 Feet of Rope",
+    "fr": "Corde (15 m)",
+    "type": "loot",
+    "rarity": "Courant",
+    "fan": false,
+    "descEn": "50 feet of sturdy rope, useful for climbing walls or descending cliffs.",
+    "descFr": "15 mètres de corde robuste, utile pour escalader une paroi ou descendre une falaise en rappel.",
+    "img": "icons/sundries/survival/rope-coiled-brown.webp"
+  },
+  {
+    "id": "jga6tUNjZjTpK6td",
+    "en": "Basic Supplies",
+    "fr": "Fournitures de base",
+    "type": "loot",
+    "rarity": "Courant",
+    "fan": false,
+    "descEn": "Standard adventuring supplies: bedroll, tinderbox, rations, waterskin, and everyday travel essentials.",
+    "descFr": "Nécessaire de voyage standard : couverture, boîte à amadou, rations, outre et matériel courant.",
+    "img": "icons/containers/bags/pack-leather-brown.webp"
   }
 ]

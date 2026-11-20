@@ -24,6 +24,8 @@ function initWiz() {
     ancestryId: null, communityId: null,
     traits: { agility: null, strength: null, finesse: null, instinct: null, presence: null, knowledge: null },
     primaryWeaponId: null, secondaryWeaponId: null, armorId: null, twoHanded: false,
+    includeCampaignGear: false,
+    startingPotion: 'health',
     cardIds: [],
     experiences: [{ name: '', mod: 2 }, { name: '', mod: 2 }],
     name: '', pronouns: '', answers: {}, notes: '',
@@ -282,14 +284,22 @@ async function stepEquipment(body) {
   const cl = classes.find(c => c.id === wiz.classId);
   const sub = subclasses.find(s => s.id === wiz.subclassId);
   const hasSpellcast = !!sub?.spellcastTrait;
+  const CAMPAIGN_TAGS = { everyday: 'Quotidien', western: 'Western', monster: 'Chasse' };
+  const fmtB = (b) => b ? (b > 0 ? `+${b}` : `${b}`) : '';
 
-  const primaries = weapons.filter(w => !w.secondary && w.tier === 1 && (!w.mag || true));
-  const secondaries = weapons.filter(w => w.secondary && w.tier === 1);
-  const armorList = armors.filter(a => a.tier === 1);
+  const tier1Filter = (x) => x.tier === 1 && (wiz.includeCampaignGear || !x.campaign);
+  const primaries = weapons.filter(w => !w.secondary && tier1Filter(w));
+  const secondaries = weapons.filter(w => w.secondary && tier1Filter(w));
+  const armorList = armors.filter(tier1Filter);
   const primary = weapons.find(w => w.id === wiz.primaryWeaponId);
 
   body.innerHTML = `
-    <div class="section-title" style="margin-top:0">Arme principale</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:.6rem">
+      <div class="section-title" style="margin:0">Arme principale</div>
+      <label style="display:inline-flex;align-items:center;gap:.4rem;font-size:.78rem;color:var(--text-dim);cursor:pointer">
+        <input type="checkbox" id="eq-camp" ${wiz.includeCampaignGear ? 'checked' : ''}> Inclure l'équipement des cadres de campagne (Quotidien, Western, Chasse)
+      </label>
+    </div>
     <p class="page-sub" style="margin-bottom:.7rem">Une arme à deux mains, ou une arme à une main + une arme secondaire. ${hasSpellcast ? 'Votre sous-classe donne accès aux armes magiques.' : 'Les armes magiques nécessitent un trait d’Incantation.'}</p>
     <div class="choice-grid" id="wgrid"></div>
     <div id="sec-block" style="display:${primary && primary.burden === 'oneHanded' ? 'block' : 'none'}">
@@ -298,7 +308,28 @@ async function stepEquipment(body) {
     </div>
     <div class="section-title">Armure</div>
     <p class="page-sub" style="margin-bottom:.7rem">L'armure définit votre Valeur d'armure et vos seuils de dégâts (auxquels s'ajoute votre niveau).</p>
-    <div class="choice-grid" id="agrid"></div>`;
+    <div class="choice-grid" id="agrid"></div>
+    <div class="section-title">Potion de départ (SRD 2.0)</div>
+    <p class="page-sub" style="margin-bottom:.7rem">En plus de votre torche, 15 m de corde et fournitures de base, choisissez votre potion de départ :</p>
+    <div class="choice-grid" id="pgrid">
+      <button class="choice ${wiz.startingPotion !== 'stamina' ? 'selected' : ''}" data-pot="health">
+        <div class="ch-head"><span class="ch-name">🧪 Potion de santé mineure</span></div>
+        <div class="ch-desc">Consommable — Régénérez 1d4 PV.</div>
+      </button>
+      <button class="choice ${wiz.startingPotion === 'stamina' ? 'selected' : ''}" data-pot="stamina">
+        <div class="ch-head"><span class="ch-name">🧪 Potion de résilience mineure</span></div>
+        <div class="ch-desc">Consommable — Régénérez 1d4 Stress.</div>
+      </button>
+    </div>`;
+
+  $('#eq-camp', body)?.addEventListener('change', (e) => {
+    wiz.includeCampaignGear = e.target.checked;
+    draw(getMain());
+  });
+  $$('[data-pot]', body).forEach(b => b.addEventListener('click', () => {
+    wiz.startingPotion = b.dataset.pot;
+    draw(getMain());
+  }));
 
   const wgrid = $('#wgrid', body);
   for (const w of primaries) {
@@ -306,12 +337,14 @@ async function stepEquipment(body) {
     if (isMag && !hasSpellcast) continue;
     const b = el(`<button class="choice ${wiz.primaryWeaponId === w.id ? 'selected' : ''}" data-id="${w.id}">
       <div class="ch-head"><span class="ch-name">${esc(w.fr)}</span>
+        ${w.campaign ? `<span class="tag">${esc(CAMPAIGN_TAGS[w.campaign] || w.campaign)}</span>` : ''}
         <span class="stat-chip">${T.burden[w.burden]}</span></div>
       <div class="ch-stats">
         <span class="stat-chip">${T.traits[w.trait] || '—'}</span>
         <span class="stat-chip">Portée <b>${esc(w.range)}</b></span>
-        <span class="stat-chip">Dégâts <b>${w.dice}</b> ${w.dmgType === 'mag' ? 'mag' : 'phy'}</span>
+        <span class="stat-chip">Dégâts <b>${w.dice}${fmtB(w.dmgBonus)}</b> ${w.dmgType === 'mag' ? 'mag' : 'phy'}</span>
       </div>
+      ${w.desc ? `<div class="ch-desc" style="font-size:.76rem">${esc(w.desc)}</div>` : ''}
     </button>`);
     b.addEventListener('click', () => {
       wiz.primaryWeaponId = w.id; /* re-clic : conserve la sélection */
@@ -325,11 +358,12 @@ async function stepEquipment(body) {
     const isMag = w.dmgType === 'mag';
     if (isMag && !hasSpellcast) continue;
     const b = el(`<button class="choice ${wiz.secondaryWeaponId === w.id ? 'selected' : ''}" data-id="${w.id}">
-      <div class="ch-head"><span class="ch-name">${esc(w.fr)}</span></div>
+      <div class="ch-head"><span class="ch-name">${esc(w.fr)}</span>${w.campaign ? `<span class="tag">${esc(CAMPAIGN_TAGS[w.campaign] || w.campaign)}</span>` : ''}</div>
       <div class="ch-stats">
         <span class="stat-chip">${T.traits[w.trait] || '—'}</span>
-        <span class="stat-chip"><b>${w.dice}</b> ${w.dmgType === 'mag' ? 'mag' : 'phy'}</span>
+        <span class="stat-chip"><b>${w.dice}${fmtB(w.dmgBonus)}</b> ${w.dmgType === 'mag' ? 'mag' : 'phy'}</span>
       </div>
+      ${w.desc ? `<div class="ch-desc" style="font-size:.76rem">${esc(w.desc)}</div>` : ''}
     </button>`);
     b.addEventListener('click', () => {
       wiz.secondaryWeaponId = w.id; /* re-clic : conserve la sélection */
@@ -340,12 +374,13 @@ async function stepEquipment(body) {
   const agrid = $('#agrid', body);
   for (const a of armorList) {
     const b = el(`<button class="choice ${wiz.armorId === a.id ? 'selected' : ''}" data-id="${a.id}">
-      <div class="ch-head"><span class="ch-name">${esc(a.fr)}</span></div>
+      <div class="ch-head"><span class="ch-name">${esc(a.fr)}</span>${a.campaign ? `<span class="tag">${esc(CAMPAIGN_TAGS[a.campaign] || a.campaign)}</span>` : ''}</div>
       <div class="ch-stats">
         <span class="stat-chip">Valeur d'armure <b>${a.armorScore}</b></span>
         <span class="stat-chip">Seuils <b>${a.major}/${a.severe}</b></span>
         ${a.heavy ? '<span class="stat-chip">Lourd</span>' : ''}
       </div>
+      ${a.desc ? `<div class="ch-desc" style="font-size:.76rem">${esc(a.desc)}</div>` : ''}
     </button>`);
     b.addEventListener('click', () => {
       wiz.armorId = a.id; /* re-clic : conserve la sélection */
@@ -516,8 +551,9 @@ async function finish(main) {
         trait: weapons.find(w => w.id === wiz.primaryWeaponId).trait,
         range: weapons.find(w => w.id === wiz.primaryWeaponId).range,
         dice: weapons.find(w => w.id === wiz.primaryWeaponId).dice,
+        dmgBonus: weapons.find(w => w.id === wiz.primaryWeaponId).dmgBonus || 0,
         dmgType: weapons.find(w => w.id === wiz.primaryWeaponId).dmgType,
-        feature: '',
+        feature: weapons.find(w => w.id === wiz.primaryWeaponId).desc || '',
         hands: weapons.find(w => w.id === wiz.primaryWeaponId).burden === 'twoHanded' ? 'two' : 'one',
         state: 'active', primary: true, secondary: false,
       }] : []),
@@ -527,23 +563,26 @@ async function finish(main) {
         trait: weapons.find(w => w.id === wiz.secondaryWeaponId).trait,
         range: weapons.find(w => w.id === wiz.secondaryWeaponId).range,
         dice: weapons.find(w => w.id === wiz.secondaryWeaponId).dice,
+        dmgBonus: weapons.find(w => w.id === wiz.secondaryWeaponId).dmgBonus || 0,
         dmgType: weapons.find(w => w.id === wiz.secondaryWeaponId).dmgType,
-        feature: '',
+        feature: weapons.find(w => w.id === wiz.secondaryWeaponId).desc || '',
         hands: weapons.find(w => w.id === wiz.secondaryWeaponId).burden === 'twoHanded' ? 'two' : 'one',
         state: 'active', primary: false, secondary: true,
       }] : []),
     ],
     armorCard: armor
-      ? { compendiumId: armor.id, name: armor.fr, baseScore: armor.armorScore, baseMajor: armor.major, baseSevere: armor.severe, feature: '' }
+      ? { compendiumId: armor.id, name: armor.fr, baseScore: armor.armorScore, baseMajor: armor.major, baseSevere: armor.severe, feature: armor.desc || '' }
       : { compendiumId: null, name: '', baseScore: 0, baseMajor: 0, baseSevere: 0, feature: '' },
     domainCards: wiz.cardIds.map((id, i) => ({ cardId: id, inHand: i < 5 })),
     goldTrack: { handfuls: 2, bags: 0, chests: 0 },
     journal: [],
     inventory: [
-      { name: 'Torche', qty: 1, desc: "Vous pouvez allumer cette torche magique à volonté. Sa flamme éclaire une surface bien plus large qu'elle ne le devrait." },
-      { name: 'Corde (15 m)', qty: 1, desc: 'Utile pour escalader un mur ou descendre une falaise en rappel.' },
-      { name: 'Fournitures de base', qty: 1, desc: 'Tente, lit, boîte à amadou, rations…' },
-      { name: 'Potion de santé mineure', qty: 1, desc: 'Effacez 1d4 PV.', itemId: 'tPfKtKRRjv8qdSqy' },
+      { name: 'Torche', qty: 1, type: 'loot', desc: "Torche d'aventure classique permettant d'éclairer les lieux sombres.", itemId: 'z3qzQoThgcZafEZr' },
+      { name: 'Corde (15 m)', qty: 1, type: 'loot', desc: '15 mètres de corde robuste, utile pour escalader une paroi ou descendre une falaise en rappel.', itemId: 'ocBTBdfvjTqIehtf' },
+      { name: 'Fournitures de base', qty: 1, type: 'loot', desc: 'Nécessaire de voyage standard : couverture, boîte à amadou, rations, outre et matériel courant.', itemId: 'jga6tUNjZjTpK6td' },
+      wiz.startingPotion === 'stamina'
+        ? { name: 'Potion de résilience mineure', qty: 1, type: 'consumable', desc: 'Régénérez 1d4 Stress.', itemId: 'b6vGSPFWOlzZZDLO' }
+        : { name: 'Potion de santé mineure', qty: 1, type: 'consumable', desc: 'Régénérez 1d4 PV.', itemId: 'tPfKtKRRjv8qdSqy' },
     ],
     backgroundAnswers: { ...wiz.answers },
     className: cl.fr, hopeAbility: { name: cl.hopeAbility, desc: cl.hopeDesc },

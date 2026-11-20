@@ -15,13 +15,18 @@ const TABS = [
 ];
 let ui = { tab: 'cards', q: '', domain: null, tier: null, itemType: null };
 let advShown = 60; /* pagination des adversaires : 60 par lot, plus de limite cachée */
+const CAMPAIGN_LABELS = { everyday: 'Quotidien', western: 'Western', monster: 'Chasse' };
+const fmtBonus = (b) => {
+  const n = parseInt(b, 10) || 0;
+  return n ? (n > 0 ? `+${n}` : `${n}`) : '';
+};
 
 export async function render(main, params) {
   main.classList.add('wide');
   main.innerHTML = `
   <div class="view">
     <h1 class="page-title">Compendium</h1>
-    <p class="page-sub">Toutes les données officielles en français — ${210} cartes, 13 classes, 24 ascendances, 15 communautés, 242 objets, équipement et adversaires.</p>
+    <p class="page-sub">Toutes les données du SRD 2.0 en français — 210 cartes, 13 classes, 24 ascendances, 15 communautés, 246 objets, 400 armes, 85 armures et 264 adversaires.</p>
     <div class="search-bar">
       <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
       <input type="text" id="q" placeholder="Rechercher (nom, description…)" value="${esc(ui.q)}">
@@ -107,11 +112,11 @@ async function listResults(main) {
     let list = items.filter(i => (!ui.itemType || i.type === ui.itemType));
     if (q) list = list.filter(i => (i.fr + ' ' + i.en + ' ' + (i.descFr || '') + ' ' + (i.descEn || '')).toLowerCase().includes(q));
     list = list.sort((a, b) => a.fr.localeCompare(b.fr, 'fr'));
-    res.insertAdjacentHTML('beforeend', `<p class="page-sub">${list.length} objet(s) — butin magique et consommables du livre de règles${list.some(i => i.fan) ? ' + Hope & Fear' : ''}</p>`);
+    res.insertAdjacentHTML('beforeend', `<p class="page-sub">${list.length} objet(s) — matériel de base, butin magique et consommables du SRD 2.0${list.some(i => i.fan) ? ' + Hope & Fear' : ''}</p>`);
     for (const i of list) {
       mk({
         key: i.id, type: 'item', raw: i, name: i.fr,
-        sub: `${i.type === 'consumable' ? 'Consommable' : 'Butin'}${i.rarity ? ' · ' + i.rarity : ''}${i.fan ? ' · supplément Hope & Fear' : ''}`,
+        sub: `${i.type === 'consumable' ? 'Consommable' : 'Butin'}${i.rarity ? ' · ' + i.rarity : ''}${i.campaign ? ' · ' + (CAMPAIGN_LABELS[i.campaign] || i.campaign) : ''}${i.fan ? ' · supplément Hope & Fear' : ''}`,
         icon: i.type === 'consumable' ? '🧪' : '🎁',
         fanTag: i.fan ? '<span class="tag fan">H&F</span>' : '',
       });
@@ -120,7 +125,7 @@ async function listResults(main) {
     const classes = await data('classes');
     const domains = await data('domains');
     let list = [...classes].sort((a, b) => a.fr.localeCompare(b.fr, 'fr'));
-    if (q) list = list.filter(c => (c.fr + c.desc).toLowerCase().includes(q));
+    if (q) list = list.filter(c => (c.fr + ' ' + c.desc).toLowerCase().includes(q));
     for (const c of list) {
       mk({ key: c.id, type: 'class', raw: c, name: c.fr, sub: c.domains.map(d => domains[d].fr).join(' · ') + ` · PV ${c.hp} · Évasion ${c.evasion}`, fanTag: c.fan ? '<span class="tag fan">H&F</span>' : '' });
     }
@@ -136,16 +141,25 @@ async function listResults(main) {
     }
   } else if (ui.tab === 'weapons') {
     const list = (await data('weapons')).filter(w => (!ui.tier || w.tier === ui.tier));
-    const f = q ? list.filter(w => (w.fr + ' ' + w.en).toLowerCase().includes(q)) : list;
-    res.insertAdjacentHTML('beforeend', `<p class="page-sub">${f.length} arme(s)</p>`);
-    for (const w of f.sort((a, b) => a.fr.localeCompare(b.fr, 'fr'))) {
-      mk({ key: w.id, type: 'weapon', raw: w, name: w.fr, sub: `${T.tiers[w.tier]} · ${w.secondary ? 'Secondaire' : 'Principale'} · ${T.traits[w.trait] || ''} · ${w.range} · ${w.dice} ${w.dmgType}` });
+    const f = q ? list.filter(w => (w.fr + ' ' + w.en + ' ' + (w.desc || '')).toLowerCase().includes(q)) : list;
+    res.insertAdjacentHTML('beforeend', `<p class="page-sub">${f.length} arme(s) — Base &amp; Cadres de campagne</p>`);
+    for (const w of f.sort((a, b) => a.tier - b.tier || a.fr.localeCompare(b.fr, 'fr'))) {
+      mk({
+        key: w.id, type: 'weapon', raw: w, name: w.fr,
+        sub: `${T.tiers[w.tier]} · ${w.secondary ? 'Secondaire' : 'Principale'} · ${T.traits[w.trait] || ''} · ${w.range} · ${w.dice}${fmtBonus(w.dmgBonus)} ${w.dmgType}${w.desc ? ' · ' + w.desc : ''}`,
+        fanTag: w.campaign ? `<span class="tag">${esc(CAMPAIGN_LABELS[w.campaign] || w.campaign)}</span>` : '',
+      });
     }
   } else if (ui.tab === 'armors') {
     const list = (await data('armors')).filter(a => (!ui.tier || a.tier === ui.tier));
-    const f = q ? list.filter(a => (a.fr + ' ' + a.en).toLowerCase().includes(q)) : list;
-    for (const a of f.sort((a, b) => a.fr.localeCompare(b.fr, 'fr'))) {
-      mk({ key: a.id, type: 'armor', raw: a, name: a.fr, sub: `${T.tiers[a.tier]} · Valeur ${a.armorScore} · Seuils ${a.major}/${a.severe}` });
+    const f = q ? list.filter(a => (a.fr + ' ' + (a.en || '') + ' ' + (a.desc || '')).toLowerCase().includes(q)) : list;
+    res.insertAdjacentHTML('beforeend', `<p class="page-sub">${f.length} armure(s) — Base &amp; Cadres de campagne</p>`);
+    for (const a of f.sort((a, b) => a.tier - b.tier || a.fr.localeCompare(b.fr, 'fr'))) {
+      mk({
+        key: a.id, type: 'armor', raw: a, name: a.fr,
+        sub: `${T.tiers[a.tier]} · Valeur ${a.armorScore} · Seuils ${a.major}/${a.severe}${a.heavy ? ' · Lourd' : ''}${a.desc ? ' · ' + a.desc : ''}`,
+        fanTag: a.campaign ? `<span class="tag">${esc(CAMPAIGN_LABELS[a.campaign] || a.campaign)}</span>` : '',
+      });
     }
   } else if (ui.tab === 'adversaries') {
     const list = (await data('adversaries')).filter(a => (!ui.tier || a.tier === ui.tier));
@@ -211,18 +225,20 @@ function showDetail(main, raw, type) {
   } else if (type === 'weapon') {
     inner = `
       <h3>${esc(raw.fr)}</h3>
-      <div class="ms-meta">${T.tiers[raw.tier]} · ${raw.secondary ? 'Arme secondaire' : 'Arme principale'} · ${T.burden[raw.burden]}</div>
+      <div class="ms-meta">${T.tiers[raw.tier]} · ${raw.secondary ? 'Arme secondaire' : 'Arme principale'} · ${T.burden[raw.burden]}${raw.campaign ? ` · ${esc(CAMPAIGN_LABELS[raw.campaign] || raw.campaign)}` : ''}</div>
       <div class="ms-body"><p>Trait : <b>${T.traits[raw.trait] || '—'}</b> · Portée : <b>${esc(raw.range)}</b></p>
-      <p>Dégâts : <b>${raw.dice}</b> (${raw.dmgType === 'mag' ? 'magique' : 'physique'})</p></div>`;
+      <p>Dégâts : <b>${raw.dice}${fmtBonus(raw.dmgBonus)}</b> (${raw.dmgType === 'mag' ? 'magique' : 'physique'})</p>
+      ${raw.desc ? `<p><b style="color:var(--golden)">Feature :</b> ${esc(raw.desc)}</p>` : ''}</div>`;
   } else if (type === 'armor') {
     inner = `
       <h3>${esc(raw.fr)}</h3>
-      <div class="ms-meta">${T.tiers[raw.tier]}</div>
-      <div class="ms-body"><p>Valeur d'armure : <b>${raw.armorScore}</b></p><p>Seuils de base : <b>${raw.major} / ${raw.severe}</b>${raw.heavy ? ' · Lourd (malus d’Évasion)' : ''}</p></div>`;
+      <div class="ms-meta">${T.tiers[raw.tier]}${raw.campaign ? ` · ${esc(CAMPAIGN_LABELS[raw.campaign] || raw.campaign)}` : ''}</div>
+      <div class="ms-body"><p>Valeur d'armure : <b>${raw.armorScore}</b></p><p>Seuils de base : <b>${raw.major} / ${raw.severe}</b>${raw.heavy ? ' · Lourd (malus d’Évasion)' : ''}</p>
+      ${raw.desc ? `<p><b style="color:var(--golden)">Feature :</b> ${esc(raw.desc)}</p>` : ''}</div>`;
   } else if (type === 'item') {
     inner = `
       <h3>${esc(raw.fr)}</h3>
-      <div class="ms-meta">${raw.type === 'consumable' ? 'Consommable' : 'Butin'}${raw.rarity ? ' · ' + raw.rarity : ''}${raw.fan ? ' · <span style="color:#c9a3d3">supplément Hope & Fear</span>' : ''}</div>
+      <div class="ms-meta">${raw.type === 'consumable' ? 'Consommable' : 'Butin'}${raw.rarity ? ' · ' + raw.rarity : ''}${raw.campaign ? ` · ${esc(CAMPAIGN_LABELS[raw.campaign] || raw.campaign)}` : ''}${raw.fan ? ' · <span style="color:#c9a3d3">supplément Hope & Fear</span>' : ''}</div>
       <div class="ms-body">
         ${raw.descFr ? `<p>${esc(raw.descFr)}</p>` : ''}
         ${!raw.descFr && raw.descEn ? `<p style="color:var(--text-faint)">${esc(raw.descEn)}</p><p style="font-size:.75rem;color:var(--text-faint)">(Description originale en anglais — traduction à venir)</p>` : ''}
@@ -269,13 +285,13 @@ function showDetail(main, raw, type) {
 
   sheet.innerHTML = inner + `
     ${type === 'card' ? `<div style="margin-top:1rem"><button class="btn" id="ms-add">＋ Ajouter à un personnage</button></div>` : ''}
-    ${type === 'item' ? `<div style="margin-top:1rem"><button class="btn" id="ms-add-item">＋ Ajouter à l'inventaire</button></div>` : ''}
+    ${(type === 'item' || type === 'weapon' || type === 'armor') ? `<div style="margin-top:1rem"><button class="btn" id="ms-add-item">＋ Ajouter à l'inventaire</button></div>` : ''}
     <div class="modal-close-row"><button class="btn ghost small" id="ms-close">Fermer</button></div>`;
   $('#ms-close', sheet).addEventListener('click', () => back.remove());
   $('#ms-add-item', sheet)?.addEventListener('click', () => {
     const st = getState();
     if (!st.characters.length) { toast('Créez d\'abord un personnage.'); return; }
-    if (st.characters.length === 1) { addItem(st.characters[0].id, raw); back.remove(); return; }
+    if (st.characters.length === 1) { addEntryToInventory(st.characters[0].id, raw, type); back.remove(); return; }
     const pick = el(`<div class="modal-back"></div>`);
     const ps = el(`<div class="modal-sheet"><h3>Ajouter à quel personnage ?</h3>
       ${st.characters.map(c => `<button class="choice" data-cid="${c.id}" style="margin-bottom:.5rem;width:100%"><span class="ch-name">${esc(c.name)}</span></button>`).join('')}
@@ -284,16 +300,22 @@ function showDetail(main, raw, type) {
     document.body.appendChild(pick);
     $('#p-close', ps).addEventListener('click', () => pick.remove());
     $$('[data-cid]', ps).forEach(b => b.addEventListener('click', () => {
-      addItem(b.dataset.cid, raw);
+      addEntryToInventory(b.dataset.cid, raw, type);
       pick.remove(); back.remove();
     }));
   });
 
-  function addItem(charId, item) {
+  function addEntryToInventory(charId, item, entryType) {
     const c = getChar(charId);
-    const existing = (c.inventory || []).find(x => x.name === item.fr);
+    const existing = (c.inventory || []).find(x => x.itemId === item.id || x.name === item.fr);
     if (existing) existing.qty = (existing.qty ?? 1) + 1;
-    else (c.inventory = c.inventory || []).push({ name: item.fr, qty: 1, desc: (item.descFr || item.descEn || '').slice(0, 140), itemId: item.id });
+    else {
+      const desc = entryType === 'item' ? (item.descFr || item.descEn || '') : (item.desc || '');
+      (c.inventory = c.inventory || []).push({
+        name: item.fr, qty: 1, desc, itemId: item.id,
+        ...(entryType === 'item' ? { type: item.type } : {}),
+      });
+    }
     saveChar(c);
     toast(`« ${item.fr} » ajouté à l'inventaire de ${c.name}.`);
   }

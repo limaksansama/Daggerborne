@@ -21,6 +21,11 @@ const MTABS = [
   { id: 'more', label: 'Plus' },
 ];
 let ui = { mtab: 'combat', more: 'cards' };
+const CAMPAIGN_LABELS = { everyday: 'Quotidien', western: 'Western', monster: 'Chasse' };
+const fmtBonus = (b) => {
+  const n = parseInt(b, 10) || 0;
+  return n ? (n > 0 ? `+${n}` : `${n}`) : '';
+};
 
 /* ============ migration vers le modèle « feuille officielle » ============ */
 function migrate(c, weapons, armors, subclasses) {
@@ -52,7 +57,7 @@ function migrate(c, weapons, armors, subclasses) {
       if (!w) return null;
       return {
         uid: uid(), compendiumId: w.id, name: w.fr, trait: w.trait, range: w.range,
-        dice: w.dice, dmgType: w.dmgType, feature: '',
+        dice: w.dice, dmgBonus: w.dmgBonus || 0, dmgType: w.dmgType, feature: w.desc || '',
         hands: w.burden === 'twoHanded' ? 'two' : 'one',
         state: 'active', primary: false, secondary: false, ...extra,
       };
@@ -62,6 +67,14 @@ function migrate(c, weapons, armors, subclasses) {
       c.secondaryWeaponId ? mk(c.secondaryWeaponId, { secondary: true }) : null,
     ].filter(Boolean);
     dirty = true;
+  } else {
+    for (const w of c.weapons) {
+      if (!w.compendiumId) continue;
+      const def = weapons.find(x => x.id === w.compendiumId);
+      if (!def) continue;
+      if (w.dmgBonus === undefined) { w.dmgBonus = def.dmgBonus || 0; dirty = true; }
+      if (!w.feature && def.desc) { w.feature = def.desc; dirty = true; }
+    }
   }
   if (!c.thresholds || c.thresholds.bonus === undefined) {
     const oldBonus = (c.thresholds?.major ?? 0) - c.level - (c.armorCard?.baseMajor || 0);
@@ -71,9 +84,12 @@ function migrate(c, weapons, armors, subclasses) {
   if (!c.armorCard) {
     const ar = armors.find(a => a.id === c.armorId);
     c.armorCard = ar
-      ? { compendiumId: ar.id, name: ar.fr, baseScore: ar.armorScore, baseMajor: ar.major, baseSevere: ar.severe, feature: '' }
+      ? { compendiumId: ar.id, name: ar.fr, baseScore: ar.armorScore, baseMajor: ar.major, baseSevere: ar.severe, feature: ar.desc || '' }
       : { compendiumId: null, name: '', baseScore: 0, baseMajor: 0, baseSevere: 0, feature: '' };
     dirty = true;
+  } else if (c.armorCard.compendiumId && !c.armorCard.feature) {
+    const ar = armors.find(a => a.id === c.armorCard.compendiumId);
+    if (ar?.desc) { c.armorCard.feature = ar.desc; dirty = true; }
   }
   if (!c.armorSlots || c.armorSlots.max !== 12) {
     c.armorSlots = { max: 12, used: Math.min(c.armorSlots?.used || 0, 12) };
@@ -348,6 +364,8 @@ export async function render(main, params) {
             ${(c.weapons.filter(w => w.primary || w.secondary).length ? c.weapons.filter(w => w.primary || w.secondary) : c.weapons.filter(w => w.state === 'active')).map(w => {
               const mod = c.traits[w.trait] || 0;
               const n = Math.max(1, Math.min(6, c.proficiency));
+              const bonus = parseInt(w.dmgBonus, 10) || 0;
+              const dmgLabel = `${n}${w.dice}${fmtBonus(bonus)}`;
               return `<div class="dha-row">
                 <span class="dha-icon" title="${w.dmgType === 'mag' ? 'Magique' : 'Physique'}">${w.dmgType === 'mag' ? '✦' : '⚔'}</span>
                 <span class="dha-name">
@@ -356,7 +374,7 @@ export async function render(main, params) {
                 </span>
                 <span class="dha-range">${esc(w.range || '—')}</span>
                 <button class="dha-btn atk" data-dha-atk="${w.uid}" title="Jet de Dualité + ${T.traits[w.trait] || ''}">${mod >= 0 ? '+' + mod : mod}</button>
-                <button class="dha-btn dmg" data-dha-dmg="${w.uid}" title="Dégâts : ${n} × ${w.dice}">${n}${w.dice}</button>
+                <button class="dha-btn dmg" data-dha-dmg="${w.uid}" title="Dégâts : ${n} × ${w.dice}${bonus ? ' ' + fmtBonus(bonus) : ''}">${dmgLabel}</button>
               </div>`;
             }).join('') || '<div class="dh-help">Équipez une arme pour voir vos attaques rapides.</div>'}
           </div>
@@ -391,9 +409,12 @@ export async function render(main, params) {
         <!-- INVENTAIRE -->
         <section class="dh-panel s-equip">
           <div class="dh-banner"><i></i><span>Inventaire</span><i></i></div>
-          <div class="search-bar">
-            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
-            <input type="text" id="inv-q" placeholder="Rechercher un objet à ajouter…" autocomplete="off">
+          <div class="dh-inv-tools">
+            <div class="search-bar">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+              <input type="text" id="inv-q" placeholder="Rechercher un objet à ajouter…" autocomplete="off">
+            </div>
+            <button class="btn ghost small dh-inv-catbtn" id="inv-catalog" title="Parcourir le catalogue complet d'objets, armes et armures">📦 Catalogue</button>
           </div>
           <div id="inv-suggest"></div>
           <div id="inv-list">
@@ -403,9 +424,10 @@ export async function render(main, params) {
               const weaponDef = it.itemId ? weapons.find(w => w.id === it.itemId) : null;
               if (armorDef) {
                 const equipped = c.armorCard?.compendiumId === armorDef.id;
+                const desc = it.desc || armorDef.desc || '';
                 return `<div class="inv-item ${equipped ? 'equipped' : ''}">
                   <span class="ii-name">${esc(it.name)} <span class="tag" style="margin-left:4px">Armure</span></span>
-                  ${it.desc ? `<span class="ii-desc">${esc(it.desc)}</span>` : ''}
+                  ${desc ? `<span class="ii-desc" title="${esc(desc)}">${esc(desc)}</span>` : ''}
                   <span class="ii-sub">Score ${armorDef.armorScore} · Seuils ${armorDef.major}/${armorDef.severe}${armorDef.heavy ? ' · Lourd' : ''}</span>
                   <div class="ii-actions">
                     <button class="btn small ${equipped ? 'ghost' : ''}" data-inv-eq-armor="${armorDef.id}">${equipped ? 'Ranger' : 'Équiper'}</button>
@@ -423,10 +445,11 @@ export async function render(main, params) {
               if (weaponDef) {
                 const owned = c.weapons.find(w => w.compendiumId === weaponDef.id);
                 const equipped = owned && (owned.primary || owned.secondary);
+                const desc = it.desc || weaponDef.desc || '';
                 return `<div class="inv-item ${equipped ? 'equipped' : ''}">
                   <span class="ii-name">${esc(it.name)} <span class="tag" style="margin-left:4px">Arme</span></span>
-                  ${it.desc ? `<span class="ii-desc">${esc(it.desc)}</span>` : ''}
-                  <span class="ii-sub">${T.traits[weaponDef.trait] || ''} · ${esc(weaponDef.range)} · ${weaponDef.dice}${weaponDef.burden === 'twoHanded' ? ' · 2 mains' : ''}</span>
+                  ${desc ? `<span class="ii-desc" title="${esc(desc)}">${esc(desc)}</span>` : ''}
+                  <span class="ii-sub">${T.traits[weaponDef.trait] || ''} · ${esc(weaponDef.range)} · ${weaponDef.dice}${fmtBonus(weaponDef.dmgBonus)}${weaponDef.burden === 'twoHanded' ? ' · 2 mains' : ''}</span>
                   <div class="ii-actions">
                     ${owned
                       ? `<button class="btn small ghost" data-inv-eq-weapon="${weaponDef.id}" data-owned-uid="${owned.uid}">${equipped ? 'Ranger' : 'Équiper'}</button>`
@@ -442,19 +465,29 @@ export async function render(main, params) {
                   </div>
                 </div>`;
               }
+              const itemDef = it.itemId
+                ? generalItems.find(g => g.id === it.itemId)
+                : generalItems.find(g => g.fr === it.name);
+              const isConsumable = it.type === 'consumable' || itemDef?.type === 'consumable';
+              const fullDesc = (itemDef?.descFr && (!it.desc || it.desc.length < itemDef.descFr.length))
+                ? itemDef.descFr
+                : (it.desc || itemDef?.descFr || itemDef?.descEn || '');
               return `<div class="inv-item">
-              <span class="ii-name">${esc(it.name)}</span>
-              ${it.desc ? `<span class="ii-desc">${esc(it.desc)}</span>` : ''}
-              <div class="ii-qty">
-                <button class="qbtn" data-qty="${i}:-1">−</button>
-                <span class="qval">${it.qty ?? 1}</span>
-                <button class="qbtn" data-qty="${i}:1">+</button>
+              <span class="ii-name" title="${esc(fullDesc)}">${esc(it.name)}${isConsumable ? ' <span class="tag" style="margin-left:4px">Consommable</span>' : ''}</span>
+              ${fullDesc ? `<span class="ii-desc" title="${esc(fullDesc)}">${esc(fullDesc)}</span>` : ''}
+              <div class="ii-actions">
+                ${isConsumable ? `<button class="btn small ghost" data-use-inv="${i}" title="Consommer 1 exemplaire">🧪 Utiliser</button>` : ''}
+                <div class="ii-qty">
+                  <button class="qbtn" data-qty="${i}:-1">−</button>
+                  <span class="qval">${it.qty ?? 1}</span>
+                  <button class="qbtn" data-qty="${i}:1">+</button>
+                </div>
+                <button class="icon-btn ii-del" data-del-inv="${i}" title="Retirer">
+                  <svg viewBox="0 0 24 24"><path d="M5 7h14"/><path d="M9 7V5h6v2"/><path d="M7 7l1 13h8l1-13"/></svg>
+                </button>
               </div>
-              <button class="icon-btn ii-del" data-del-inv="${i}" title="Retirer">
-                <svg viewBox="0 0 24 24"><path d="M5 7h14"/><path d="M9 7V5h6v2"/><path d="M7 7l1 13h8l1-13"/></svg>
-              </button>
             </div>`;
-            }).join('') || '<div class="dh-help">Inventaire vide — ajoutez des objets via la recherche.</div>'}
+            }).join('') || '<div class="dh-help">Inventaire vide — ajoutez des objets via la recherche ou le catalogue.</div>'}
           </div>
           <div class="dh-invadd">
             <input type="text" id="inv-new" placeholder="Ajouter un objet perso…">
@@ -527,14 +560,18 @@ function weaponCardHTML(w, i, c) {
       <label class="dh-fl"><span>Trait</span>
         <select data-wf="${i}:trait">${TRAIT_KEYS.map(k => `<option value="${k}" ${w.trait === k ? 'selected' : ''}>${T.traits[k]}</option>`).join('')}</select></label>
       <label class="dh-fl"><span>Portée</span><input data-wf="${i}:range" value="${esc(w.range)}" placeholder="Mêlée · Distance…"></label>
-      <label class="dh-fl"><span>Dé de dégâts</span>
-        <select data-wf="${i}:dice">${DICE.map(d => `<option ${w.dice === d ? 'selected' : ''}>${d}</option>`).join('')}</select></label>
+      <label class="dh-fl"><span>Dé &amp; Bonus</span>
+        <div class="dh-wdice-row">
+          <select data-wf="${i}:dice">${DICE.map(d => `<option ${w.dice === d ? 'selected' : ''}>${d}</option>`).join('')}</select>
+          <input type="number" data-wf="${i}:dmgBonus" value="${parseInt(w.dmgBonus, 10) || 0}" min="-10" max="30" title="Bonus fixe de dégâts (+N)">
+        </div>
+      </label>
       <label class="dh-fl"><span>Type</span>
         <select data-wf="${i}:dmgType">
           <option value="phy" ${w.dmgType === 'phy' ? 'selected' : ''}>Physique</option>
           <option value="mag" ${w.dmgType === 'mag' ? 'selected' : ''}>Magique</option>
         </select></label>
-      <button class="btn small dh-wdmg" data-wroll="${i}" title="Lancer les dégâts : ${c.proficiency} × ${w.dice}">🎲 ${c.proficiency}${w.dice}</button>
+      <button class="btn small dh-wdmg" data-wroll="${i}" title="Lancer les dégâts : ${c.proficiency} × ${w.dice}${w.dmgBonus ? ' ' + fmtBonus(w.dmgBonus) : ''}">🎲 ${c.proficiency}${w.dice}${fmtBonus(w.dmgBonus)}</button>
     </div>
     <label class="dh-fl"><span>Feature</span><input data-wf="${i}:feature" value="${esc(w.feature)}" placeholder="Feature d'arme…"></label>
   </div>`;
@@ -781,8 +818,9 @@ function bindAll(root, c, ctx) {
   }));
   $$('[data-wf]', root).forEach(inp => inp.addEventListener('change', () => {
     const [i, k] = inp.dataset.wf.split(':');
-    c.weapons[+i][k] = inp.value;
+    c.weapons[+i][k] = k === 'dmgBonus' ? (parseInt(inp.value, 10) || 0) : inp.value;
     saveChar(c);
+    if (k === 'dice' || k === 'dmgBonus' || k === 'trait' || k === 'range' || k === 'dmgType') render(main, params);
   }));
   $$('[data-wdel]', root).forEach(b => b.addEventListener('click', () => {
     c.weapons.splice(+b.dataset.wdel, 1);
@@ -816,6 +854,22 @@ function bindAll(root, c, ctx) {
     const it = c.inventory[i];
     if (it) { it.qty = Math.max(1, (it.qty ?? 1) + d); refresh(); }
   }));
+  $$('[data-use-inv]', root).forEach(b => b.addEventListener('click', () => {
+    const i = +b.dataset.useInv;
+    const it = c.inventory[i];
+    if (!it) return;
+    const qty = it.qty ?? 1;
+    const itemDef = it.itemId ? ctx.generalItems.find(g => g.id === it.itemId) : ctx.generalItems.find(g => g.fr === it.name);
+    const desc = it.desc || itemDef?.descFr || itemDef?.descEn || '';
+    if (qty <= 1) {
+      c.inventory.splice(i, 1);
+      toast(`« ${it.name} » utilisé (retiré de l'inventaire)${desc ? ' — ' + desc : ''}`);
+    } else {
+      it.qty = qty - 1;
+      toast(`« ${it.name} » utilisé (${it.qty} restant(s))${desc ? ' — ' + desc : ''}`);
+    }
+    refresh();
+  }));
   $$('[data-del-inv]', root).forEach(b => b.addEventListener('click', () => {
     c.inventory.splice(+b.dataset.delInv, 1); refresh();
   }));
@@ -833,7 +887,7 @@ function bindAll(root, c, ctx) {
       c.armorCard = {
         compendiumId: def.id, name: def.fr,
         baseScore: def.armorScore, baseMajor: def.major, baseSevere: def.severe,
-        feature: '',
+        feature: def.desc || '',
       };
       toast(`« ${def.fr} » équipée — Score ${def.armorScore}, seuils ${def.major}/${def.severe}.`);
     }
@@ -856,7 +910,7 @@ function bindAll(root, c, ctx) {
     }
     const w = {
       uid: uid(), compendiumId: def.id, name: def.fr, trait: def.trait, range: def.range,
-      dice: def.dice, dmgType: def.dmgType, feature: def.featureFr || '',
+      dice: def.dice, dmgBonus: def.dmgBonus || 0, dmgType: def.dmgType, feature: def.desc || '',
       hands: def.burden === 'twoHanded' ? 'two' : 'one',
       state: 'active', primary: false, secondary: false,
     };
@@ -896,23 +950,24 @@ function bindAll(root, c, ctx) {
     if (inp.value.trim()) { c.inventory.push({ name: inp.value.trim(), qty: 1 }); refresh(); }
   });
   $('#inv-new', root)?.addEventListener('keydown', (e) => { if (e.key === 'Enter') $('#inv-add', root).click(); });
+  $('#inv-catalog', root)?.addEventListener('click', () => openInventoryCatalog(c, ctx, () => render(main, params)));
   const q = $('#inv-q', root), sug = $('#inv-suggest', root);
   if (q) q.addEventListener('input', () => {
     const s = q.value.trim().toLowerCase();
     if (s.length < 2) { sug.innerHTML = ''; return; }
     /* recherche unifiée : objets généraux + armes + armures du compendium */
-    const itemHits = ctx.generalItems.filter(g => (g.fr + ' ' + g.en).toLowerCase().includes(s)).slice(0, 5)
-      .map(g => ({ kind: 'item', id: g.id, fr: g.fr, icon: g.type === 'consumable' ? '🧪' : '🎁', sub: `${g.type === 'consumable' ? 'Consommable' : 'Butin'}${g.rarity ? ' · ' + g.rarity : ''}`, desc: (g.descFr || g.descEn || '').slice(0, 140) }));
-    const weaponHits = ctx.weapons.filter(w => (w.fr + ' ' + w.en).toLowerCase().includes(s)).slice(0, 4)
-      .map(w => ({ kind: 'weapon', id: w.id, fr: w.fr, icon: '⚔', sub: `${T.traits[w.trait] || ''} · ${w.range} · ${w.dice}${w.burden === 'twoHanded' ? ' · 2 mains' : ''}`, desc: (w.desc || '').slice(0, 140) }));
-    const armorHits = ctx.armors.filter(a => (a.fr + ' ' + a.en).toLowerCase().includes(s)).slice(0, 4)
-      .map(a => ({ kind: 'armor', id: a.id, fr: a.fr, icon: '🛡', sub: `Armure · Score ${a.armorScore} · Seuils ${a.major}/${a.severe}${a.heavy ? ' · Lourd' : ''}`, desc: (a.desc || '').slice(0, 140) }));
-    const hits = [...itemHits, ...weaponHits, ...armorHits].slice(0, 10);
+    const itemHits = ctx.generalItems.filter(g => (g.fr + ' ' + g.en + ' ' + (g.descFr || '')).toLowerCase().includes(s)).slice(0, 6)
+      .map(g => ({ kind: 'item', itemType: g.type, id: g.id, fr: g.fr, icon: g.type === 'consumable' ? '🧪' : '🎁', sub: `${g.type === 'consumable' ? 'Consommable' : 'Butin'}${g.rarity ? ' · ' + g.rarity : ''}${g.campaign ? ' · ' + (CAMPAIGN_LABELS[g.campaign] || g.campaign) : ''}`, desc: g.descFr || g.descEn || '' }));
+    const weaponHits = ctx.weapons.filter(w => (w.fr + ' ' + w.en + ' ' + (w.desc || '')).toLowerCase().includes(s)).slice(0, 4)
+      .map(w => ({ kind: 'weapon', id: w.id, fr: w.fr, icon: '⚔', sub: `${T.traits[w.trait] || ''} · ${w.range} · ${w.dice}${fmtBonus(w.dmgBonus)}${w.burden === 'twoHanded' ? ' · 2 mains' : ''}${w.campaign ? ' · ' + (CAMPAIGN_LABELS[w.campaign] || w.campaign) : ''}`, desc: w.desc || '' }));
+    const armorHits = ctx.armors.filter(a => (a.fr + ' ' + (a.en || '') + ' ' + (a.desc || '')).toLowerCase().includes(s)).slice(0, 4)
+      .map(a => ({ kind: 'armor', id: a.id, fr: a.fr, icon: '🛡', sub: `Armure · Score ${a.armorScore} · Seuils ${a.major}/${a.severe}${a.heavy ? ' · Lourd' : ''}${a.campaign ? ' · ' + (CAMPAIGN_LABELS[a.campaign] || a.campaign) : ''}`, desc: a.desc || '' }));
+    const hits = [...itemHits, ...weaponHits, ...armorHits].slice(0, 12);
     sug.innerHTML = hits.map(g => `
       <button class="inv-sug" data-add-id="${g.id}" data-add-kind="${g.kind}">
         <span class="is-type">${g.icon}</span>
         <span class="is-body"><span class="is-name">${esc(g.fr)}</span>
-        <span class="is-sub">${esc(g.sub)}</span></span>
+        <span class="is-sub">${esc(g.sub)}${g.desc ? ' — ' + esc(g.desc.slice(0, 90)) + (g.desc.length > 90 ? '…' : '') : ''}</span></span>
         <span class="is-add">＋</span>
       </button>`).join('');
     $$('[data-add-id]', sug).forEach(b => b.addEventListener('click', () => {
@@ -920,7 +975,7 @@ function bindAll(root, c, ctx) {
       if (!hit) return;
       const ex = c.inventory.find(x => x.itemId === hit.id);
       if (ex) ex.qty = (ex.qty ?? 1) + 1;
-      else c.inventory.push({ name: hit.fr, qty: 1, desc: hit.desc, itemId: hit.id });
+      else c.inventory.push({ name: hit.fr, qty: 1, desc: hit.desc, itemId: hit.id, ...(hit.itemType ? { type: hit.itemType } : {}) });
       q.value = ''; sug.innerHTML = '';
       refresh();
       toast(`« ${hit.fr} » ajouté à l'inventaire.`);
@@ -1124,11 +1179,20 @@ function weaponPicker(c, ctx, onDone) {
   document.body.appendChild(back);
   back.addEventListener('click', (e) => { if (e.target === back) back.remove(); });
 
+  let tierFilter = null;
+  let query = '';
   sheet.innerHTML = `
-    <h3>Ajouter une arme</h3>
+    <h3>Ajouter une arme (${ctx.weapons.length})</h3>
     <div class="search-bar">
       <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
-      <input type="text" id="wp-q" placeholder="Rechercher une arme du compendium…" autocomplete="off">
+      <input type="text" id="wp-q" placeholder="Rechercher (nom, trait, feature…)" autocomplete="off">
+    </div>
+    <div class="filter-row" id="wp-tiers" style="margin:.45rem 0">
+      <button class="filter-chip active" data-wtier="">Tous</button>
+      <button class="filter-chip" data-wtier="1">Palier 1</button>
+      <button class="filter-chip" data-wtier="2">Palier 2</button>
+      <button class="filter-chip" data-wtier="3">Palier 3</button>
+      <button class="filter-chip" data-wtier="4">Palier 4</button>
     </div>
     <div id="wp-list" class="wp-list"></div>
     <div style="margin-top:.8rem;display:flex;gap:.5rem;justify-content:flex-end">
@@ -1136,21 +1200,27 @@ function weaponPicker(c, ctx, onDone) {
       <button class="btn" id="wp-custom">✎ Arme personnalisée</button>
     </div>`;
 
-  const draw = (s = '') => {
+  const draw = () => {
+    const q = query.toLowerCase();
     const hits = ctx.weapons
-      .filter(w => (w.fr + ' ' + w.en).toLowerCase().includes(s.toLowerCase()))
-      .slice(0, 24);
+      .filter(w => (!tierFilter || w.tier === tierFilter))
+      .filter(w => !q || (w.fr + ' ' + w.en + ' ' + (w.desc || '')).toLowerCase().includes(q))
+      .sort((a, b) => a.tier - b.tier || a.fr.localeCompare(b.fr, 'fr'))
+      .slice(0, 60);
     $('#wp-list', sheet).innerHTML = hits.map(w => `
       <button class="inv-sug" data-pickid="${w.id}">
-        <span class="is-body"><span class="is-name">${esc(w.fr)}</span>
-        <span class="is-sub">${T.traits[w.trait] || ''} · ${esc(w.range)} · ${w.dice} · ${w.burden === 'twoHanded' ? '2 mains' : '1 main'}</span></span>
+        <span class="is-body">
+          <span class="is-name">${esc(w.fr)} <span class="tag" style="margin-left:4px">P${w.tier}</span>${w.campaign ? ` <span class="tag">${esc(CAMPAIGN_LABELS[w.campaign] || w.campaign)}</span>` : ''}</span>
+          <span class="is-sub">${T.traits[w.trait] || ''} · ${esc(w.range)} · ${w.dice}${fmtBonus(w.dmgBonus)} (${w.dmgType === 'mag' ? 'mag' : 'phy'}) · ${w.burden === 'twoHanded' ? '2 mains' : '1 main'}${w.secondary ? ' · Sec.' : ''}</span>
+          ${w.desc ? `<span class="is-sub" style="color:var(--text-faint);margin-top:2px">${esc(w.desc)}</span>` : ''}
+        </span>
         <span class="is-add">＋</span>
       </button>`).join('') || '<div class="dh-help">Aucune arme trouvée.</div>';
     $$('[data-pickid]', sheet).forEach(b => b.addEventListener('click', () => {
       const w = ctx.weapons.find(x => x.id === b.dataset.pickid);
       c.weapons.push({
         uid: uid(), compendiumId: w.id, name: w.fr, trait: w.trait, range: w.range,
-        dice: w.dice, dmgType: w.dmgType, feature: '',
+        dice: w.dice, dmgBonus: w.dmgBonus || 0, dmgType: w.dmgType, feature: w.desc || '',
         hands: w.burden === 'twoHanded' ? 'two' : 'one',
         state: 'active', primary: !c.weapons.some(x => x.primary), secondary: false,
       });
@@ -1161,12 +1231,18 @@ function weaponPicker(c, ctx, onDone) {
     }));
   };
   draw();
-  $('#wp-q', sheet).addEventListener('input', (e) => draw(e.target.value.trim()));
+  $$('[data-wtier]', sheet).forEach(b => b.addEventListener('click', () => {
+    $$('[data-wtier]', sheet).forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    tierFilter = b.dataset.wtier ? +b.dataset.wtier : null;
+    draw();
+  }));
+  $('#wp-q', sheet).addEventListener('input', (e) => { query = e.target.value.trim(); draw(); });
   $('#wp-cancel', sheet).addEventListener('click', () => back.remove());
   $('#wp-custom', sheet).addEventListener('click', () => {
     c.weapons.push({
       uid: uid(), compendiumId: null, name: '', trait: 'strength', range: 'Mêlée',
-      dice: 'd6', dmgType: 'phy', feature: '', hands: 'one',
+      dice: 'd6', dmgBonus: 0, dmgType: 'phy', feature: '', hands: 'one',
       state: 'active', primary: !c.weapons.some(x => x.primary), secondary: false,
     });
     saveChar(c);
@@ -1183,11 +1259,20 @@ function armorPicker(c, ctx, onDone) {
   document.body.appendChild(back);
   back.addEventListener('click', (e) => { if (e.target === back) back.remove(); });
 
+  let tierFilter = null;
+  let query = '';
   sheet.innerHTML = `
-    <h3>Ajouter une armure</h3>
+    <h3>Choisir une armure (${ctx.armors.length})</h3>
     <div class="search-bar">
       <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
-      <input type="text" id="ap-q" placeholder="Rechercher une armure du compendium…" autocomplete="off">
+      <input type="text" id="ap-q" placeholder="Rechercher (nom, feature…)" autocomplete="off">
+    </div>
+    <div class="filter-row" id="ap-tiers" style="margin:.45rem 0">
+      <button class="filter-chip active" data-atier="">Tous</button>
+      <button class="filter-chip" data-atier="1">Palier 1</button>
+      <button class="filter-chip" data-atier="2">Palier 2</button>
+      <button class="filter-chip" data-atier="3">Palier 3</button>
+      <button class="filter-chip" data-atier="4">Palier 4</button>
     </div>
     <div id="ap-list" class="wp-list"></div>
     <div style="margin-top:.8rem;display:flex;gap:.5rem;justify-content:flex-end">
@@ -1195,14 +1280,20 @@ function armorPicker(c, ctx, onDone) {
       <button class="btn" id="ap-custom">✎ Armure personnalisée</button>
     </div>`;
 
-  const draw = (s = '') => {
+  const draw = () => {
+    const q = query.toLowerCase();
     const hits = ctx.armors
-      .filter(a => (a.fr + ' ' + (a.en || '')).toLowerCase().includes(s.toLowerCase()))
-      .slice(0, 24);
+      .filter(a => (!tierFilter || a.tier === tierFilter))
+      .filter(a => !q || (a.fr + ' ' + (a.en || '') + ' ' + (a.desc || '')).toLowerCase().includes(q))
+      .sort((a, b) => a.tier - b.tier || a.fr.localeCompare(b.fr, 'fr'))
+      .slice(0, 60);
     $('#ap-list', sheet).innerHTML = hits.map(a => `
       <button class="inv-sug" data-apick="${a.id}">
-        <span class="is-body"><span class="is-name">${esc(a.fr)}</span>
-        <span class="is-sub">Score ${a.armorScore} · Seuils ${a.major}/${a.severe}${a.heavy ? ' · Lourd' : ''}</span></span>
+        <span class="is-body">
+          <span class="is-name">${esc(a.fr)} <span class="tag" style="margin-left:4px">P${a.tier}</span>${a.campaign ? ` <span class="tag">${esc(CAMPAIGN_LABELS[a.campaign] || a.campaign)}</span>` : ''}</span>
+          <span class="is-sub">Score ${a.armorScore} · Seuils ${a.major}/${a.severe}${a.heavy ? ' · Lourd' : ''}</span>
+          ${a.desc ? `<span class="is-sub" style="color:var(--text-faint);margin-top:2px">${esc(a.desc)}</span>` : ''}
+        </span>
         <span class="is-add">＋</span>
       </button>`).join('') || '<div class="dh-help">Aucune armure trouvée.</div>';
     $$('[data-apick]', sheet).forEach(b => b.addEventListener('click', () => {
@@ -1211,7 +1302,7 @@ function armorPicker(c, ctx, onDone) {
       c.armorCard = {
         compendiumId: a.id, name: a.fr,
         baseScore: a.armorScore, baseMajor: a.major, baseSevere: a.severe,
-        feature: '',
+        feature: a.desc || '',
       };
       c.armorId = a.id; /* cohérence avec les anciens champs */
       saveChar(c);
@@ -1221,7 +1312,13 @@ function armorPicker(c, ctx, onDone) {
     }));
   };
   draw();
-  $('#ap-q', sheet).addEventListener('input', (e) => draw(e.target.value.trim()));
+  $$('[data-atier]', sheet).forEach(b => b.addEventListener('click', () => {
+    $$('[data-atier]', sheet).forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    tierFilter = b.dataset.atier ? +b.dataset.atier : null;
+    draw();
+  }));
+  $('#ap-q', sheet).addEventListener('input', (e) => { query = e.target.value.trim(); draw(); });
   $('#ap-cancel', sheet).addEventListener('click', () => back.remove());
   $('#ap-custom', sheet).addEventListener('click', () => {
     /* armure vierge : l'utilisateur remplit les champs manuellement */
@@ -1231,6 +1328,108 @@ function armorPicker(c, ctx, onDone) {
     toast('Armure personnalisée — remplissez les champs.');
     onDone();
   });
+}
+
+/* ================= CATALOGUE D'INVENTAIRE COMPLET ================= */
+function openInventoryCatalog(c, ctx, onDone) {
+  const back = el(`<div class="modal-back"></div>`);
+  const sheet = el(`<div class="modal-sheet dh-picker"></div>`);
+  back.appendChild(sheet);
+  document.body.appendChild(back);
+  let changed = false;
+  const finish = () => {
+    back.remove();
+    if (changed) onDone();
+  };
+  back.addEventListener('click', (e) => { if (e.target === back) finish(); });
+
+  let cat = 'all';
+  let query = '';
+  const allEntries = [
+    ...ctx.generalItems.map(g => ({
+      kind: 'item', itemType: g.type, id: g.id, fr: g.fr, en: g.en || '',
+      icon: g.type === 'consumable' ? '🧪' : '🎁',
+      sub: `${g.type === 'consumable' ? 'Consommable' : 'Butin'}${g.rarity ? ' · ' + g.rarity : ''}${g.campaign ? ' · ' + (CAMPAIGN_LABELS[g.campaign] || g.campaign) : ''}`,
+      desc: g.descFr || g.descEn || '',
+    })),
+    ...ctx.weapons.map(w => ({
+      kind: 'weapon', itemType: 'weapon', id: w.id, fr: w.fr, en: w.en || '',
+      icon: '⚔',
+      sub: `Arme P${w.tier} · ${T.traits[w.trait] || ''} · ${w.range} · ${w.dice}${fmtBonus(w.dmgBonus)} · ${w.burden === 'twoHanded' ? '2 mains' : '1 main'}${w.campaign ? ' · ' + (CAMPAIGN_LABELS[w.campaign] || w.campaign) : ''}`,
+      desc: w.desc || '',
+    })),
+    ...ctx.armors.map(a => ({
+      kind: 'armor', itemType: 'armor', id: a.id, fr: a.fr, en: a.en || '',
+      icon: '🛡',
+      sub: `Armure P${a.tier} · Score ${a.armorScore} · Seuils ${a.major}/${a.severe}${a.heavy ? ' · Lourd' : ''}${a.campaign ? ' · ' + (CAMPAIGN_LABELS[a.campaign] || a.campaign) : ''}`,
+      desc: a.desc || '',
+    })),
+  ].sort((a, b) => a.fr.localeCompare(b.fr, 'fr'));
+
+  sheet.innerHTML = `
+    <h3>Catalogue complet (${allEntries.length})</h3>
+    <div class="search-bar">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+      <input type="text" id="cat-q" placeholder="Filtrer par nom ou effet…" autocomplete="off">
+    </div>
+    <div class="filter-row" id="cat-tabs" style="margin:.45rem 0">
+      <button class="filter-chip active" data-cat="all">Tous</button>
+      <button class="filter-chip" data-cat="loot">🎁 Butin</button>
+      <button class="filter-chip" data-cat="consumable">🧪 Consommables</button>
+      <button class="filter-chip" data-cat="weapon">⚔ Armes</button>
+      <button class="filter-chip" data-cat="armor">🛡 Armures</button>
+    </div>
+    <div id="cat-count" class="page-sub" style="margin:0 0 .4rem;font-size:.75rem"></div>
+    <div id="cat-list" class="wp-list"></div>
+    <div class="modal-close-row"><button class="btn ghost small" id="cat-close">Fermer</button></div>`;
+
+  const draw = () => {
+    const q = query.toLowerCase();
+    const list = allEntries.filter(e => {
+      if (cat === 'loot' && !(e.kind === 'item' && e.itemType === 'loot')) return false;
+      if (cat === 'consumable' && !(e.kind === 'item' && e.itemType === 'consumable')) return false;
+      if (cat === 'weapon' && e.kind !== 'weapon') return false;
+      if (cat === 'armor' && e.kind !== 'armor') return false;
+      if (!q) return true;
+      return (e.fr + ' ' + e.en + ' ' + e.desc + ' ' + e.sub).toLowerCase().includes(q);
+    });
+    const shown = list.slice(0, 80);
+    $('#cat-count', sheet).textContent = `${list.length} résultat(s)${list.length > shown.length ? ` — ${shown.length} affichés (affinez la recherche)` : ''}`;
+    $('#cat-list', sheet).innerHTML = shown.map(e => `
+      <button class="inv-sug" data-cat-add="${e.id}">
+        <span class="is-type">${e.icon}</span>
+        <span class="is-body">
+          <span class="is-name">${esc(e.fr)}</span>
+          <span class="is-sub">${esc(e.sub)}</span>
+          ${e.desc ? `<span class="is-sub" style="color:var(--text-faint);margin-top:2px">${esc(e.desc)}</span>` : ''}
+        </span>
+        <span class="is-add">＋</span>
+      </button>`).join('') || '<div class="dh-help">Aucun élément trouvé.</div>';
+
+    $$('[data-cat-add]', sheet).forEach(b => b.addEventListener('click', () => {
+      const entry = allEntries.find(x => x.id === b.dataset.catAdd);
+      if (!entry) return;
+      const ex = c.inventory.find(x => x.itemId === entry.id);
+      if (ex) ex.qty = (ex.qty ?? 1) + 1;
+      else c.inventory.push({
+        name: entry.fr, qty: 1, desc: entry.desc, itemId: entry.id,
+        ...(entry.kind === 'item' ? { type: entry.itemType } : {}),
+      });
+      saveChar(c);
+      changed = true;
+      toast(`« ${entry.fr} » ajouté à l'inventaire.`);
+    }));
+  };
+
+  draw();
+  $$('[data-cat]', sheet).forEach(b => b.addEventListener('click', () => {
+    $$('[data-cat]', sheet).forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    cat = b.dataset.cat;
+    draw();
+  }));
+  $('#cat-q', sheet).addEventListener('input', (e) => { query = e.target.value.trim(); draw(); });
+  $('#cat-close', sheet).addEventListener('click', finish);
 }
 
 /* ================= ONGLETS « PLUS » (contenus existants) ================= */

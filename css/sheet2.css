@@ -617,9 +617,11 @@
   /* bande défenses en colonne sur mobile */
   .dh-defstrip .dh-shield-block { border-right: none; border-bottom: 1px dotted var(--border); padding: 0 0 .6rem; }
   .dh-traitrow { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: .6rem; }
-  .dh-thrrow { flex-wrap: wrap; }
-  .dh-thrbar { flex: 1 1 45%; }
-  .dh-thrval { width: 30px; height: 30px; }
+  .dh-thrrow { flex-wrap: nowrap; gap: .22rem; }
+  .dh-thrbar { flex: 1 1 0; min-width: 0; padding: .28rem .14rem; }
+  .dh-thrbar span { font-size: .54rem; letter-spacing: .02em; line-height: 1.15; }
+  .dh-thrbar em { font-size: .5rem; }
+  .dh-thrval { width: 28px; height: 28px; font-size: .85rem; }
   .dh-wgrid { grid-template-columns: 1fr 1fr; }
   .dh-wgrid.armor { grid-template-columns: 1fr 1fr; }
   .dh-gold { flex-direction: column; gap: .7rem; }
@@ -629,7 +631,14 @@
   .dh-wrole { margin-left: 0; }
 }
 
-/* très petit écran : traits en 2 colonnes */
+/* très petit écran : traits en 2 colonnes et seuils compacts sur 1 ligne */
+@media (max-width: 480px) {
+  .dh-thrrow { gap: .15rem; }
+  .dh-thrbar { padding: .22rem .1rem; }
+  .dh-thrbar span { font-size: .46rem; letter-spacing: 0; line-height: 1.12; }
+  .dh-thrbar em { font-size: .44rem; }
+  .dh-thrval { width: 24px; height: 26px; font-size: .78rem; border-radius: 6px; }
+}
 @media (max-width: 420px) {
   .dh-traitrow { grid-template-columns: repeat(2, 1fr); }
   .dh-box { width: 22px; height: 18px; }
@@ -671,3 +680,13 @@
   font-size: 1rem; line-height: 1; transition: transform .15s ease, color .15s ease;
 }
 .dh-lvlup .lu-card.open .lc-chev { color: var(--golden); }
+
+/* Inventaire : bouton catalogue + actions sur les consommables */
+.dh-inv-tools { display: flex; gap: .45rem; align-items: stretch; margin-bottom: .35rem; }
+.dh-inv-tools .search-bar { flex: 1; margin-bottom: 0; }
+.dh-inv-catbtn { white-space: nowrap; flex: none; }
+.dh-wdice-row { display: flex; gap: .3rem; align-items: center; }
+.dh-wdice-row select { flex: 1.2; }
+.dh-wdice-row input { flex: .8; text-align: center; }
+.dh-sheet .inv-item { flex-wrap: wrap; }
+.dh-sheet .inv-item .ii-name { flex: 1 1 130px; }

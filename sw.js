@@ -1,5 +1,5 @@
 /* Service worker — cache-first PWA for Daggerborne */
-const VERSION = 'daggerborne-v29';
+const VERSION = 'daggerborne-v30';
 const CORE = [
   './', './index.html', './manifest.webmanifest',
   './css/app.css', './css/sheet2.css', './css/dice-box.css', './js/app.js', './js/core.js',

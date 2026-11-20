@@ -43,7 +43,7 @@ export function ensureCharacter(obj) {
 
 // ---------- data cache ----------
 const cache = {};
-const DATA_VER = 'v25';
+const DATA_VER = 'v26';
 export async function data(name) {
   if (!cache[name]) {
     const r = await fetch(`data/${name}.json?${DATA_VER}`);
