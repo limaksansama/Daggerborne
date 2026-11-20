@@ -20,7 +20,7 @@ export async function render(main, params) {
     <div class="section-title">À propos</div>
     <div class="card">
       <div class="about-logo-row">
-        <img src="assets/icons/icon-192.png" alt="Daggervault">
+        <img src="public/assets/dpcgl-community-logo-light.png" alt="Daggervault — Daggerheart Compatible">
         <div>
           <div style="font-family:var(--font-title);font-weight:800;color:var(--golden);font-size:1.15rem">Daggervault · Compagnon JDR</div>
           <div style="font-size:.78rem;color:var(--text-dim)">Application PWA non officielle — français</div>
@@ -33,17 +33,19 @@ export async function render(main, params) {
     </div>
 
     <div class="section-title">Crédits &amp; Licences</div>
-    <!-- logo communautaire officiel DPCGL en tête de la section (section 2.5(b)) -->
-    <div class="license-head">
-      <img src="public/assets/dpcgl-community-logo.png" alt="Daggerheart Compatible">
-    </div>
     <div class="license-box">
       <b>Attribution officielle — DPCGL 2.0</b><br>
       <span style="font-size:.8rem;color:var(--text-dim);line-height:1.6;display:inline-block;margin-top:.3rem">This product includes materials from the Daggerheart System Reference Document 2.0, Critical Role, LLC. under the terms of the Darrington Press Community Gaming (DPCGL) License. More information can be found at https://www.daggerheart.com. This content has been translated into French and adapted for an interactive digital character sheet.</span>
     </div>
     <div class="license-box">
-      <b>Mention légale du logo communautaire</b><br>
-      <span style="font-size:.8rem;color:var(--text-dim);line-height:1.6;display:inline-block;margin-top:.3rem">Darrington Press™ and the Darrington Press authorized work logo are trademarks of Critical Role, LLC and used with permission. Daggerheart™ Compatible. Terms at Daggerheart.com</span>
+      <!-- logo communautaire officiel DPCGL (section 2.5(b)) — rendu en petit à côté de la mention légale -->
+      <div class="license-logo-row">
+        <img src="public/assets/dpcgl-community-logo.png" alt="Daggerheart Compatible">
+        <div>
+          <b>Mention légale du logo communautaire</b><br>
+          <span style="font-size:.8rem;color:var(--text-dim);line-height:1.6;display:inline-block;margin-top:.3rem">Darrington Press™ and the Darrington Press authorized work logo are trademarks of Critical Role, LLC and used with permission. Daggerheart™ Compatible. Terms at Daggerheart.com</span>
+        </div>
+      </div>
     </div>
     <div class="license-box">
       <b>Licence Open Source (code technique)</b><br>

@@ -128,7 +128,7 @@ input, select, textarea { font-family: inherit; }
   border-bottom: 1px solid var(--border);
 }
 .topbar .brand { display: flex; align-items: center; gap: .5rem; min-width: 0; }
-.topbar .brand img { width: 30px; height: 30px; flex: none; }
+.topbar .brand img { width: auto; height: 32px; flex: none; object-fit: contain; }
 .topbar .brand .t {
   font-family: var(--font-title); font-weight: 700; font-size: 1.02rem;
   color: var(--golden); letter-spacing: .06em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -615,20 +615,17 @@ h1.page-title {
 
 /* ============ SETTINGS ============ */
 .about-logo-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
-.about-logo-row img { width: 64px; }
+.about-logo-row img { width: 48px; height: auto; }
 .license-box {
   background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
   padding: .9rem; font-size: .8rem; color: var(--text-dim); line-height: 1.55;
   margin-bottom: .8rem;
 }
 .license-box b { color: var(--text); }
-/* logo communautaire officiel en tête de la section Crédits & Licences (rendu tel quel) */
-.license-head {
-  display: flex; justify-content: center; align-items: center;
-  padding: 1rem .8rem 1.2rem; margin-bottom: .8rem;
-  background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
-}
-.license-head img { width: clamp(96px, 24vw, 140px); height: auto; }
+/* logo communautaire officiel DPCGL : petit format à côté de la mention légale
+   (section 2.5(b) — le logo doit être affiché, sans obligation de grande taille) */
+.license-logo-row { display: flex; align-items: center; gap: .9rem; flex-wrap: wrap; }
+.license-logo-row img { width: 48px; height: auto; flex: none; filter: drop-shadow(0 1px 6px rgba(0,0,0,.3)); }
 .credit-list { display: flex; flex-direction: column; gap: .4rem; }
 .credit-list .cr { display: flex; justify-content: space-between; gap: 1rem; font-size: .84rem; padding: .5rem .7rem; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; }
 .credit-list .cr .cr-role { color: var(--text-faint); font-size: .74rem; }

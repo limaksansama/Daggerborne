@@ -33,7 +33,7 @@ function buildShell() {
   app.innerHTML = `
     <header class="topbar">
       <div class="brand">
-        <img src="assets/icons/icon-192.png" alt="">
+        <img src="public/assets/dpcgl-community-logo-light.png" alt="Daggervault — Daggerheart Compatible">
         <span class="t">Daggervault<span class="brand-badge" title="Compatible avec Daggerheart™">Compatible avec Daggerheart™</span></span>
       </div>
       <span class="page-title" id="top-title"></span>

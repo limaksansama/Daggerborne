@@ -1,5 +1,5 @@
 /* Service worker — cache-first PWA for Daggervault */
-const VERSION = 'daggervault-v24';
+const VERSION = 'daggervault-v28';
 const CORE = [
   './', './index.html', './manifest.webmanifest',
   './css/app.css', './css/sheet2.css', './css/dice-box.css', './js/app.js', './js/core.js',
@@ -19,7 +19,7 @@ const CORE = [
   './assets/icons/icon-192.png', './assets/icons/icon-512.png', './assets/icons/maskable-192.png', './assets/icons/maskable-512.png',
   /* logo communautaire officiel DPCGL (fiole d'alchimie) — requis hors-ligne */
   './public/assets/dpcgl-community-logo.png',
-  './assets/parchments/parchment-dark.webp', './assets/parchments/parchment-light.webp',
+  './public/assets/dpcgl-community-logo-light.png',
   /* ---- moteur de dés 3D : physique WASM + thèmes ---- */
   './assets/dice-box/ammo/ammo.wasm.wasm',
   './assets/dice-box/themes/default/theme.config.json', './assets/dice-box/themes/default/default.json',
