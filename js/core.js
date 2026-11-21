@@ -174,7 +174,7 @@ export const cloudSync = {
     return {
       schema: 'daggerborne-backup-v1',
       exportedAt: new Date().toISOString(),
-      data: getState(),
+      data: JSON.parse(JSON.stringify(getState())),
     };
   },
 };
@@ -187,9 +187,10 @@ export function ensureCharacter(obj) {
 /* Import d'un personnage depuis un texte JSON */
 export function importCharacterFromText(rawText) {
   const obj = JSON.parse(rawText);
-  if (!obj || typeof obj !== 'object' || !obj.name || !obj.traits) {
+  if (!obj || typeof obj !== 'object' || typeof obj.name !== 'string' || !obj.traits || typeof obj.traits !== 'object') {
     throw new Error('Format de personnage invalide.');
   }
+  if (!obj.name.trim()) obj.name = 'Sans nom';
   ensureCharacter(obj);
   obj.id = uid();
   obj.updatedAt = Date.now();

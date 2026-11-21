@@ -21,6 +21,23 @@ export function formatBonus(b) {
   return n ? (n > 0 ? `+${n}` : `${n}`) : '';
 }
 
+export function formatAtkBonus(b) {
+  if (b === null || b === undefined || b === '') return '';
+  const s = String(b).trim();
+  if (!s) return '';
+  if (/^[+-]\d+$/.test(s)) return s;
+  const n = Number(s);
+  if (Number.isFinite(n)) return n >= 0 ? `+${n}` : `${n}`;
+  return s;
+}
+
+const DIE_STEPS = ['d4', 'd6', 'd8', 'd10', 'd12'];
+export function nextDieStep(dice) {
+  const idx = DIE_STEPS.indexOf(String(dice || '').toLowerCase());
+  if (idx < 0) return 'd8';
+  return DIE_STEPS[Math.min(DIE_STEPS.length - 1, idx + 1)];
+}
+
 export function multiclassDomainCap(level) {
   return Math.ceil(Math.max(1, Number(level) || 1) / 2);
 }
@@ -131,13 +148,39 @@ export function calcEncounterSpent(entries = []) {
   }, 0);
 }
 
+const NESTED_PLAIN_KEYS = ['traits', 'hp', 'stress', 'hope', 'thresholds', 'armorSlots', 'armorCard', 'goldTrack'];
+
 export function sanitizeCharacter(obj, blankTemplate) {
   for (const k of Object.keys(blankTemplate)) {
-    if (obj[k] === undefined) obj[k] = structuredCloneSafe(blankTemplate[k]);
+    const tmplVal = blankTemplate[k];
+    if (obj[k] === undefined || obj[k] === null) {
+      if (tmplVal !== null) obj[k] = structuredCloneSafe(tmplVal);
+      else if (obj[k] === undefined) obj[k] = null;
+    } else if (NESTED_PLAIN_KEYS.includes(k) && tmplVal && typeof tmplVal === 'object' && !Array.isArray(tmplVal)) {
+      if (typeof obj[k] !== 'object' || Array.isArray(obj[k])) {
+        obj[k] = structuredCloneSafe(tmplVal);
+      } else {
+        for (const subK of Object.keys(tmplVal)) {
+          if (obj[k][subK] === undefined || obj[k][subK] === null) {
+            obj[k][subK] = structuredCloneSafe(tmplVal[subK]);
+          }
+        }
+      }
+    }
   }
   if (!Array.isArray(obj.conditions)) obj.conditions = [];
+  if (!Array.isArray(obj.experiences)) obj.experiences = structuredCloneSafe(blankTemplate.experiences || []);
+  if (!Array.isArray(obj.weapons)) obj.weapons = [];
+  if (!Array.isArray(obj.inventory)) obj.inventory = [];
+  if (!Array.isArray(obj.domainCards)) obj.domainCards = [];
+  if (!Array.isArray(obj.journal)) obj.journal = [];
+  if (!Array.isArray(obj.traitMarks)) obj.traitMarks = [];
+  if (!Array.isArray(obj.extraDomains)) obj.extraDomains = [];
   if (!obj.cardUses || typeof obj.cardUses !== 'object') obj.cardUses = {};
   if (!obj.cardTokens || typeof obj.cardTokens !== 'object') obj.cardTokens = {};
+  if (!obj.subcardTaken || typeof obj.subcardTaken !== 'object') obj.subcardTaken = {};
+  if (!obj.tierUses || typeof obj.tierUses !== 'object') obj.tierUses = {};
+  if (!obj.backgroundAnswers || typeof obj.backgroundAnswers !== 'object') obj.backgroundAnswers = {};
   if (typeof obj.shortRestsSinceLong !== 'number') obj.shortRestsSinceLong = 0;
   return obj;
 }

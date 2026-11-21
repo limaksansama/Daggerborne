@@ -223,10 +223,19 @@ async function stepAncestry(body) {
 
   $('#anc-mixed', body).addEventListener('change', (e) => {
     wiz.mixedAncestry = e.target.checked;
+    if (!wiz.mixedAncestry) wiz.ancestry2Id = null;
     draw(getMain());
   });
-  $('#anc-s1', body)?.addEventListener('change', (e) => { wiz.ancestryId = e.target.value || null; draw(getMain()); });
-  $('#anc-s2', body)?.addEventListener('change', (e) => { wiz.ancestry2Id = e.target.value || null; draw(getMain()); });
+  $('#anc-s1', body)?.addEventListener('change', (e) => {
+    wiz.ancestryId = e.target.value || null;
+    if (wiz.ancestryId && wiz.ancestryId === wiz.ancestry2Id) wiz.ancestry2Id = null;
+    draw(getMain());
+  });
+  $('#anc-s2', body)?.addEventListener('change', (e) => {
+    wiz.ancestry2Id = e.target.value || null;
+    if (wiz.ancestry2Id && wiz.ancestry2Id === wiz.ancestryId) wiz.ancestry2Id = null;
+    draw(getMain());
+  });
   $('#anc-mname', body)?.addEventListener('input', (e) => { wiz.mixedName = e.target.value; });
   $$('[data-mix-ord]', body).forEach(b => b.addEventListener('click', () => {
     wiz.mixedFirstFrom = +b.dataset.mixOrd;
@@ -247,8 +256,13 @@ async function stepAncestry(body) {
     btn.addEventListener('click', () => {
       if (!wiz.mixedAncestry) {
         wiz.ancestryId = a.id;
-      } else if (!wiz.ancestryId || wiz.ancestryId === a.id) {
+      } else if (!wiz.ancestryId) {
         wiz.ancestryId = a.id;
+      } else if (wiz.ancestryId === a.id) {
+        /* re-clic sur Lignée 1 : désélectionne si Lignée 2 est libre, sinon conserve */
+        if (wiz.ancestry2Id) { wiz.ancestryId = wiz.ancestry2Id; wiz.ancestry2Id = null; }
+      } else if (wiz.ancestry2Id === a.id) {
+        wiz.ancestry2Id = null;
       } else {
         wiz.ancestry2Id = a.id;
       }
@@ -382,6 +396,14 @@ async function stepEquipment(body) {
 
   $('#eq-camp', body)?.addEventListener('change', (e) => {
     wiz.includeCampaignGear = e.target.checked;
+    if (!wiz.includeCampaignGear) {
+      const pw = weapons.find(w => w.id === wiz.primaryWeaponId);
+      const sw = weapons.find(w => w.id === wiz.secondaryWeaponId);
+      const ar = armors.find(a => a.id === wiz.armorId);
+      if (pw?.campaign) wiz.primaryWeaponId = null;
+      if (sw?.campaign) wiz.secondaryWeaponId = null;
+      if (ar?.campaign) wiz.armorId = null;
+    }
     draw(getMain());
   });
   $$('[data-pot]', body).forEach(b => b.addEventListener('click', () => {
@@ -511,6 +533,10 @@ async function stepIdentity(body) {
   const cl = classes.find(c => c.id === wiz.classId);
   const sub = subclasses.find(s => s.id === wiz.subclassId);
   const anc = ancestries.find(a => a.id === wiz.ancestryId);
+  const anc2 = wiz.mixedAncestry ? ancestries.find(a => a.id === wiz.ancestry2Id) : null;
+  const ancSummary = (wiz.mixedAncestry && anc && anc2)
+    ? (wiz.mixedName.trim() || `${anc.fr}-${anc2.fr}`)
+    : (anc?.fr || '—');
   const com = communities.find(c => c.id === wiz.communityId);
 
   body.innerHTML = `
@@ -539,7 +565,7 @@ async function stepIdentity(body) {
       <div class="cc-meta" style="gap:.4rem 1.2rem">
         <span>Classe : <b style="color:var(--golden)">${esc(cl.fr)}</b></span>
         <span>Sous-classe : <b style="color:var(--golden)">${esc(sub?.fr || '—')}</b></span>
-        <span>Ascendance : <b style="color:var(--golden)">${esc(anc?.fr || '—')}</b></span>
+        <span>Ascendance : <b style="color:var(--golden)">${esc(ancSummary)}</b></span>
         <span>Communauté : <b style="color:var(--golden)">${esc(com?.fr || '—')}</b></span>
         <span>Transformation : <b style="color:var(--golden)">${esc(wiz.transformation || '—')}</b></span>
         <span>PV : <b>${cl.hp}</b></span>

@@ -4,6 +4,7 @@
   "description": "Fiche de personnage numérique interactive compatible avec Daggerheart™ : création guidée, dés de Dualité, compendium français. Fonctionne hors-ligne.",
   "lang": "fr",
   "dir": "ltr",
+  "id": "./index.html",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

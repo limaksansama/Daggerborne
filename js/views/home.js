@@ -62,15 +62,16 @@ export async function render(main, params) {
 
   if (chars.length) {
     const grid = $('#char-grid', main);
-    for (const c of [...chars].sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 3)) {
-      const classes = await data('classes');
+    const recent = [...chars].sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 3);
+    const classes = recent.some(c => !c.className && c.classId) ? await data('classes') : [];
+    for (const c of recent) {
       const cl = classes.find(x => x.id === c.classId);
       const card = el(`<button class="choice" data-char="${c.id}">
         <div class="ch-head"><span class="ch-name">${esc(c.name || 'Sans nom')}</span></div>
-        <div class="ch-sub">${esc(c.ancestry?.fr || '')}${c.ancestry && c.community ? ' · ' : ''}${esc(c.community?.fr || '')}</div>
+        <div class="ch-sub">${esc(c.ancestry?.fr || c.heritage || '')}${c.ancestry && c.community ? ' · ' : ''}${esc(c.community?.fr || '')}</div>
         <div class="ch-stats">
           <span class="stat-chip">Niv. <b>${c.level}</b></span>
-          <span class="stat-chip">${esc(cl?.fr || '—')}</span>
+          <span class="stat-chip">${esc(c.className || cl?.fr || '—')}</span>
           <span class="stat-chip">♥ <b>${c.hp.current}/${c.hp.max}</b></span>
           <span class="stat-chip">✦ <b>${c.hope.current}</b></span>
         </div>

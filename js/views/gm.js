@@ -5,10 +5,12 @@ import {
   RULES_CONDITIONS, RULES_REST, RULES_ENCOUNTER, RULES_MULTICLASS,
   RULES_THRESHOLDS, RULES_DEATH, RULES_TEAMWORK, RULES_HAZARDS, RULES_CAMPAIGN_FRAMES,
 } from '../gmRules.js';
-import { ADVERSARY_POINT_COST, calcEncounterBudget, calcEncounterSpent } from '../rules.js';
+import { ADVERSARY_POINT_COST, calcEncounterBudget, calcEncounterSpent, formatAtkBonus } from '../rules.js';
 import { rollDice } from '../dice3d.js';
 
-let gmUi = { tab: 'fear', tier: null, type: null, q: '' };
+let gmUi = { tab: 'fear', tier: null, type: null, q: '', envTier: null, envQ: '' };
+const openEncDetails = new Set();
+let gmSeq = 0;
 
 const TYPES = ['bruiser', 'horde', 'leader', 'minion', 'ranged', 'skulk', 'social', 'solo', 'standard', 'support'];
 const TYPE_LABELS = {
@@ -18,6 +20,7 @@ const TYPE_LABELS = {
 const ADV_CONDS = ['Vulnérable', 'Entravé', 'Caché', 'Empoisonné'];
 
 export async function render(main, params) {
+  const seq = ++gmSeq;
   main.classList.add('wide');
   const st = getState();
 
@@ -45,9 +48,9 @@ export async function render(main, params) {
 
   const body = $('#gm-body', main);
   if (gmUi.tab === 'fear') await drawFear(body, main, st);
-  else if (gmUi.tab === 'encounter') await drawEncounter(body, main, st);
-  else if (gmUi.tab === 'bestiary') await drawBestiary(body, main);
-  else if (gmUi.tab === 'environments') await drawEnvironments(body, main);
+  else if (gmUi.tab === 'encounter') await drawEncounter(body, main, st, seq);
+  else if (gmUi.tab === 'bestiary') await drawBestiary(body, main, seq);
+  else if (gmUi.tab === 'environments') await drawEnvironments(body, main, seq);
   else if (gmUi.tab === 'rules') await drawRules(body, main);
 }
 
@@ -158,8 +161,9 @@ async function drawFear(main, root, st) {
 }
 
 /* ---------- Tracker d'Affrontement & Calculateur de Points de Combat ---------- */
-async function drawEncounter(body, main, st) {
+async function drawEncounter(body, main, st, seq = gmSeq) {
   const [adversaries, environments] = await Promise.all([data('adversaries'), data('environments')]);
+  if (seq !== gmSeq || !body.isConnected) return;
   st.encounter = st.encounter || { pcCount: 4, adj: {}, active: [], environmentId: null };
   const enc = st.encounter;
   const pcCount = enc.pcCount || 4;
@@ -240,17 +244,24 @@ async function drawEncounter(body, main, st) {
       const def = inst.advId ? adversaries.find(a => a.id === inst.advId) : null;
       const defeated = inst.hpMax > 0 && inst.hpMarked >= inst.hpMax;
       const cost = ADVERSARY_POINT_COST[inst.type] ?? 2;
+      const atkHasDice = inst.atkDamage && /\d*d\d+/i.test(String(inst.atkDamage));
+      const atkBadge = inst.atkDamage
+        ? (atkHasDice
+            ? `<button class="btn ghost small" data-enc-dmg="${inst.uid}" title="Lancer les dégâts (${inst.atkDamage})">🎲 ${esc(inst.atkDamage)}</button>`
+            : `<span class="tag" style="align-self:center">⚔ ${esc(inst.atkDamage)} (fixe)</span>`)
+        : '';
+      const atkFmt = formatAtkBonus(inst.atkBonus);
       const card = el(`<div class="card" style="margin-bottom:.75rem;${defeated ? 'opacity:.62;border-color:rgba(212,104,104,.4)' : ''}">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem;flex-wrap:wrap">
           <div>
             <span class="li-name">${esc(inst.name)}</span>
             <span class="tag">${TYPE_LABELS[inst.type] || inst.type} (${cost} pt${cost > 1 ? 's' : ''})</span>
             ${defeated ? '<span class="tag" style="background:rgba(166,46,60,.3);border-color:#d46868;color:#ffb4b4">Vaincu</span>' : ''}
-            <div class="ms-meta" style="margin-top:.2rem">Diff ${inst.difficulty ?? '—'} · Seuils ${inst.major ?? '—'}/${inst.severe ?? '—'}${inst.atkBonus !== null && inst.atkBonus !== undefined ? ` · ATQ ${inst.atkBonus >= 0 ? '+' : ''}${inst.atkBonus}` : ''}</div>
+            <div class="ms-meta" style="margin-top:.2rem">Diff ${inst.difficulty ?? '—'} · Seuils ${inst.major ?? '—'}/${inst.severe ?? '—'}${atkFmt ? ` · ATQ ${esc(atkFmt)}` : ''}</div>
           </div>
           <div style="display:flex;gap:.35rem;flex-wrap:wrap">
-            ${inst.atkBonus !== null && inst.atkBonus !== undefined ? `<button class="btn small" data-enc-atk="${inst.uid}" title="Jet d'attaque d20 ${inst.atkBonus >= 0 ? '+' : ''}${inst.atkBonus}">⚔ ATQ ${inst.atkBonus >= 0 ? '+' : ''}${inst.atkBonus}</button>` : ''}
-            ${inst.atkDamage ? `<button class="btn ghost small" data-enc-dmg="${inst.uid}" title="Lancer les dégâts (${inst.atkDamage})">🎲 ${esc(inst.atkDamage)}</button>` : ''}
+            ${atkFmt ? `<button class="btn small" data-enc-atk="${inst.uid}" title="Jet d'attaque d20 ${esc(atkFmt)}">⚔ ATQ ${esc(atkFmt)}</button>` : ''}
+            ${atkBadge}
             <button class="icon-btn" style="width:32px;height:32px" data-enc-del="${inst.uid}" title="Retirer"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
           </div>
         </div>
@@ -281,7 +292,7 @@ async function drawEncounter(body, main, st) {
         </div>
 
         ${def?.features?.length ? `
-          <details style="margin-top:.55rem">
+          <details style="margin-top:.55rem" data-enc-det="${inst.uid}" ${openEncDetails.has(inst.uid) ? 'open' : ''}>
             <summary style="cursor:pointer;font-size:.76rem;color:var(--text-faint)">Statblock &amp; Features (${def.features.length})</summary>
             <div style="margin-top:.4rem">
               ${def.motives ? `<p class="ch-desc" style="font-size:.78rem"><b style="color:var(--golden)">Motivations :</b> ${esc(def.motives)}</p>` : ''}
@@ -291,6 +302,10 @@ async function drawEncounter(body, main, st) {
       </div>`);
       listEl.appendChild(card);
     }
+    $$('[data-enc-det]', listEl).forEach(det => det.addEventListener('toggle', () => {
+      if (det.open) openEncDetails.add(det.dataset.encDet);
+      else openEncDetails.delete(det.dataset.encDet);
+    }));
   }
 
   $('#enc-pc-dec', body).addEventListener('click', () => { setState(s => { s.encounter.pcCount = Math.max(1, (s.encounter.pcCount || 4) - 1); }); render(main); });
@@ -312,11 +327,13 @@ async function drawEncounter(body, main, st) {
   $('#enc-add-custom', body).addEventListener('click', () => openCustomAdversaryModal(() => render(main)));
   $('#enc-clear', body)?.addEventListener('click', () => {
     if (!confirm('Retirer tous les adversaires de l\'affrontement ?')) return;
+    openEncDetails.clear();
     setState(s => { s.encounter.active = []; });
     render(main);
   });
 
   $$('[data-enc-del]', body).forEach(b => b.addEventListener('click', () => {
+    openEncDetails.delete(b.dataset.encDel);
     setState(s => { s.encounter.active = s.encounter.active.filter(x => x.uid !== b.dataset.encDel); });
     render(main);
   }));
@@ -398,7 +415,7 @@ function addAdversaryToEncounter(a) {
       stressMarked: 0,
       major: a.major ?? null,
       severe: a.severe ?? null,
-      atkBonus: a.atkBonus ?? 0,
+      atkBonus: a.atkBonus ?? null,
       atkName: a.atkName || '',
       atkDamage: a.atkDamage || '',
       conditions: [],
@@ -461,8 +478,9 @@ function openCustomAdversaryModal(onDone) {
 }
 
 /* ---------- Bestiaire : statblocks complets SRD 2.0 ---------- */
-async function drawBestiary(body, main) {
+async function drawBestiary(body, main, seq = gmSeq) {
   const all = (await data('adversaries')).sort((a, b) => a.en.localeCompare(b.en));
+  if (seq !== gmSeq || !body.isConnected) return;
 
   body.innerHTML = `
     <div class="search-bar" style="margin-bottom:.6rem">
@@ -488,15 +506,16 @@ async function drawBestiary(body, main) {
     const advList = $('#gm-adv-list', body);
     advList.innerHTML = '';
     for (const a of list) {
+      const atkFmt = formatAtkBonus(a.atkBonus);
       const box = el(`<details class="rules-block adv-block">
         <summary><b>${esc(a.en)}</b> <span class="tag">${TYPE_LABELS[a.type] || a.type}</span> <span class="ms-meta" style="display:inline">${T.tiers[a.tier]} · Diff ${a.difficulty ?? '—'} · PV ${a.hp ?? '—'} · Stress ${a.stress ?? '—'}</span></summary>
         <div style="display:flex;gap:.5rem;margin-bottom:.55rem;flex-wrap:wrap">
           <button class="btn small" data-add-enc="${a.id}">⚔ Ajouter à l'affrontement</button>
-          ${a.atkBonus !== null && a.atkBonus !== undefined ? `<button class="btn ghost small" data-adv-atk="${a.id}">🎲 ATQ ${a.atkBonus >= 0 ? '+' : ''}${a.atkBonus}</button>` : ''}
+          ${atkFmt ? `<button class="btn ghost small" data-adv-atk="${a.id}">🎲 ATQ ${esc(atkFmt)}</button>` : ''}
         </div>
         <div class="statblock">
           <div class="sb-row"><span class="sb-k">PV</span><span class="sb-v">${a.hp ?? '—'}</span><span class="sb-k">Stress</span><span class="sb-v">${a.stress ?? '—'}</span><span class="sb-k">Seuils</span><span class="sb-v">${a.major ?? '—'} / ${a.severe ?? '—'}</span>${a.horde ? `<span class="sb-k">Horde</span><span class="sb-v">${a.horde}/PV</span>` : ''}</div>
-          ${a.atkName ? `<div class="sb-row"><span class="sb-k">ATQ</span><span class="sb-v">${a.atkBonus >= 0 ? '+' : ''}${a.atkBonus}</span><span class="sb-k">Attaque</span><span class="sb-v">${esc(a.atkName)} (${esc(a.atkRange)})</span><span class="sb-k">Dégâts</span><span class="sb-v">${esc(a.atkDamage || '—')}</span></div>` : ''}
+          ${a.atkName ? `<div class="sb-row"><span class="sb-k">ATQ</span><span class="sb-v">${esc(atkFmt || '—')}</span><span class="sb-k">Attaque</span><span class="sb-v">${esc(a.atkName)} (${esc(a.atkRange)})</span><span class="sb-k">Dégâts</span><span class="sb-v">${esc(a.atkDamage || '—')}</span></div>` : ''}
           ${a.experience ? `<div class="sb-row"><span class="sb-k">Expérience</span><span class="sb-v">${esc(a.experience)}</span></div>` : ''}
         </div>
         <p class="ch-desc">${esc(a.desc)}</p>
@@ -537,25 +556,26 @@ async function drawBestiary(body, main) {
 }
 
 /* ---------- Environnements SRD 2.0 ---------- */
-async function drawEnvironments(body, main) {
+async function drawEnvironments(body, main, seq = gmSeq) {
   const all = (await data('environments')).sort((a, b) => a.tier - b.tier || (a.fr || a.en).localeCompare(b.fr || b.en, 'fr'));
+  if (seq !== gmSeq || !body.isConnected) return;
 
   body.innerHTML = `
     <div class="search-bar" style="margin-bottom:.6rem">
       <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
-      <input type="text" id="gm-q" placeholder="Rechercher un environnement…" value="${esc(gmUi.q)}">
+      <input type="text" id="gm-env-q" placeholder="Rechercher un environnement…" value="${esc(gmUi.envQ)}">
     </div>
     <div class="filter-row" style="margin-bottom:.8rem">
-      <button class="filter-chip ${gmUi.tier === null ? 'active' : ''}" data-btier="">Tous paliers</button>
-      ${[1, 2, 3, 4].map(t => `<button class="filter-chip ${gmUi.tier === t ? 'active' : ''}" data-btier="${t}">Palier ${t}</button>`).join('')}
+      <button class="filter-chip ${gmUi.envTier === null ? 'active' : ''}" data-etier="">Tous paliers</button>
+      ${[1, 2, 3, 4].map(t => `<button class="filter-chip ${gmUi.envTier === t ? 'active' : ''}" data-etier="${t}">Palier ${t}</button>`).join('')}
     </div>
     <p class="page-sub" id="gm-env-count"></p>
     <div id="gm-env-list"></div>`;
 
   const renderList = () => {
     const list = all
-      .filter(e => (!gmUi.tier || e.tier === gmUi.tier))
-      .filter(e => !gmUi.q || ((e.fr || '') + ' ' + e.en + ' ' + (e.descFr || '') + ' ' + e.desc).toLowerCase().includes(gmUi.q));
+      .filter(e => (!gmUi.envTier || e.tier === gmUi.envTier))
+      .filter(e => !gmUi.envQ || ((e.fr || '') + ' ' + e.en + ' ' + (e.descFr || '') + ' ' + e.desc).toLowerCase().includes(gmUi.envQ));
     $('#gm-env-count', body).textContent = `${list.length} environnement(s) — SRD 2.0`;
     const envList = $('#gm-env-list', body);
     envList.innerHTML = '';
@@ -582,10 +602,10 @@ async function drawEnvironments(body, main) {
   };
   renderList();
 
-  $('#gm-q', body).addEventListener('input', (e) => { gmUi.q = e.target.value.toLowerCase(); renderList(); });
-  $$('[data-btier]', body).forEach(b => b.addEventListener('click', () => {
-    gmUi.tier = b.dataset.btier ? +b.dataset.btier : null;
-    $$('[data-btier]', body).forEach(x => x.classList.toggle('active', (x.dataset.btier ? +x.dataset.btier : null) === gmUi.tier));
+  $('#gm-env-q', body).addEventListener('input', (e) => { gmUi.envQ = e.target.value.toLowerCase(); renderList(); });
+  $$('[data-etier]', body).forEach(b => b.addEventListener('click', () => {
+    gmUi.envTier = b.dataset.etier ? +b.dataset.etier : null;
+    $$('[data-etier]', body).forEach(x => x.classList.toggle('active', (x.dataset.etier ? +x.dataset.etier : null) === gmUi.envTier));
     renderList();
   }));
 }

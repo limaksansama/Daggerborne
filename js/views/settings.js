@@ -39,11 +39,15 @@ export async function render(main, params) {
       <p class="ch-desc">${esc(cs.summary)}</p>
     </div>
 
-    <div class="section-title">Règles optionnelles (SRD 2.0)</div>
-    <div class="card">
+    <div class="section-title">Règles &amp; Préférences</div>
+    <div class="card" style="display:flex;flex-direction:column;gap:.75rem">
       <label style="display:flex;align-items:flex-start;gap:.6rem;cursor:pointer;font-size:.86rem;color:var(--text-dim)">
         <input type="checkbox" id="opt-massive" ${st.settings?.massiveDamageRule ? 'checked' : ''} style="margin-top:.2rem;accent-color:var(--golden)">
         <span><b style="color:var(--text)">Dégâts Massifs (SRD 2.0, p. 50)</b><br>Si un personnage subit des dégâts ≥ 2 × son seuil Grave, il marque <b>4 PV</b> au lieu de 3.</span>
+      </label>
+      <label style="display:flex;align-items:flex-start;gap:.6rem;cursor:pointer;font-size:.86rem;color:var(--text-dim)">
+        <input type="checkbox" id="opt-dice3d" ${st.settings?.diceAnim !== false ? 'checked' : ''} style="margin-top:.2rem;accent-color:var(--golden)">
+        <span><b style="color:var(--text)">Animations des dés 3D</b><br>Affiche les lancers physiques 3D à l'écran (désactivez pour des jets instantanés sur tablette ancienne).</span>
       </label>
     </div>
 
@@ -127,6 +131,10 @@ export async function render(main, params) {
   $('#opt-massive', main).addEventListener('change', (e) => {
     setState(s => { s.settings = s.settings || {}; s.settings.massiveDamageRule = e.target.checked; });
     toast(e.target.checked ? 'Règle Dégâts Massifs activée.' : 'Règle Dégâts Massifs désactivée.');
+  });
+  $('#opt-dice3d', main).addEventListener('change', (e) => {
+    setState(s => { s.settings = s.settings || {}; s.settings.diceAnim = e.target.checked; });
+    toast(e.target.checked ? 'Dés 3D activés.' : 'Dés 3D désactivés (jets instantanés).');
   });
   $('#wipe', main).addEventListener('click', () => {
     setState(s => { s.rolls = []; });

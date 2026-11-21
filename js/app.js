@@ -1,5 +1,5 @@
-/* App bootstrap: router + shell + service worker */
-import { $, $$, el, go, parseHash, registerRoute, T } from './core.js';
+/* App bootstrap: router + shell + service worker + IndexedDB hydration */
+import { $, $$, go, parseHash, registerRoute, T, initStorage, toast } from './core.js';
 import * as home from './views/home.js';
 import * as chars from './views/chars.js';
 import * as create from './views/create.js';
@@ -50,8 +50,11 @@ function buildShell() {
 }
 
 const TITLES = { home: '', chars: T.pageChars, create: 'Création', sheet: 'Fiche', dice: T.pageDice, compendium: T.pageCompendium, gm: T.pageGM, settings: T.pageSettings };
+const routes = { home: home.render, chars: chars.render, create: create.render, sheet: sheet.render, dice: dice.render, compendium: compendium.render, gm: gm.render, settings: settings.render };
 
 async function route() {
+  /* ferme d'éventuelles modales orphelines lors d'une navigation directe */
+  document.querySelectorAll('.modal-back').forEach(m => m.remove());
   const { path, param } = parseHash();
   const main = $('#main');
   $$('[data-nav]').forEach(b => b.classList.toggle('active', b.dataset.nav === path));
@@ -63,27 +66,30 @@ async function route() {
     main.innerHTML = `<div class="view"><div class="empty"><div class="e-title">Erreur</div><div class="e-sub">${String(err.message || err)}</div></div></div>`;
   }
 }
-const routes = { home: home.render, chars: chars.render, create: create.render, sheet: sheet.render, dice: dice.render, compendium: compendium.render, gm: gm.render, settings: settings.render };
 
 buildShell();
 initFab(); /* lanceur de dés flottant (d12 Espoir/Peur) */
 window.addEventListener('hashchange', route);
-route();
+
+(async () => {
+  await initStorage();
+  await route();
+  document.getElementById('splash')?.classList.add('hide');
+})();
+
+setTimeout(() => document.getElementById('splash')?.classList.add('hide'), 900);
 
 // PWA
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
+  navigator.serviceWorker.register('sw.js').then((reg) => {
+    reg.addEventListener('updatefound', () => {
+      const nw = reg.installing;
+      if (!nw) return;
+      nw.addEventListener('statechange', () => {
+        if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+          toast('Mise à jour disponible — prête au prochain chargement.');
+        }
+      });
+    });
+  }).catch(() => {});
 }
-// install prompt
-let deferredPrompt = null;
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-});
-window.addEventListener('DOMContentLoaded', () => {
-  const splash = document.getElementById('splash');
-  setTimeout(() => splash?.classList.add('hide'), 400);
-});
-document.addEventListener('DOMContentLoaded', () => {});
-// hide splash once first route rendered
-setTimeout(() => document.getElementById('splash')?.classList.add('hide'), 700);

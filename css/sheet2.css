@@ -690,3 +690,51 @@
 .dh-wdice-row input { flex: .8; text-align: center; }
 .dh-sheet .inv-item { flex-wrap: wrap; }
 .dh-sheet .inv-item .ii-name { flex: 1 1 130px; }
+
+/* Emplacements d'armure verrouillés (au-delà du Score d'armure) */
+.dh-aspip.locked { opacity: .28; cursor: not-allowed; }
+.dh-aspip.locked > svg polygon { stroke-dasharray: 3 2; stroke: var(--border); }
+
+/* Cicatrices sur la jauge d'Espoir */
+.dh-diamond.scarred {
+  opacity: .35; cursor: not-allowed; border-color: #a03030;
+  background: repeating-linear-gradient(45deg, #2a1218, #2a1218 3px, #140b10 3px, #140b10 6px);
+}
+.dh-hope-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: .35rem; font-size: .72rem; color: var(--text-dim); }
+.dh-hope-head b { color: var(--golden); }
+
+/* Conditions (états) & boutons Dégâts / Mort */
+.dh-conds { display: flex; flex-wrap: wrap; gap: .32rem; margin-top: .65rem; padding-top: .55rem; border-top: 1px dotted var(--border); align-items: center; }
+.dh-cond-lbl { font-size: .58rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--text-faint); margin-right: .15rem; }
+.dh-cond {
+  padding: .2rem .55rem; border-radius: 999px; font-size: .7rem; font-weight: 700;
+  background: var(--panel-3); border: 1px solid var(--border); color: var(--text-dim); cursor: pointer;
+}
+.dh-cond.on { background: rgba(212, 104, 104, .2); border-color: #d46868; color: #ffb4b4; }
+.dh-dmg-bar { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .55rem; }
+
+/* Bascule Avantage/Désavantage rapide dans Actions & Attaques */
+.dha-toggles { display: inline-flex; gap: .28rem; align-items: center; }
+.dha-tbtn {
+  border: 1px solid var(--border); background: var(--panel-3); color: var(--text-dim);
+  border-radius: 8px; padding: .2rem .48rem; font-size: .68rem; font-weight: 800; cursor: pointer;
+}
+.dha-tbtn.on { border-color: var(--golden); color: var(--golden); background: var(--golden-10); }
+
+/* Cooldowns 1x/repos & jetons sur cartes/aptitudes */
+.dc-meta-ctrls { display: inline-flex; align-items: center; gap: .35rem; flex-wrap: wrap; }
+.dc-use-btn {
+  border: 1px solid var(--border); background: var(--panel-3); color: var(--text-dim);
+  border-radius: 999px; padding: .2rem .6rem; font-size: .7rem; font-weight: 700; cursor: pointer;
+}
+.dc-use-btn.used { background: rgba(212, 104, 104, .16); border-color: #d46868; color: #ffb4b4; text-decoration: line-through; }
+.dc-tok { display: inline-flex; align-items: center; gap: .25rem; background: var(--panel-3); border: 1px solid var(--border-gold); border-radius: 999px; padding: .1rem .35rem; font-size: .72rem; color: var(--golden); font-weight: 800; }
+.dc-tok button { background: none; border: none; color: var(--text); font-weight: 800; cursor: pointer; padding: 0 .25rem; }
+
+/* Forme bestiale active badge */
+.dh-bf-banner {
+  display: flex; align-items: center; justify-content: space-between; gap: .5rem; flex-wrap: wrap;
+  background: rgba(120, 200, 160, .1); border: 1px solid rgba(120, 200, 160, .35);
+  border-radius: 10px; padding: .45rem .65rem; margin-bottom: .6rem; font-size: .78rem; color: #b9f3d2;
+}
+

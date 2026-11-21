@@ -1,5 +1,6 @@
 /* Compendium — recherche et navigation dans toutes les données FR */
 import { $, $$, el, esc, go, T, data, toast, getChar, saveChar, getState, addToHand } from '../core.js';
+import { formatAtkBonus } from '../rules.js';
 
 const TABS = [
   { id: 'cards', label: 'Cartes de domaine', icon: '🃏' },
@@ -16,6 +17,7 @@ const TABS = [
 ];
 let ui = { tab: 'cards', q: '', domain: null, tier: null, itemType: null };
 let advShown = 60; /* pagination des adversaires : 60 par lot, plus de limite cachée */
+let renderSeq = 0;
 const CAMPAIGN_LABELS = { everyday: 'Quotidien', western: 'Western', monster: 'Chasse' };
 const fmtBonus = (b) => {
   const n = parseInt(b, 10) || 0;
@@ -23,6 +25,7 @@ const fmtBonus = (b) => {
 };
 
 export async function render(main, params) {
+  const seq = ++renderSeq;
   main.classList.add('wide');
   main.innerHTML = `
   <div class="view">
@@ -39,20 +42,23 @@ export async function render(main, params) {
     <div id="results"></div>
   </div>`;
 
-  $('#q', main).addEventListener('input', (e) => { ui.q = e.target.value.toLowerCase(); listResults(main); });
+  $('#q', main).addEventListener('input', (e) => { ui.q = e.target.value.toLowerCase(); advShown = 60; listResults(main, renderSeq); });
   $$('#tabs [data-tab]', main).forEach(b => b.addEventListener('click', () => {
-    ui.tab = b.dataset.tab; ui.domain = null; ui.tier = null; ui.itemType = null; ui.q = '';
+    ui.tab = b.dataset.tab; ui.domain = null; ui.tier = null; ui.itemType = null; ui.q = ''; advShown = 60;
     render(main, params);
   }));
-  await drawSubfilters(main);
-  await listResults(main);
+  await drawSubfilters(main, seq);
+  if (seq !== renderSeq) return;
+  await listResults(main, seq);
 }
 
-async function drawSubfilters(main) {
+async function drawSubfilters(main, seq) {
   const sf = $('#subfilters', main);
+  if (!sf || !sf.isConnected || seq !== renderSeq) return;
   sf.innerHTML = '';
   if (ui.tab === 'cards') {
     const domains = await data('domains');
+    if (!$('#subfilters', main) || !sf.isConnected || seq !== renderSeq) return;
     sf.appendChild(el(`<button class="filter-chip ${ui.domain === null ? 'active' : ''}" data-dom="">Tous</button>`));
     for (const [k, d] of Object.entries(domains)) {
       sf.appendChild(el(`<button class="filter-chip ${ui.domain === k ? 'active' : ''}" data-dom="${k}"><img src="assets/icons/domain-card/${k}.png" alt="">${esc(d.fr)}</button>`));
@@ -66,7 +72,7 @@ async function drawSubfilters(main) {
     for (const [v, label] of types) {
       sf.appendChild(el(`<button class="filter-chip ${ui.itemType === v ? 'active' : ''}" data-itype="${v || ''}">${label}</button>`));
     }
-    $$('[data-itype]', sf).forEach(b => b.addEventListener('click', () => { ui.itemType = b.dataset.itype || null; render(main); }));
+    $$('[data-itype]', sf).forEach(b => b.addEventListener('click', () => { ui.itemType = b.dataset.itype || null; advShown = 60; render(main); }));
   } else if (ui.tab === 'weapons' || ui.tab === 'armors' || ui.tab === 'adversaries' || ui.tab === 'environments' || ui.tab === 'beastforms') {
     sf.appendChild(el(`<button class="filter-chip ${ui.tier === null ? 'active' : ''}" data-tier="">Tous paliers</button>`));
     for (const t of [1, 2, 3, 4]) {
@@ -74,11 +80,13 @@ async function drawSubfilters(main) {
     }
   }
   $$('[data-dom]', sf).forEach(b => b.addEventListener('click', () => { ui.domain = b.dataset.dom || null; render(main); }));
-  $$('[data-tier]', sf).forEach(b => b.addEventListener('click', () => { ui.tier = b.dataset.tier ? +b.dataset.tier : null; render(main); }));
+  $$('[data-tier]', sf).forEach(b => b.addEventListener('click', () => { ui.tier = b.dataset.tier ? +b.dataset.tier : null; advShown = 60; render(main); }));
 }
 
-async function listResults(main) {
+async function listResults(main, seq = renderSeq) {
   const res = $('#results', main);
+  if (!res || !res.isConnected || seq !== renderSeq) return;
+  const stale = () => seq !== renderSeq || !res.isConnected || $('#results', main) !== res;
   res.innerHTML = '';
   const q = ui.q;
   const mk = (item) => {
@@ -94,8 +102,8 @@ async function listResults(main) {
   };
 
   if (ui.tab === 'cards') {
-    const cards = await data('domainCards');
-    const domains = await data('domains');
+    const [cards, domains] = await Promise.all([data('domainCards'), data('domains')]);
+    if (stale()) return;
     let list = cards.filter(c => (!ui.domain || c.domain === ui.domain));
     if (q) list = list.filter(c => (c.fr + ' ' + c.en + ' ' + c.desc).toLowerCase().includes(q));
     list = list.sort((a, b) => a.domain.localeCompare(b.domain) || a.level - b.level);
@@ -110,6 +118,7 @@ async function listResults(main) {
     }
   } else if (ui.tab === 'items') {
     const items = await data('generalItems');
+    if (stale()) return;
     let list = items.filter(i => (!ui.itemType || i.type === ui.itemType));
     if (q) list = list.filter(i => (i.fr + ' ' + i.en + ' ' + (i.descFr || '') + ' ' + (i.descEn || '')).toLowerCase().includes(q));
     list = list.sort((a, b) => a.fr.localeCompare(b.fr, 'fr'));
@@ -123,8 +132,8 @@ async function listResults(main) {
       });
     }
   } else if (ui.tab === 'classes') {
-    const classes = await data('classes');
-    const domains = await data('domains');
+    const [classes, domains] = await Promise.all([data('classes'), data('domains')]);
+    if (stale()) return;
     let list = [...classes].sort((a, b) => a.fr.localeCompare(b.fr, 'fr'));
     if (q) list = list.filter(c => (c.fr + ' ' + c.desc).toLowerCase().includes(q));
     for (const c of list) {
@@ -132,16 +141,19 @@ async function listResults(main) {
     }
   } else if (ui.tab === 'ancestries') {
     const list = (await data('ancestries')).sort((a, b) => a.fr.localeCompare(b.fr, 'fr'));
+    if (stale()) return;
     for (const a of (q ? list.filter(a => (a.fr + a.desc).toLowerCase().includes(q)) : list)) {
       mk({ key: a.id, type: 'ancestry', raw: a, name: a.fr, sub: a.abilities.map(x => x.fr).join(' · '), fanTag: a.fan ? '<span class="tag fan">H&F</span>' : '' });
     }
   } else if (ui.tab === 'communities') {
     const list = (await data('communities')).sort((a, b) => a.fr.localeCompare(b.fr, 'fr'));
+    if (stale()) return;
     for (const c of (q ? list.filter(c => (c.fr + c.desc).toLowerCase().includes(q)) : list)) {
       mk({ key: c.id, type: 'community', raw: c, name: c.fr, sub: c.ability ? c.ability.fr : '', fanTag: c.fan ? '<span class="tag fan">H&F</span>' : '' });
     }
   } else if (ui.tab === 'weapons') {
     const list = (await data('weapons')).filter(w => (!ui.tier || w.tier === ui.tier));
+    if (stale()) return;
     const f = q ? list.filter(w => (w.fr + ' ' + w.en + ' ' + (w.desc || '')).toLowerCase().includes(q)) : list;
     res.insertAdjacentHTML('beforeend', `<p class="page-sub">${f.length} arme(s) — Base &amp; Cadres de campagne</p>`);
     for (const w of f.sort((a, b) => a.tier - b.tier || a.fr.localeCompare(b.fr, 'fr'))) {
@@ -153,6 +165,7 @@ async function listResults(main) {
     }
   } else if (ui.tab === 'armors') {
     const list = (await data('armors')).filter(a => (!ui.tier || a.tier === ui.tier));
+    if (stale()) return;
     const f = q ? list.filter(a => (a.fr + ' ' + (a.en || '') + ' ' + (a.desc || '')).toLowerCase().includes(q)) : list;
     res.insertAdjacentHTML('beforeend', `<p class="page-sub">${f.length} armure(s) — Base &amp; Cadres de campagne</p>`);
     for (const a of f.sort((a, b) => a.tier - b.tier || a.fr.localeCompare(b.fr, 'fr'))) {
@@ -164,6 +177,7 @@ async function listResults(main) {
     }
   } else if (ui.tab === 'adversaries') {
     const list = (await data('adversaries')).filter(a => (!ui.tier || a.tier === ui.tier));
+    if (stale()) return;
     const f = q ? list.filter(a => (a.en + ' ' + a.desc).toLowerCase().includes(q)) : list;
     const sorted = f.sort((a, b) => a.en.localeCompare(b.en));
     const shown = sorted.slice(0, advShown);
@@ -178,6 +192,7 @@ async function listResults(main) {
     }
   } else if (ui.tab === 'beastforms') {
     const list = (await data('beastforms')).filter(b => (!ui.tier || b.tier === ui.tier));
+    if (stale()) return;
     const f = q ? list.filter(b => (b.fr + ' ' + b.en + ' ' + (b.examples || '') + ' ' + (b.advantages || []).join(' ')).toLowerCase().includes(q)) : list;
     res.insertAdjacentHTML('beforeend', `<p class="page-sub">${f.length} forme(s) bestiale(s) de Druide — SRD 2.0 (Paliers 1 à 4)</p>`);
     for (const b of f.sort((a, x) => a.tier - x.tier || a.fr.localeCompare(x.fr, 'fr'))) {
@@ -190,6 +205,7 @@ async function listResults(main) {
     }
   } else if (ui.tab === 'environments') {
     const list = (await data('environments')).filter(e => (!ui.tier || e.tier === ui.tier));
+    if (stale()) return;
     const f = q ? list.filter(e => ((e.fr || '') + ' ' + e.en + ' ' + (e.descFr || '') + ' ' + e.desc).toLowerCase().includes(q)) : list;
     res.insertAdjacentHTML('beforeend', `<p class="page-sub">${f.length} environnement(s) — SRD 2.0 (Paliers 1 à 4)</p>`);
     for (const e of f.sort((a, b) => a.tier - b.tier || (a.fr || a.en).localeCompare(b.fr || b.en, 'fr'))) {
@@ -197,6 +213,7 @@ async function listResults(main) {
     }
   } else if (ui.tab === 'transformations') {
     const list = (await data('transformations'));
+    if (stale()) return;
     const f = q ? list.filter(t => (t.fr + ' ' + t.en + ' ' + t.desc).toLowerCase().includes(q)) : list;
     res.insertAdjacentHTML('beforeend', `<p class="page-sub">${f.length} transformation(s) — options de personnage optionnelles du SRD 2.0</p>`);
     for (const t of f.sort((a, b) => a.fr.localeCompare(b.fr, 'fr'))) {
@@ -205,7 +222,7 @@ async function listResults(main) {
   }
 }
 
-function showDetail(main, raw, type) {
+async function showDetail(main, raw, type) {
   const back = el(`<div class="modal-back"></div>`);
   const sheet = el(`<div class="modal-sheet"></div>`);
   back.appendChild(sheet);
@@ -214,10 +231,10 @@ function showDetail(main, raw, type) {
 
   let inner = '';
   if (type === 'card') {
-    const domains = data('domains');
+    const domains = await data('domains');
     inner = `
       <h3>${esc(raw.fr)}</h3>
-      <div class="ms-meta">Carte de domaine · ${T.cardType[raw.type]} · Niveau ${raw.level} · Prix de rappel ${raw.recall} ${raw.fan ? '· <span style="color:#c9a3d3">traduction amateur (Hope & Fear)</span>' : ''}</div>
+      <div class="ms-meta">${esc(domains[raw.domain]?.fr || raw.domain)} · ${T.cardType[raw.type]} · Niveau ${raw.level} · Prix de rappel ${raw.recall} ${raw.fan ? '· <span style="color:#c9a3d3">traduction amateur (Hope & Fear)</span>' : ''}</div>
       <div class="ms-body"><p>${esc(raw.desc)}</p></div>`;
   } else if (type === 'class') {
     inner = `
@@ -260,12 +277,13 @@ function showDetail(main, raw, type) {
   } else if (type === 'adversary') {
     const a = raw;
     const hordeTxt = a.horde ? ` · ${a.horde}/PV` : '';
+    const atkFmt = formatAtkBonus(a.atkBonus);
     inner = `
       <h3>${esc(a.en)}</h3>
       <div class="ms-meta">${T.tiers[a.tier]} · ${esc(a.typeFr || '')}${hordeTxt}${a.difficulty ? ' · Difficulté ' + a.difficulty : ''}</div>
       <div class="statblock">
         <div class="sb-row"><span class="sb-k">PV</span><span class="sb-v">${a.hp ?? '—'}</span><span class="sb-k">Stress</span><span class="sb-v">${a.stress ?? '—'}</span><span class="sb-k">Seuils</span><span class="sb-v">${a.major ?? '—'} / ${a.severe ?? '—'}</span></div>
-        ${a.atkName ? `<div class="sb-row"><span class="sb-k">ATQ</span><span class="sb-v">${a.atkBonus >= 0 ? '+' : ''}${a.atkBonus}</span><span class="sb-k">Attaque</span><span class="sb-v">${esc(a.atkName)} (${esc(a.atkRange)})</span><span class="sb-k">Dégâts</span><span class="sb-v">${esc(a.atkDamage || '—')}</span></div>` : ''}
+        ${a.atkName ? `<div class="sb-row"><span class="sb-k">ATQ</span><span class="sb-v">${esc(atkFmt || '—')}</span><span class="sb-k">Attaque</span><span class="sb-v">${esc(a.atkName)} (${esc(a.atkRange)})</span><span class="sb-k">Dégâts</span><span class="sb-v">${esc(a.atkDamage || '—')}</span></div>` : ''}
         ${a.experience ? `<div class="sb-row"><span class="sb-k">Expérience</span><span class="sb-v">${esc(a.experience)}</span></div>` : ''}
       </div>
       <div class="ms-body"><p>${esc(a.desc)}</p>

@@ -1,5 +1,5 @@
 /* Dés de Dualité */
-import { $, $$, el, esc, go, parseHash, T, data, toast, getState, setState, getChar, saveChar, rollD } from '../core.js';
+import { $, el, esc, parseHash, T, getState, getChar } from '../core.js';
 import { rollDuality } from '../dice3d.js';
 
 let ui = { mod: 0, adv: false, disadv: false, trait: null, expMod: 0, label: '', charId: null };
@@ -30,8 +30,8 @@ export async function render(main, params) {
           ${Object.entries(T.traits).map(([k, v]) => `<option value="${k}" ${ui.trait === k ? 'selected' : ''}>${v} ${c.traits[k] > 0 ? '+' : ''}${c.traits[k]}</option>`).join('')}
           ${c.experiences.map((e, i) => ({ e, i })).filter(x => x.e.name && x.e.name.trim()).map(x => `<option value="exp${x.i}" ${ui.trait === `exp${x.i}` ? 'selected' : ''}>✦ ${esc(x.e.name)} (+${x.e.mod})</option>`).join('')}
         </select>` : ''}
-        <button class="btn ghost ${ui.adv ? 'sel' : ''}" id="btn-adv">▲ Avantage</button>
-        <button class="btn ghost ${ui.disadv ? 'sel' : ''}" id="btn-disadv">▼ Désavantage</button>
+        <button class="btn ghost ${ui.adv ? 'sel' : ''}" id="btn-adv">▲ Avantage (d6)</button>
+        <button class="btn ghost ${ui.disadv ? 'sel' : ''}" id="btn-disadv">▼ Désavantage (d6)</button>
       </div>
       <button class="btn block" id="btn-roll" style="max-width:420px">✦ Lancer les dés</button>
     </div>
@@ -45,6 +45,14 @@ export async function render(main, params) {
     histEl.innerHTML = '<div class="empty"><div class="e-title">Aucun jet</div><div class="e-sub">Lancez vos Dés de Dualité (deux d12) : si votre dé d\'Espoir dépasse celui de la Peur, vous gagnez un Espoir.</div></div>';
   }
   for (const r of st.rolls.slice(0, 25)) {
+    if (r.hope == null) {
+      histEl.appendChild(el(`<div class="hist-item">
+        <span class="hi-out plain">${esc(r.notation || 'Dés')}</span>
+        <span class="hi-detail">${esc(r.label || 'Jet de dés')}</span>
+        <span class="hi-total">${r.total}</span>
+      </div>`));
+      continue;
+    }
     const cls = r.result === 'crit' ? 'crit' : r.result;
     const label = r.result === 'crit' ? 'Critique' : r.result === 'hope' ? 'Espoir' : 'Peur';
     histEl.appendChild(el(`<div class="hist-item">
@@ -73,33 +81,27 @@ export async function render(main, params) {
     btnRoll.disabled = true;
     const unlock = () => { btnRoll.dataset.rolling = ''; btnRoll.disabled = false; };
 
-    // compute modifier
     let mod = 0;
     let label = 'Jet d\'action';
     if (ui.trait?.startsWith('exp')) {
-      if (!c) { ui.trait = null; unlock(); return; }  // perso supprimé : réinitialise la sélection
+      if (!c) { ui.trait = null; unlock(); return; }
       const e = c.experiences[+ui.trait.slice(3)];
       if (!e) { ui.trait = null; unlock(); return; }
       mod += e.mod; label = `✦ ${e.name}`;
     } else if (ui.trait && c) {
       mod += c.traits[ui.trait]; label = `Jet de ${T.traits[ui.trait]}`;
     }
-    /* Avantage/Désavantage : dé d6 (tirage rapide, intégré au modificateur) */
-    if (ui.adv || ui.disadv) {
-      const v = rollD(6);
-      if (ui.adv) { mod += v; label += ` + Avantage d6 (${v})`; }
-      else { mod -= v; label += ` − Désavantage d6 (${v})`; }
-    }
 
-    /* UNIFICATION : jet de Dualité 3D via rollService (bannière interactive) */
-    const r = await rollDuality({ mod, label, charId: c ? c.id : null });
+    /* UNIFICATION : jet de Dualité 3D (avec d6 3D avantage/désavantage si actif) */
+    const r = await rollDuality({
+      mod,
+      label,
+      charId: c ? c.id : null,
+      advantage: ui.adv,
+      disadvantage: ui.disadv,
+    });
     unlock();
     if (!r || parseHash().path !== 'dice') return;
-    /* affichage de secours dans la vue (la bannière 3D porte le résultat principal) */
-    const dieH = $('#die-hope', main), dieF = $('#die-fear', main);
-    dieH?.classList.remove('rolling'); dieF?.classList.remove('rolling');
-    $('#val-hope', main).textContent = r.hope;
-    $('#val-fear', main).textContent = r.fear;
     render(main, params).then(() => {
       if (parseHash().path !== 'dice') return;
       const res = $('#roll-result', main);
@@ -108,7 +110,9 @@ export async function render(main, params) {
         const word = r.result === 'crit' ? '★ Succès critique' : r.result === 'hope' ? 'Avec Espoir' : 'Avec Peur';
         res.innerHTML = `
           <span class="total">${r.total}</span>
-          <span class="outcome ${cls}">${word}</span>`;
+          <span class="outcome ${cls}">${word}</span>
+          ${r.adv ? `<span class="stat-chip">+${r.adv} Avantage</span>` : ''}
+          ${r.dis ? `<span class="stat-chip">−${r.dis} Désavantage</span>` : ''}`;
         $('#val-hope', main).textContent = r.hope;
         $('#val-fear', main).textContent = r.fear;
       }

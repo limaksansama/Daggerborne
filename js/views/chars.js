@@ -1,5 +1,5 @@
 /* Liste des personnages */
-import { $, $$, el, esc, go, getState, toast, importCharacterFromText, openPasteJsonModal } from '../core.js';
+import { $, $$, el, esc, go, getState, toast, data, importCharacterFromText, openPasteJsonModal } from '../core.js';
 
 export async function render(main, params) {
   main.classList.remove('wide');
@@ -23,13 +23,16 @@ export async function render(main, params) {
   if (!st.characters.length) {
     list.innerHTML = `<div class="empty"><div class="e-icon">✦</div><div class="e-title">Aucun personnage</div><div class="e-sub">Créez votre premier héros avec l'assistant guidé en 9 étapes.</div></div>`;
   } else {
+    const needsClassLookup = st.characters.some(c => !c.className && c.classId);
+    const classes = needsClassLookup ? await data('classes') : [];
     for (const c of [...st.characters].sort((a, b) => b.updatedAt - a.updatedAt)) {
+      const clsName = c.className || classes.find(x => x.id === c.classId)?.fr || '';
       const card = el(`<button class="char-card" data-id="${c.id}">
         <span class="ava">${c.portrait ? `<img src="${esc(c.portrait)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block">` : esc((c.name || '?')[0].toUpperCase())}</span>
         <span class="cc-body">
           <span class="cc-name">${esc(c.name || 'Sans nom')}</span>
           <span class="cc-meta">
-            <span>${esc(c.className || '')}</span>
+            <span>${esc(clsName)}</span>
             <span>Niv. ${c.level}</span>
             <span>${esc(c.heritage || c.ancestry?.fr || '')}</span>
           </span>

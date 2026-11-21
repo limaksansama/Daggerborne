@@ -453,6 +453,7 @@ h1.page-title {
 .hist-item .hi-out.hope { color: var(--golden); }
 .hist-item .hi-out.fear { color: var(--chat-blue); }
 .hist-item .hi-out.crit { color: #ff8f8f; }
+.hist-item .hi-out.plain { color: #cbd5e1; }
 .hist-item .hi-detail { color: var(--text-dim); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .hist-item .hi-total { font-weight: 800; font-size: 1rem; }
 

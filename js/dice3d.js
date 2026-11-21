@@ -106,18 +106,35 @@ async function rollDuality({ mod = 0, label = '', charId = null, weaponUid = nul
   if (busy) return null;
   busy = true;
   try {
-    const db = await ensureInit();
-    const diceReq = [
-      { sides: 12, qty: 1, theme: 'hope', themeColor: '#fbbf24' },
-      { sides: 12, qty: 1, theme: 'fear', themeColor: '#5b21b6' },
-    ];
     const hasAdvDis = Boolean(advantage ^ disadvantage);
-    if (hasAdvDis) diceReq.push({ sides: 6, qty: 1, theme: 'nebula-gold' });
-    const rolls = await db.roll(diceReq);
-    const hope = safeValue(rolls[0], 12);
-    const fear = safeValue(rolls[1], 12);
-    const advVal = (hasAdvDis && advantage) ? safeValue(rolls[2], 6) : 0;
-    const disVal = (hasAdvDis && disadvantage) ? safeValue(rolls[2], 6) : 0;
+    const use3d = getState().settings?.diceAnim !== false;
+    let hope, fear, advVal = 0, disVal = 0;
+    if (use3d) {
+      try {
+        const db = await ensureInit();
+        const diceReq = [
+          { sides: 12, qty: 1, theme: 'hope', themeColor: '#fbbf24' },
+          { sides: 12, qty: 1, theme: 'fear', themeColor: '#5b21b6' },
+        ];
+        if (hasAdvDis) diceReq.push({ sides: 6, qty: 1, theme: 'nebula-gold' });
+        const rolls = await db.roll(diceReq);
+        hope = safeValue(rolls[0], 12);
+        fear = safeValue(rolls[1], 12);
+        advVal = (hasAdvDis && advantage) ? safeValue(rolls[2], 6) : 0;
+        disVal = (hasAdvDis && disadvantage) ? safeValue(rolls[2], 6) : 0;
+      } catch (err3d) {
+        console.warn('rollDuality 3D fallback:', err3d);
+        hope = rng(12);
+        fear = rng(12);
+        advVal = (hasAdvDis && advantage) ? rng(6) : 0;
+        disVal = (hasAdvDis && disadvantage) ? rng(6) : 0;
+      }
+    } else {
+      hope = rng(12);
+      fear = rng(12);
+      advVal = (hasAdvDis && advantage) ? rng(6) : 0;
+      disVal = (hasAdvDis && disadvantage) ? rng(6) : 0;
+    }
     const total = hope + fear + mod + advVal - disVal;
     const result = hope === fear ? 'crit' : hope > fear ? 'hope' : 'fear';
     const word = result === 'crit' ? '★ Succès Critique !' : result === 'hope' ? 'Avec Espoir' : 'Avec Peur';
@@ -127,7 +144,8 @@ async function rollDuality({ mod = 0, label = '', charId = null, weaponUid = nul
     if (charId) {
       const c = getChar(charId);
       if (c) {
-        if (result === 'hope' || result === 'crit') c.hope.current = Math.min(c.hope.max, c.hope.current + 1);
+        const effHopeMax = Math.max(0, (c.hope.max || 6) - (c.scars || 0));
+        if (result === 'hope' || result === 'crit') c.hope.current = Math.min(effHopeMax, c.hope.current + 1);
         if (result === 'crit') c.stress.current = Math.max(0, c.stress.current - 1);
         if (result === 'fear') setState(s => { s.fear = Math.min(30, s.fear + 1); });
         saveChar(c);
@@ -173,22 +191,63 @@ async function rollDuality({ mod = 0, label = '', charId = null, weaponUid = nul
   }
 }
 
-/* ---------- jet de dés standards (notation ndX ou ndX+Y) — thème nebula-gold ---------- */
+/* ---------- parseur multi-dés (ex. "1d8 + 2d6 + 3") ---------- */
+function parseMultiDice(notation) {
+  const clean = String(notation || '1d6').replace(/\s+/g, '');
+  const terms = clean.match(/[+-]?[^+-]+/g) || ['1d6'];
+  const diceReqs = [];
+  const expectedSides = [];
+  let flatMod = 0;
+
+  for (const term of terms) {
+    const m = term.match(/^([+-]?)(\d*)d(\d+)$/i);
+    if (m) {
+      const sign = m[1] === '-' ? -1 : 1;
+      const qty = Math.max(1, parseInt(m[2], 10) || 1);
+      const sides = Math.max(2, parseInt(m[3], 10) || 6);
+      diceReqs.push({ sides, qty, theme: 'nebula-gold', _sign: sign });
+      for (let i = 0; i < qty; i++) expectedSides.push({ sides, sign });
+    } else if (/^[+-]?\d+$/.test(term)) {
+      flatMod += parseInt(term, 10);
+    }
+  }
+  if (!diceReqs.length) {
+    diceReqs.push({ sides: 6, qty: 1, theme: 'nebula-gold' });
+    expectedSides.push({ sides: 6, sign: 1 });
+  }
+  return { clean, diceReqs, expectedSides, flatMod };
+}
+
+/* ---------- jet de dés standards (notation multi-dés ex: 1d8+2d6+3) — thème nebula-gold ---------- */
 async function rollDice(notation, { label = '' } = {}) {
   if (busy) return null;
   busy = true;
   try {
-    const clean = String(notation || '1d6').replace(/\s+/g, '');
-    const modMatch = clean.match(/([+-]\d+)$/);
-    const flatMod = modMatch ? parseInt(modMatch[1], 10) : 0;
-    const dicePart = modMatch ? clean.slice(0, -modMatch[1].length) : clean;
-
-    const db = await ensureInit();
-    const rolls = await db.roll(dicePart);
-    /* lecture sûre : fallback local si la physique n'a pas pu lire une face (dice-box #74) */
-    const sidesOf = r => parseInt(r?.dieType?.replace('d', '') || (dicePart.match(/d(\d+)/) || [])[1] || '6', 10);
-    const values = rolls.map(r => safeValue(r, sidesOf(r)));
-    const diceSum = values.reduce((a, b) => a + b, 0);
+    const { clean, diceReqs, expectedSides, flatMod } = parseMultiDice(notation);
+    const dbPayload = diceReqs.map(({ sides, qty, theme }) => ({ sides, qty, theme }));
+    const use3d = getState().settings?.diceAnim !== false;
+    let rolls = [];
+    if (use3d) {
+      try {
+        const db = await ensureInit();
+        rolls = await db.roll(dbPayload);
+      } catch (err3d) {
+        console.warn('rollDice 3D fallback:', err3d);
+        rolls = [];
+      }
+    }
+    /* lecture sûre par dé : fallback local aux faces exactes du dé concerné (dice-box #74) */
+    const values = [];
+    let diceSum = 0;
+    const count = Math.max(rolls.length, expectedSides.length);
+    for (let i = 0; i < count; i++) {
+      const r = rolls[i];
+      const exp = expectedSides[i] || expectedSides[0] || { sides: 6, sign: 1 };
+      const sides = parseInt(String(r?.dieType || '').replace('d', '') || r?.sides || exp.sides, 10) || exp.sides;
+      const v = r ? safeValue(r, sides) : rng(sides);
+      values.push(exp.sign < 0 ? -v : v);
+      diceSum += exp.sign < 0 ? -v : v;
+    }
     const total = diceSum + flatMod;
     const modTxt = flatMod ? ` (${flatMod > 0 ? '+' + flatMod : flatMod})` : '';
     setState(s => {
@@ -216,7 +275,7 @@ export async function rollDamage(charId, weaponUid) {
   if (!c) return null;
   const w = c.weapons?.find(x => x.uid === weaponUid) || c.weapons?.find(x => x.primary);
   if (!w) return null;
-  const n = c.proficiency;                                  /* Maîtrise */
+  const n = Math.max(1, Math.min(6, parseInt(c.proficiency, 10) || 1)); /* Maîtrise */
   const face = parseInt((w.dice || 'd6').replace('d', ''), 10) || 6;
   const bonus = parseInt(w.dmgBonus, 10) || 0;
   const notation = bonus ? `${n}d${face}${bonus > 0 ? '+' + bonus : bonus}` : `${n}d${face}`;

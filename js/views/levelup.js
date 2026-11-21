@@ -135,24 +135,31 @@ async function runLevelUpWizard(c, ctx) {
   document.body.appendChild(back);
 
   /* ---- historique : un état poussé à chaque étape ; retour Android = étape précédente ---- */
+  let closed = false;
   const pushHist = () => { try { history.pushState({ dhLvl: wiz.step }, ''); } catch (e) { /* noop */ } };
   const onPop = (e) => {
+    if (closed) return;
     if (e.state && Number.isInteger(e.state.dhLvl) && e.state.dhLvl >= 1 && e.state.dhLvl <= 5) {
       wiz.step = e.state.dhLvl;
-      render();
+      render(true);
     } else {
       close(true);
     }
   };
+  const onHash = () => close(true);
   window.addEventListener('popstate', onPop);
-  const close = (fromPop) => {
+  window.addEventListener('hashchange', onHash);
+  const close = (fromExternal) => {
+    if (closed) return;
+    closed = true;
     window.removeEventListener('popstate', onPop);
+    window.removeEventListener('hashchange', onHash);
     lvlupOpen = false;
     /* remonte l'historique jusqu'à l'état d'avant le wizard (une entrée par étape) */
-    if (!fromPop && history.state?.dhLvl) { try { history.go(-wiz.step); } catch (e) { /* noop */ } }
+    if (!fromExternal && history.state?.dhLvl) { try { history.go(-wiz.step); } catch (e) { /* noop */ } }
     back.remove();
   };
-  back.addEventListener('click', (e) => { if (e.target === back) close(); });
+  back.addEventListener('click', (e) => { if (e.target === back) close(false); });
 
   /* ---------- pied de page : boutons selon l'étape ---------- */
   const footer = () => {
@@ -183,7 +190,9 @@ async function runLevelUpWizard(c, ctx) {
     </div>`;
 
   /* ================= RENDER ================= */
-  const render = () => {
+  const render = (resetScroll = false) => {
+    const prevBody = $('.lu-body', sheet);
+    const prevScroll = prevBody ? prevBody.scrollTop : 0;
     const availTraits = traitsAvailable(c);
     const counts = tierCounts(c, newTier);
     const head = `
@@ -225,13 +234,15 @@ async function runLevelUpWizard(c, ctx) {
           return true;
         }).map(([id, label]) => {
           const selCount = id === 'proficiency' ? wiz.profChecks : wiz.choices.filter(x => x === id).length;
+          const isPicked = wiz.choices.includes(id);
           const maxSel = id === 'proficiency' ? 2 : 1;
           const used = counts[id];
           const noTraitLeft = id === 'attributes' && availTraits.length < 2;
-          const noRoom = id === 'multiclass' && pts() >= 1 && !wiz.choices.includes('multiclass');
+          const hasDoubleCost = wiz.choices.includes('proficiency') || wiz.choices.includes('multiclass');
+          const noRoom = !isPicked && (pts() >= 2 || hasDoubleCost || ((id === 'multiclass' || id === 'proficiency') && wiz.choices.length > 0));
           const full = selCount >= maxSel || noTraitLeft || used[0] >= used[1] || noRoom;
-          return `<button class="lu-opt ${selCount ? 'sel' : ''}" data-luopt="${id}" ${full ? 'disabled' : ''}>
-            <span class="lo-check">${selCount ? '✓' : ''}</span>
+          return `<button class="lu-opt ${isPicked ? 'sel' : ''}" data-luopt="${id}" ${full ? 'disabled' : ''}>
+            <span class="lo-check">${isPicked ? '✓' : ''}</span>
             <span class="lo-txt">${label}<span class="lo-use">[${used[0]}/${used[1]}]</span></span>
           </button>`;
         }).join('')}
@@ -307,12 +318,13 @@ async function runLevelUpWizard(c, ctx) {
           if (!cd) return '';
           const sel = wiz.swapIndex === i;
           return `<div class="lu-card ${sel ? 'sel' : ''}" data-luswap="${i}">
-            <span class="lc-lvl">Niv. ${cd.level}</span>
-            <span class="lc-body"><b>${esc(cd.fr)}</b><small>${esc(domains[cd.domain]?.fr || '')}${dc.inHand ? ' · en main' : ' · caveau'}</small></span>
-            <span class="lc-add">${sel ? '✓' : '⇄'}</span>
+            <div class="lc-row">
+              <span class="lc-lvl">Niv. ${cd.level}</span>
+              <span class="lc-body"><b>${esc(cd.fr)}</b><small>${esc(domains[cd.domain]?.fr || '')}${dc.inHand ? ' · en main' : ' · caveau'}</small></span>
+              <span class="lc-add">${sel ? '✓' : '⇄'}</span>
+            </div>
           </div>
-          ${sel && wiz.swapPick === null ? renderSwapChoices(i) : ''}
-          ${sel && wiz.swapPick ? renderSwapChoices(i) : ''}`;
+          ${sel ? renderSwapChoices(i) : ''}`;
         }).join('') || '<div class="dh-help">Aucune carte possédée.</div>'}
       </div>`;
     }
@@ -324,7 +336,7 @@ async function runLevelUpWizard(c, ctx) {
     sheet.innerHTML = `${head}<div class="lu-body">${body}</div>${footer()}`;
     bind();
     const b = $('.lu-body', sheet);
-    if (b) b.scrollTop = 0;
+    if (b) b.scrollTop = resetScroll ? 0 : prevScroll;
   };
 
   /* ---------- rendu des cartes (étape 3, accordéon) ---------- */
@@ -445,9 +457,13 @@ async function runLevelUpWizard(c, ctx) {
           toast('La carte de sous-classe remplace le multiclassage pour ce palier.');
           return;
         }
-        /* options à double coût : ne prennent la main que si les 2 points sont libres */
-        if ((id === 'multiclass' || id === 'proficiency') && pts() >= 1) {
+        /* options à double coût : ne prennent la main que si aucun point n'est pris */
+        if ((id === 'multiclass' || id === 'proficiency') && wiz.choices.length > 0) {
           toast('Cette option à double coût consomme vos 2 points d\'amélioration.');
+          return;
+        }
+        if (pts() >= 2 || wiz.choices.includes('proficiency') || wiz.choices.includes('multiclass')) {
+          toast('Vos 2 points d\'amélioration sont déjà alloués.');
           return;
         }
         wiz.choices.push(id);
@@ -515,7 +531,10 @@ async function runLevelUpWizard(c, ctx) {
           else {
             if (wiz.cardPicks.length >= cardQuota()) { toast(`Maximum : ${cardQuota()} carte(s).`); return; }
             wiz.cardPicks.push(id);
-            if (wiz.swapPick === id) wiz.swapPick = null;
+            if (wiz.swapPick === id) {
+              wiz.swapPick = null;
+              toast('Échange réinitialisé (carte sélectionnée à l’étape 3).');
+            }
           }
           refreshCards();
           updateMain();
@@ -559,7 +578,7 @@ async function runLevelUpWizard(c, ctx) {
   };
 
   /* changement d'étape : rendu + entrée d'historique (retour Android) */
-  const goto = (n) => { wiz.step = n; render(); pushHist(); };
+  const goto = (n) => { wiz.step = n; render(true); pushHist(); };
 
   /* actualise uniquement la liste de cartes (préserve le focus de la recherche) */
   const refreshCards = () => { const b = $('#lu-cards', sheet); if (b) b.innerHTML = renderCards(); };
@@ -605,7 +624,11 @@ async function runLevelUpWizard(c, ctx) {
     for (const id of wiz.choices) {
       tu[id] = (tu[id] || 0) + 1;
       if (id === 'attributes') wiz.traitPicks.forEach(k => { c.traits[k] = Math.min(9, c.traits[k] + 1); c.traitMarks.push(k); });
-      if (id === 'hitPointSlots') { c.hp.active = (c.hp.active || 6) + 1; c.hp.max = c.hp.active + (c.hp.unlocked || 0); }
+      if (id === 'hitPointSlots') {
+        c.hp.active = (c.hp.active || 6) + 1;
+        c.hp.max = c.hp.active + (c.hp.unlocked || 0);
+        c.hp.current = Math.min(c.hp.max, (c.hp.current || 0) + 1);
+      }
       else if (id === 'stressSlots') { c.stress.active = (c.stress.active || 6) + 1; c.stress.max = c.stress.active + (c.stress.unlocked || 0); }
       else if (id === 'experiences') wiz.expPicks.forEach(i => {
         const e = expList()[i];
@@ -629,6 +652,7 @@ async function runLevelUpWizard(c, ctx) {
       else if (id === 'proficiency') { /* incrémenté ci-dessous via wiz.profChecks — tu.proficiency déjà compté ci-dessus */ }
       else if (id === 'multiclass') {
         c.multiclassed = true;
+        c.multiclassClassId = wiz.multiclassId;
         const mcClass = classes.find(x => x.id === wiz.multiclassId);
         if (mcClass) {
           c.classFeature = (c.classFeature ? c.classFeature + '\n\n' : '') + `〔Multiclassage〕 ${mcClass.fr} — ${mcClass.hopeAbility} : ${mcClass.hopeDesc}`;
