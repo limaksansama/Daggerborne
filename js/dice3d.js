@@ -8,6 +8,7 @@
    - Bannière de résultat interactive : statut, gain d'Espoir, enchaînement dégâts. */
 
 import { $, el, esc, getState, setState, saveChar, getChar } from './core.js';
+import { calcDamageSpec } from './rules.js';
 
 let diceBox = null;
 let initPromise = null;
@@ -102,7 +103,7 @@ const rng = (n) => 1 + Math.floor(Math.random() * n);
 const safeValue = (r, sides) => (Number.isInteger(r?.value) && r.value >= 1 && r.value <= sides ? r.value : rng(sides));
 
 /* ---------- jet de Dualité : 2d12 Espoir + Peur (+ d6 avantage/désavantage optionnel) ---------- */
-async function rollDuality({ mod = 0, label = '', charId = null, weaponUid = null, advantage = false, disadvantage = false }) {
+async function rollDuality({ mod = 0, label = '', charId = null, weaponUid = null, customDamage = null, advantage = false, disadvantage = false }) {
   if (busy) return null;
   busy = true;
   try {
@@ -139,14 +140,18 @@ async function rollDuality({ mod = 0, label = '', charId = null, weaponUid = nul
     const result = hope === fear ? 'crit' : hope > fear ? 'hope' : 'fear';
     const word = result === 'crit' ? '★ Succès Critique !' : result === 'hope' ? 'Avec Espoir' : 'Avec Peur';
 
-    /* effets de jeu : gain d'Espoir / Peur du MJ */
+    /* effets de jeu : gain d'Espoir (+ −1 Stress si critique) / Peur du MJ */
+    let stressCleared = false;
     const rec = { hope, fear, mod, adv: advVal || null, dis: disVal || null, total, result, label };
     if (charId) {
       const c = getChar(charId);
       if (c) {
         const effHopeMax = Math.max(0, (c.hope.max || 6) - (c.scars || 0));
         if (result === 'hope' || result === 'crit') c.hope.current = Math.min(effHopeMax, c.hope.current + 1);
-        if (result === 'crit') c.stress.current = Math.max(0, c.stress.current - 1);
+        if (result === 'crit' && c.stress.current > 0) {
+          c.stress.current = Math.max(0, c.stress.current - 1);
+          stressCleared = true;
+        }
         if (result === 'fear') setState(s => { s.fear = Math.min(30, s.fear + 1); });
         saveChar(c);
       }
@@ -164,19 +169,42 @@ async function rollDuality({ mod = 0, label = '', charId = null, weaponUid = nul
     /* bannière interactive */
     const modTxt = mod ? ` ${fmt(mod)} (${label})` : (label ? ` (${label})` : '');
     const advTxt = advVal ? ` + ${advVal} (Avantage)` : disVal ? ` − ${disVal} (Désavantage)` : '';
-    pendingDamage = (charId && weaponUid) ? { charId, weaponUid } : null;
+    const critSummary = result === 'crit'
+      ? '<div class="d3d-detail" style="color:#fde68a;margin-top:4px">Réussite auto · +1 Espoir · −1 Stress · Projecteur conservé</div>'
+      : '';
+    pendingDamage = (charId && (weaponUid || customDamage))
+      ? { charId, weaponUid, customDamage, crit: result === 'crit' }
+      : null;
+
+    const gainLabel = result === 'crit'
+      ? (charId ? (stressCleared ? '✦ +1 Espoir · −1 Stress appliqués' : '✦ +1 Espoir appliqué (Stress déjà à 0)') : '✦ Critique : réussite auto · +1 Espoir · −1 Stress')
+      : '✦ +1 Espoir appliqué';
+
     showBanner(`
       <div class="d3d-dice"><span class="d3d-die hope">${hope}</span><span class="d3d-die fear">${fear}</span>${advVal ? `<span class="d3d-die" title="Avantage d6">+${advVal}</span>` : ''}${disVal ? `<span class="d3d-die" title="Désavantage d6">−${disVal}</span>` : ''}</div>
       <div class="d3d-total">${total}</div>
       <div class="d3d-status ${result}">${word}</div>
-      <div class="d3d-detail">Espoir ${hope} · Peur ${fear}${modTxt}${advTxt} = ${total}</div>`,
+      <div class="d3d-detail">Espoir ${hope} · Peur ${fear}${modTxt}${advTxt} = ${total}</div>
+      ${critSummary}`,
       {
         buttons: [
           ...(result === 'hope' || result === 'crit'
-            ? [{ id: 'gain', label: '✦ +1 Espoir appliqué', cls: 'ghost', action: () => { try { diceBox?.clear(); } catch (e) { /* noop */ } closeBanner(); } }]
+            ? [{ id: 'gain', label: gainLabel, cls: 'ghost', action: () => { try { diceBox?.clear(); } catch (e) { /* noop */ } closeBanner(); } }]
             : []),
           ...(pendingDamage
-            ? [{ id: 'dmg', label: `🎲 Jet de dégâts →`, cls: 'primary', action: () => { const pd = pendingDamage; pendingDamage = null; try { diceBox?.clear(); } catch (e) { /* noop */ } closeBanner(); rollDamage(pd.charId, pd.weaponUid); } }]
+            ? [{
+                id: 'dmg',
+                label: pendingDamage.crit ? '💥 Dégâts critiques →' : '🎲 Jet de dégâts →',
+                cls: 'primary',
+                action: () => {
+                  const pd = pendingDamage;
+                  pendingDamage = null;
+                  try { diceBox?.clear(); } catch (e) { /* noop */ }
+                  closeBanner();
+                  if (pd.weaponUid) rollDamage(pd.charId, pd.weaponUid, { crit: pd.crit });
+                  else if (pd.customDamage) rollCustomDamage({ ...pd.customDamage, crit: pd.crit });
+                },
+              }]
             : []),
           { id: 'close', label: 'Fermer', cls: 'ghost', action: () => { try { diceBox?.clear(); } catch (e) { /* noop */ } closeBanner(); } },
         ],
@@ -219,7 +247,7 @@ function parseMultiDice(notation) {
 }
 
 /* ---------- jet de dés standards (notation multi-dés ex: 1d8+2d6+3) — thème nebula-gold ---------- */
-async function rollDice(notation, { label = '' } = {}) {
+async function rollDice(notation, { label = '', critInfo = null } = {}) {
   if (busy) return null;
   busy = true;
   try {
@@ -250,16 +278,20 @@ async function rollDice(notation, { label = '' } = {}) {
     }
     const total = diceSum + flatMod;
     const modTxt = flatMod ? ` (${flatMod > 0 ? '+' + flatMod : flatMod})` : '';
+    const detailHtml = critInfo
+      ? `Max ${critInfo.critMax} (${esc(critInfo.diceOnly)}) + [${values.join(' + ')}]${critInfo.flatBonus ? (critInfo.flatBonus > 0 ? ' + ' + critInfo.flatBonus : ' − ' + Math.abs(critInfo.flatBonus)) : ''} = ${total}`
+      : `${esc(clean)} : ${values.join(' + ')}${modTxt} = ${total}`;
+    const statusCls = critInfo ? 'crit' : 'plain';
     setState(s => {
       s.rolls.unshift({ id: 'r' + Date.now(), t: Date.now(), notation: clean, total, label: label || clean, hope: null, fear: null, result: 'plain' });
       s.rolls = s.rolls.slice(0, 60);
     });
     showBanner(`
       <div class="d3d-total">${total}</div>
-      <div class="d3d-status plain">${esc(label || clean)}</div>
-      <div class="d3d-detail">${esc(clean)} : ${values.join(' + ')}${modTxt} = ${total}</div>`,
+      <div class="d3d-status ${statusCls}">${esc(label || clean)}</div>
+      <div class="d3d-detail">${detailHtml}</div>`,
       { buttons: [{ id: 'close', label: 'Fermer', cls: 'ghost', action: () => { try { diceBox?.clear(); } catch (e) { /* noop */ } closeBanner(); } }] });
-    return { total, rolls: values, mod: flatMod };
+    return { total, rolls: values, mod: flatMod, critMax: critInfo?.critMax || 0 };
   } catch (e) {
     console.error('rollDice:', e);
     closeBanner();
@@ -269,17 +301,31 @@ async function rollDice(notation, { label = '' } = {}) {
   }
 }
 
-/* ---------- jet de dégâts d'arme : Maîtrise × dé de l'arme + bonus ---------- */
-export async function rollDamage(charId, weaponUid) {
+/* ---------- jet de dégâts générique (arme, Forme bestiale, Compagnon) avec support Critique SRD 2.0 ---------- */
+export async function rollCustomDamage({ qty = 1, dice = 'd6', bonus = 0, label = 'Dégâts', crit = false } = {}) {
+  const spec = calcDamageSpec(qty, dice, bonus, { crit });
+  if (spec.crit) {
+    return rollDice(spec.fullNotation, {
+      label: `💥 Critique — ${label}`,
+      critInfo: { critMax: spec.critMax, diceOnly: spec.diceOnlyNotation, flatBonus: spec.flatBonus },
+    });
+  }
+  return rollDice(spec.normalNotation, { label });
+}
+
+/* ---------- jet de dégâts d'arme : Maîtrise × dé de l'arme + bonus (+ max des dés sur Critique) ---------- */
+export async function rollDamage(charId, weaponUid, { crit = false } = {}) {
   const c = getChar(charId);
   if (!c) return null;
   const w = c.weapons?.find(x => x.uid === weaponUid) || c.weapons?.find(x => x.primary);
   if (!w) return null;
-  const n = Math.max(1, Math.min(6, parseInt(c.proficiency, 10) || 1)); /* Maîtrise */
-  const face = parseInt((w.dice || 'd6').replace('d', ''), 10) || 6;
-  const bonus = parseInt(w.dmgBonus, 10) || 0;
-  const notation = bonus ? `${n}d${face}${bonus > 0 ? '+' + bonus : bonus}` : `${n}d${face}`;
-  return rollDice(notation, { label: `Dégâts — ${w.name}` });
+  return rollCustomDamage({
+    qty: c.proficiency,
+    dice: w.dice || 'd6',
+    bonus: w.dmgBonus || 0,
+    label: `Dégâts — ${w.name}`,
+    crit,
+  });
 }
 
 /* ---------- jet d'attaque d'arme : Dualité + Trait de l'arme ---------- */

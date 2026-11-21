@@ -113,6 +113,33 @@ export function parseDiceNotation(notation) {
   };
 }
 
+/* Calcul de dégâts selon le SRD 2.0 :
+   - Normal : N dX + bonus fixe (N = Maîtrise bornée 1..6)
+   - Succès critique : max des dés de dégâts (N × X) + jet normal (N dX) + bonus fixe (non doublé) */
+export function calcDamageSpec(proficiency, dice = 'd6', dmgBonus = 0, { crit = false } = {}) {
+  const qty = Math.max(1, Math.min(6, parseInt(proficiency, 10) || 1));
+  const sides = Math.max(2, parseInt(String(dice || 'd6').replace(/^d/i, ''), 10) || 6);
+  const flatBonus = parseInt(dmgBonus, 10) || 0;
+  const critMax = crit ? qty * sides : 0;
+  const diceOnlyNotation = `${qty}d${sides}`;
+  const normalNotation = flatBonus
+    ? `${diceOnlyNotation}${flatBonus > 0 ? '+' + flatBonus : flatBonus}`
+    : diceOnlyNotation;
+  const fullNotation = crit
+    ? `${diceOnlyNotation}+${critMax}${flatBonus ? (flatBonus > 0 ? '+' + flatBonus : flatBonus) : ''}`
+    : normalNotation;
+  return {
+    qty,
+    sides,
+    flatBonus,
+    crit: !!crit,
+    critMax,
+    diceOnlyNotation,
+    normalNotation,
+    fullNotation,
+  };
+}
+
 /* Points de combat recommandés pour un affrontement (SRD 2.0) */
 export const ADVERSARY_POINT_COST = {
   minion: 1,    /* par groupe de Sbires = taille du groupe de PJ */

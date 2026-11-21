@@ -433,6 +433,53 @@ test('dice3d: rollDuality & rollDice work reliably with diceAnim disabled and ap
   assert.ok(atk && atk.total >= 2);
   const dmg = await dice3d.rollDamage('dice-pc', 'w-1');
   assert.ok(dmg && dmg.rolls.length === 2 && dmg.mod === 2);
+
+  const critDmg = await dice3d.rollDamage('dice-pc', 'w-1', { crit: true });
+  assert.ok(critDmg);
+  assert.equal(critDmg.critMax, 16);
+  assert.equal(critDmg.mod, 18);
+  assert.equal(critDmg.total, critDmg.rolls[0] + critDmg.rolls[1] + 16 + 2);
+});
+
+test('dice3d: critical success (double 2d12) grants +1 Hope, -1 Stress, keeps Spotlight, and chains to critical damage', async () => {
+  resetTestState();
+  const c = core.newCharacter({
+    id: 'crit-pc',
+    name: 'Vaelen',
+    traits: { agility: 2, strength: 0, finesse: 0, instinct: 0, presence: 0, knowledge: 0 },
+    hope: { max: 6, current: 2 },
+    stress: { max: 6, current: 2, active: 6, unlocked: 0 },
+    proficiency: 2,
+    weapons: [{ uid: 'w-1', name: 'Arc long', trait: 'agility', dice: 'd8', dmgBonus: 1 }],
+  });
+  core.saveChar(c);
+
+  const origRandom = Math.random;
+  Math.random = () => 0.4; /* floor(0.4 * 12) + 1 = 5 on both Hope and Fear */
+  try {
+    const atk = await dice3d.rollAttack('crit-pc', 'w-1');
+    assert.ok(atk);
+    assert.equal(atk.hope, 5);
+    assert.equal(atk.fear, 5);
+    assert.equal(atk.result, 'crit');
+    assert.equal(c.hope.current, 3, 'Critical success must grant +1 Hope');
+    assert.equal(c.stress.current, 1, 'Critical success must clear 1 Stress');
+    assert.equal(core.getState().fear, 0, 'Critical success keeps Spotlight (no Fear gained)');
+
+    const dmgBtn = globalThis.document.body.querySelector('.d3d-banner [data-b="dmg"]');
+    assert.ok(dmgBtn, 'Chained critical damage button must appear in banner');
+    assert.ok(dmgBtn.textContent.includes('critiques'), 'Button must indicate critical damage');
+    dmgBtn.click();
+    await new Promise(r => setTimeout(r, 20));
+
+    const lastRoll = core.getState().rolls[0];
+    assert.equal(lastRoll.notation, '2d8+16+1');
+    assert.equal(lastRoll.total, 4 + 4 + 16 + 1);
+    const detailTxt = globalThis.document.body.querySelector('.d3d-banner .d3d-detail')?.textContent || '';
+    assert.ok(detailTxt.includes('Max 16 (2d8) + [4 + 4] + 1 = 25'), `Unexpected crit detail text: ${detailTxt}`);
+  } finally {
+    Math.random = origRandom;
+  }
 });
 
 test('dice3d: automatically falls back to RNG when diceAnim is true but WebGL fails in headless/restricted environment', async () => {
@@ -498,6 +545,15 @@ test('all views render cleanly with real SRD data and expose no formatting artif
   assert.ok(!main.innerHTML.includes('1variable'), 'sheet.js rendered unresolved "variable" dice');
   assert.ok(main.innerHTML.includes('Sixième Sens'), 'Expected 6th experience to render on sheet');
   assert.ok(main.innerHTML.includes('d6'), 'Expected mythic-beast evolved agile-scout d4->d6 step');
+
+  const critBtn = main.querySelector('#dha-crit');
+  assert.ok(critBtn, 'Actions & Attaques should render #dha-crit toggle');
+  critBtn.click();
+  await new Promise(r => setTimeout(r, 20));
+  assert.ok(main.querySelector('#dha-crit')?.classList.contains('on'), 'Toggling #dha-crit activates critical damage mode');
+  assert.ok(main.innerHTML.includes('16+2d8+2') || main.innerHTML.includes('8+1d8+2'), 'Critical damage formula preview must appear when #dha-crit is active');
+  main.querySelector('#dha-crit')?.click();
+  await new Promise(r => setTimeout(r, 20));
 
   /* Compendium adversary sign check + card detail domain label check */
   await views.compendium.render(main, null);

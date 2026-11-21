@@ -60,6 +60,8 @@ export const RULES_DEATH = [
 ];
 
 export const RULES_TEAMWORK = [
+  { name: 'Succès Critique & Dégâts critiques', tag: 'Double sur 2d12',
+    desc: "Lorsque vos dés d'Espoir et de Peur affichent le même chiffre : l'action réussit automatiquement (quelle que soit la Difficulté), vous gagnez 1 Espoir, vous effacez 1 Stress et vous conservez le Projecteur (comme avec Espoir). Sur une attaque, les dégâts critiques ajoutent le maximum possible de vos dés de dégâts (Maîtrise × faces) au jet de dégâts normal + modificateurs fixes (ex. 2d8+1 devient 16 + 2d8 + 1)." },
   { name: 'Aider un allié', tag: '1 Espoir',
     desc: "Décrivez comment vous assistez un allié sur un jet d'action et lancez 1d6 d'Avantage. Plusieurs alliés peuvent dépenser 1 Espoir chacun pour aider : le PJ actif ajoute uniquement le meilleur dé d'Avantage à son total." },
   { name: 'Jet combiné (Tag Team)', tag: '3 Espoirs · 1×/session',

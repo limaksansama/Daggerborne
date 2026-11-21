@@ -15,6 +15,7 @@ import {
   classifyDamage,
   computeDamageApplication,
   parseDiceNotation,
+  calcDamageSpec,
   calcEncounterBudget,
   calcEncounterSpent,
   sanitizeCharacter,
@@ -121,6 +122,39 @@ test('parseDiceNotation parses standard and modified notations', () => {
     sides: 10,
     mod: -1,
   });
+});
+
+test('calcDamageSpec implements SRD 2.0 normal and critical damage formulas without doubling flat bonuses', () => {
+  const norm = calcDamageSpec(2, 'd8', 1);
+  assert.deepEqual(norm, {
+    qty: 2,
+    sides: 8,
+    flatBonus: 1,
+    crit: false,
+    critMax: 0,
+    diceOnlyNotation: '2d8',
+    normalNotation: '2d8+1',
+    fullNotation: '2d8+1',
+  });
+
+  const crit = calcDamageSpec(2, 'd8', 1, { crit: true });
+  assert.deepEqual(crit, {
+    qty: 2,
+    sides: 8,
+    flatBonus: 1,
+    crit: true,
+    critMax: 16,
+    diceOnlyNotation: '2d8',
+    normalNotation: '2d8+1',
+    fullNotation: '2d8+16+1',
+  });
+
+  const negCrit = calcDamageSpec(3, 'd6', -1, { crit: true });
+  assert.equal(negCrit.critMax, 18);
+  assert.equal(negCrit.fullNotation, '3d6+18-1');
+
+  assert.equal(calcDamageSpec(0, 'd10', 0, { crit: true }).qty, 1);
+  assert.equal(calcDamageSpec(9, 'd10', 0, { crit: true }).critMax, 60);
 });
 
 test('calcEncounterBudget and calcEncounterSpent match SRD 2.0 combat points', () => {

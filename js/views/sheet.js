@@ -3,8 +3,8 @@
    2 colonnes (Dégâts&Santé/Espoir/Expériences/Or/Aptitude || Armes/Armure/Inventaire).
    Thème sombre conservé, mobile = onglets Combat / Stats / Équipement / Plus. */
 import { $, $$, el, esc, go, T, data, toast, getChar, saveChar, getState, setState, uid, exportJsonFile, importCharacterFromText } from '../core.js';
-import { rollDuality, rollDice, rollAttack, rollDamage, isRolling } from '../dice3d.js';
-import { computeDamageApplication, tierOf, nextDieStep } from '../rules.js';
+import { rollDuality, rollDice, rollAttack, rollDamage, rollCustomDamage, isRolling } from '../dice3d.js';
+import { computeDamageApplication, calcDamageSpec, tierOf, nextDieStep } from '../rules.js';
 import { openLevelUp } from './levelup.js';
 
 const TRAIT_KEYS = ['agility', 'strength', 'finesse', 'instinct', 'presence', 'knowledge'];
@@ -24,7 +24,7 @@ const MTABS = [
   { id: 'equip', label: 'Équipement' },
   { id: 'more', label: 'Plus' },
 ];
-let ui = { mtab: 'combat', more: 'cards', atkAdv: false, atkDis: false };
+let ui = { mtab: 'combat', more: 'cards', atkAdv: false, atkDis: false, atkCrit: false };
 const CAMPAIGN_LABELS = { everyday: 'Quotidien', western: 'Western', monster: 'Chasse' };
 const fmtBonus = (b) => {
   const n = parseInt(b, 10) || 0;
@@ -458,9 +458,13 @@ export async function render(main, params) {
               <span class="dha-toggles">
                 <button class="dha-tbtn ${ui.atkAdv ? 'on' : ''}" id="dha-adv" title="Appliquer Avantage (+1d6) aux attaques rapides">▲ Avantage</button>
                 <button class="dha-tbtn ${ui.atkDis ? 'on' : ''}" id="dha-dis" title="Appliquer Désavantage (−1d6) aux attaques rapides">▼ Désavantage</button>
+                <button class="dha-tbtn crit ${ui.atkCrit ? 'on' : ''}" id="dha-crit" title="Dégâts critiques : max des dés (Maîtrise × faces) + jet normal + bonus fixe">💥 Critique</button>
               </span>
             </div>
-            ${activeBf ? `
+            ${activeBf ? (() => {
+              const bfSpec = calcDamageSpec(c.proficiency, activeBf.dmgDice, activeBf.dmgBonus, { crit: ui.atkCrit });
+              const bfLabel = ui.atkCrit ? `💥 ${bfSpec.critMax}+${bfSpec.normalNotation}` : bfSpec.normalNotation;
+              return `
             <div class="dh-bf-banner">
               <span>🐾 <b>Forme bestiale : ${esc(activeBf.fr)}</b> (${T.traits[activeBf.trait] || activeBf.trait} +${activeBf.traitBonus}, Évasion +${activeBf.evasionBonus}${activeBf.advantages?.length ? ` · Avantages : ${esc(activeBf.advantages.join(', '))}` : ''})</span>
               <button class="btn ghost small" id="bf-exit-fast">Quitter</button>
@@ -473,13 +477,13 @@ export async function render(main, params) {
               </span>
               <span class="dha-range">${esc(activeBf.range)}</span>
               <button class="dha-btn atk" data-bf-atk title="Jet d'attaque en Forme bestiale">${signed(effTrait(activeBf.trait))}</button>
-              <button class="dha-btn dmg" data-bf-dmg title="Dégâts naturels en Forme bestiale">${Math.max(1, Math.min(6, c.proficiency))}${activeBf.dmgDice}${fmtBonus(activeBf.dmgBonus)}</button>
-            </div>` : ''}
+              <button class="dha-btn dmg" data-bf-dmg title="${ui.atkCrit ? `Dégâts critiques : ${bfSpec.critMax} + ${bfSpec.normalNotation}` : 'Dégâts naturels en Forme bestiale'}">${bfLabel}</button>
+            </div>`;
+            })() : ''}
             ${(c.weapons.filter(w => w.primary || w.secondary).length ? c.weapons.filter(w => w.primary || w.secondary) : c.weapons.filter(w => w.state === 'active')).map(w => {
               const mod = effTrait(w.trait);
-              const n = Math.max(1, Math.min(6, c.proficiency));
-              const bonus = parseInt(w.dmgBonus, 10) || 0;
-              const dmgLabel = `${n}${w.dice}${fmtBonus(bonus)}`;
+              const spec = calcDamageSpec(c.proficiency, w.dice, w.dmgBonus, { crit: ui.atkCrit });
+              const dmgLabel = ui.atkCrit ? `💥 ${spec.critMax}+${spec.normalNotation}` : spec.normalNotation;
               return `<div class="dha-row">
                 <span class="dha-icon" title="${w.dmgType === 'mag' ? 'Magique' : 'Physique'}">${w.dmgType === 'mag' ? '✦' : '⚔'}</span>
                 <span class="dha-name">
@@ -488,10 +492,13 @@ export async function render(main, params) {
                 </span>
                 <span class="dha-range">${esc(w.range || '—')}</span>
                 <button class="dha-btn atk" data-dha-atk="${w.uid}" title="Jet de Dualité + ${T.traits[w.trait] || ''}">${mod >= 0 ? '+' + mod : mod}</button>
-                <button class="dha-btn dmg" data-dha-dmg="${w.uid}" title="Dégâts : ${n} × ${w.dice}${bonus ? ' ' + fmtBonus(bonus) : ''}">${dmgLabel}</button>
+                <button class="dha-btn dmg" data-dha-dmg="${w.uid}" title="${ui.atkCrit ? `Dégâts critiques : ${spec.critMax} + ${spec.normalNotation}` : `Dégâts : ${spec.qty} × ${w.dice}${spec.flatBonus ? ' ' + fmtBonus(spec.flatBonus) : ''}`}">${dmgLabel}</button>
               </div>`;
             }).join('') || (!activeBf ? '<div class="dh-help">Équipez une arme pour voir vos attaques rapides.</div>' : '')}
-            ${c.companion ? `
+            ${c.companion ? (() => {
+              const compSpec = calcDamageSpec(c.proficiency, c.companion.dice || 'd6', 0, { crit: ui.atkCrit });
+              const compLabel = ui.atkCrit ? `💥 ${compSpec.critMax}+${compSpec.normalNotation}` : compSpec.normalNotation;
+              return `
             <div class="dha-row">
               <span class="dha-icon" title="Compagnon animal">🐺</span>
               <span class="dha-name">
@@ -500,8 +507,9 @@ export async function render(main, params) {
               </span>
               <span class="dha-range">${esc(c.companion.range || 'Mêlée')}</span>
               <button class="dha-btn atk" data-comp-atk title="Jet d'attaque du compagnon (Instinct)">${signed(effTrait('instinct'))}</button>
-              <button class="dha-btn dmg" data-comp-dmg title="Dégâts du compagnon">${Math.max(1, Math.min(6, c.proficiency))}${esc(c.companion.dice || 'd6')}</button>
-            </div>` : ''}
+              <button class="dha-btn dmg" data-comp-dmg title="${ui.atkCrit ? `Dégâts critiques : ${compSpec.critMax} + ${compSpec.normalNotation}` : 'Dégâts du compagnon'}">${compLabel}</button>
+            </div>`;
+            })() : ''}
           </div>
 
           <div class="dh-prof" title="Maîtrise — nombre de dés de dégâts lancés">
@@ -696,7 +704,10 @@ function weaponCardHTML(w, i, c) {
           <option value="phy" ${w.dmgType === 'phy' ? 'selected' : ''}>Physique</option>
           <option value="mag" ${w.dmgType === 'mag' ? 'selected' : ''}>Magique</option>
         </select></label>
-      <button class="btn small dh-wdmg" data-wroll="${i}" title="Lancer les dégâts : ${c.proficiency} × ${w.dice}${w.dmgBonus ? ' ' + fmtBonus(w.dmgBonus) : ''}">🎲 ${c.proficiency}${w.dice}${fmtBonus(w.dmgBonus)}</button>
+      ${(() => {
+        const wSpec = calcDamageSpec(c.proficiency, w.dice, w.dmgBonus, { crit: ui.atkCrit });
+        return `<button class="btn small dh-wdmg" data-wroll="${i}" title="${ui.atkCrit ? `Dégâts critiques : ${wSpec.critMax} + ${wSpec.normalNotation}` : `Lancer les dégâts : ${wSpec.qty} × ${w.dice}${wSpec.flatBonus ? ' ' + fmtBonus(wSpec.flatBonus) : ''}`}">${ui.atkCrit ? `💥 ${wSpec.critMax}+${wSpec.normalNotation}` : `🎲 ${wSpec.normalNotation}`}</button>`;
+      })()}
     </div>
     <label class="dh-fl"><span>Feature</span><input data-wf="${i}:feature" value="${esc(w.feature)}" placeholder="Feature d'arme…"></label>
   </div>`;
@@ -983,7 +994,7 @@ function bindAll(root, c, ctx) {
   }));
   $$('[data-wroll]', root).forEach(b => b.addEventListener('click', () => {
     const w = c.weapons[+b.dataset.wroll];
-    if (w) rollDamage(c.id, w.uid);
+    if (w) rollDamage(c.id, w.uid, { crit: ui.atkCrit });
   }));
 
   /* --- maîtrise --- */
@@ -1105,6 +1116,10 @@ function bindAll(root, c, ctx) {
     $('#dha-dis', root).classList.toggle('on', ui.atkDis);
     $('#dha-adv', root)?.classList.remove('on');
   });
+  $('#dha-crit', root)?.addEventListener('click', () => {
+    ui.atkCrit = !ui.atkCrit;
+    render(main, params);
+  });
   $('#bf-exit-fast', root)?.addEventListener('click', () => {
     c.beastform = null;
     toast('Forme bestiale quittée.');
@@ -1118,14 +1133,23 @@ function bindAll(root, c, ctx) {
       charId: c.id,
       advantage: ui.atkAdv,
       disadvantage: ui.atkDis,
+      customDamage: {
+        qty: Math.max(1, Math.min(6, c.proficiency)),
+        dice: ctx.activeBf.dmgDice,
+        bonus: parseInt(ctx.activeBf.dmgBonus, 10) || 0,
+        label: `Dégâts — ${ctx.activeBf.fr}`,
+      },
     });
   });
   $('[data-bf-dmg]', root)?.addEventListener('click', () => {
     if (!ctx.activeBf) return;
-    const n = Math.max(1, Math.min(6, c.proficiency));
-    const bonus = parseInt(ctx.activeBf.dmgBonus, 10) || 0;
-    const note = bonus ? `${n}${ctx.activeBf.dmgDice}${bonus > 0 ? '+' + bonus : bonus}` : `${n}${ctx.activeBf.dmgDice}`;
-    rollDice(note, { label: `Dégâts — ${ctx.activeBf.fr}` });
+    rollCustomDamage({
+      qty: Math.max(1, Math.min(6, c.proficiency)),
+      dice: ctx.activeBf.dmgDice,
+      bonus: parseInt(ctx.activeBf.dmgBonus, 10) || 0,
+      label: `Dégâts — ${ctx.activeBf.fr}`,
+      crit: ui.atkCrit,
+    });
   });
   $('[data-comp-atk]', root)?.addEventListener('click', () => {
     if (!c.companion) return;
@@ -1135,12 +1159,23 @@ function bindAll(root, c, ctx) {
       charId: c.id,
       advantage: ui.atkAdv,
       disadvantage: ui.atkDis,
+      customDamage: {
+        qty: Math.max(1, Math.min(6, c.proficiency)),
+        dice: c.companion.dice || 'd6',
+        bonus: 0,
+        label: `Dégâts — ${c.companion.name || 'Compagnon'}`,
+      },
     });
   });
   $('[data-comp-dmg]', root)?.addEventListener('click', () => {
     if (!c.companion) return;
-    const n = Math.max(1, Math.min(6, c.proficiency));
-    rollDice(`${n}${c.companion.dice || 'd6'}`, { label: `Dégâts — ${c.companion.name || 'Compagnon'}` });
+    rollCustomDamage({
+      qty: Math.max(1, Math.min(6, c.proficiency)),
+      dice: c.companion.dice || 'd6',
+      bonus: 0,
+      label: `Dégâts — ${c.companion.name || 'Compagnon'}`,
+      crit: ui.atkCrit,
+    });
   });
   $$('[data-dha-atk]', root).forEach(b => b.addEventListener('click', () => {
     const w = c.weapons?.find(x => x.uid === b.dataset.dhaAtk);
@@ -1153,7 +1188,7 @@ function bindAll(root, c, ctx) {
     });
   }));
   $$('[data-dha-dmg]', root).forEach(b => b.addEventListener('click', () => {
-    rollDamage(c.id, b.dataset.dhaDmg);
+    rollDamage(c.id, b.dataset.dhaDmg, { crit: ui.atkCrit });
   }));
 
   $('#inv-add', root)?.addEventListener('click', () => {
