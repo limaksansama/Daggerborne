@@ -1,9 +1,9 @@
 /* Service worker — cache-first PWA for Daggerborne */
-const VERSION = 'daggerborne-v31';
+const VERSION = 'daggerborne-v35';
 const CORE = [
   './', './index.html', './manifest.webmanifest',
   './css/app.css', './css/sheet2.css', './css/dice-box.css', './js/app.js', './js/core.js',
-  './js/dice3d.js', './js/fab.js', './js/gmRules.js',
+  './js/dice3d.js', './js/fab.js', './js/gmRules.js', './js/rules.js',
   './js/vendor/dice-box.es.min.js', './js/vendor/world.offscreen.min.js',
   './js/vendor/world.onscreen.min.js', './js/vendor/world.none.min.js',
   './js/views/home.js', './js/views/chars.js', './js/views/create.js', './js/views/sheet.js',
@@ -12,6 +12,7 @@ const CORE = [
   './data/domains.json', './data/classes.json', './data/subclasses.json', './data/ancestries.json',
   './data/communities.json', './data/domainCards.json', './data/weapons.json', './data/armors.json',
   './data/adversaries.json', './data/generalItems.json', './data/environments.json', './data/transformations.json',
+  './data/beastforms.json',
   './assets/fonts/Cinzel-VariableFont_wght.ttf', './assets/fonts/cinzel-decorative-bold-latin.woff2',
   './assets/fonts/overpass-regular-latin.woff2', './assets/fonts/overpass-regular-latin-ext.woff2',
   './assets/fonts/overpass-italic-latin.woff2',
@@ -25,11 +26,8 @@ const CORE = [
   /* logo communautaire officiel DPCGL (fiole d'alchimie) — requis hors-ligne */
   './public/assets/dpcgl-community-logo.png',
   './public/assets/dpcgl-community-logo-light.png',
-  /* ---- moteur de dés 3D : physique WASM + thèmes ---- */
+  /* ---- moteur de dés 3D : physique WASM + thèmes (set unifié HOPE/FEAR/NEBULA, v33) ---- */
   './assets/dice-box/ammo/ammo.wasm.wasm',
-  './assets/dice-box/themes/default/theme.config.json', './assets/dice-box/themes/default/default.json',
-  './assets/dice-box/themes/default/diffuse-light.png', './assets/dice-box/themes/default/diffuse-dark.png',
-  './assets/dice-box/themes/default/normal.png', './assets/dice-box/themes/default/specular.jpg',
   './assets/dice-box/themes/nebula-gold/theme.config.json', './assets/dice-box/themes/nebula-gold/default.json',
   './assets/dice-box/themes/nebula-gold/diffuse-dark.png', './assets/dice-box/themes/nebula-gold/diffuse-light.png',
   './assets/dice-box/themes/nebula-gold/normal.png', './assets/dice-box/themes/nebula-gold/specular.jpg',
