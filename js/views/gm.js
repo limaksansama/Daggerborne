@@ -85,9 +85,24 @@ async function drawFear(main, root, st) {
     </div>`;
 
   const pool = $('#fear-pool', main);
+  const HEX = 'M18 1.5 L34.9 11.25 L34.9 30.75 L18 40.5 L1.1 30.75 L1.1 11.25 Z';
+  const HEX_IN = 'M18 9.3 L28.1 15.15 L28.1 26.85 L18 32.7 L7.9 26.85 L7.9 15.15 Z';
   const drawFearPips = () => {
-    pool.innerHTML = Array.from({ length: Math.max(st.fear, 12) }, (_, i) =>
-      `<span class="fear-pip ${i < st.fear ? 'on' : ''}" data-fear="${i}"></span>`).join('');
+    /* gradient partagé par tous les pips (défini une fois, référencé via url(#fg-hex)) */
+    let html = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+      <linearGradient id="fg-hex" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#b8b1ff"/><stop offset="1" stop-color="#7b71e6"/>
+      </linearGradient></defs></svg>`;
+    for (let i = 0; i < Math.max(st.fear, 12); i++) {
+      const on = i < st.fear;
+      html += `<button type="button" class="fear-pip ${on ? 'on' : ''}" data-fear="${i}"
+        aria-label="${on ? `Retirer la Peur ${i + 1}` : `Définir la Peur à ${i + 1}`}">
+        <svg viewBox="0 0 36 42" focusable="false">
+          <path class="hex-body" d="${HEX}"/>
+          <path class="hex-inner" d="${HEX_IN}"/>
+        </svg></button>`;
+    }
+    pool.innerHTML = html;
     $$('.fear-pip', pool).forEach(p => p.addEventListener('click', () => {
       const i = +p.dataset.fear;
       setState(s => { s.fear = (i < s.fear) ? i : i + 1; });

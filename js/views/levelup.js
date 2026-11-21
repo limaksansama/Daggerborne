@@ -47,7 +47,25 @@ function tierCounts(c, newTier) {
 }
 
 /* ---------- WIZARD ---------- */
+/* drapeau synchrone module : un seul wizard à la fois. Un check DOM ne suffit pas :
+   entre le 1er clic et l'ajout de la modal il y a un await data() pendant lequel
+   un 2e clic (double-tap mobile) passe aussi le garde-fou. */
+let lvlupOpen = false;
+
 export async function openLevelUp(c, ctx) {
+  if (lvlupOpen) return;
+  lvlupOpen = true;
+  try {
+    await runLevelUpWizard(c, ctx);
+  } catch (e) {
+    /* échec du chargement/setup : libère le drapeau, sinon plus aucune montée
+       de niveau ne serait possible jusqu'au rechargement */
+    lvlupOpen = false;
+    throw e;
+  }
+}
+
+async function runLevelUpWizard(c, ctx) {
   const classes = await data('classes');
   const subclasses = await data('subclasses');
   const cards = await data('domainCards');
@@ -129,6 +147,7 @@ export async function openLevelUp(c, ctx) {
   window.addEventListener('popstate', onPop);
   const close = (fromPop) => {
     window.removeEventListener('popstate', onPop);
+    lvlupOpen = false;
     /* remonte l'historique jusqu'à l'état d'avant le wizard (une entrée par étape) */
     if (!fromPop && history.state?.dhLvl) { try { history.go(-wiz.step); } catch (e) { /* noop */ } }
     back.remove();
