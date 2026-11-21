@@ -1,9 +1,21 @@
-/* Outils du MJ : pool de Peur, comptes à rebours, référence des règles SRD 2.0,
-   bestiaire (statblocks complets) et environnements */
-import { $, $$, el, esc, go, T, data, toast, getState, setState } from '../core.js';
-import { RULES_CONDITIONS, RULES_REST, RULES_ENCOUNTER, RULES_MULTICLASS, RULES_THRESHOLDS } from '../gmRules.js';
+/* Outils du MJ : pool de Peur, comptes à rebours, tracker d'affrontement actif,
+   référence complète des règles SRD 2.0, bestiaire (statblocks complets) et environnements */
+import { $, $$, el, esc, go, T, data, toast, uid, getState, setState } from '../core.js';
+import {
+  RULES_CONDITIONS, RULES_REST, RULES_ENCOUNTER, RULES_MULTICLASS,
+  RULES_THRESHOLDS, RULES_DEATH, RULES_TEAMWORK, RULES_HAZARDS, RULES_CAMPAIGN_FRAMES,
+} from '../gmRules.js';
+import { ADVERSARY_POINT_COST, calcEncounterBudget, calcEncounterSpent } from '../rules.js';
+import { rollDice } from '../dice3d.js';
 
 let gmUi = { tab: 'fear', tier: null, type: null, q: '' };
+
+const TYPES = ['bruiser', 'horde', 'leader', 'minion', 'ranged', 'skulk', 'social', 'solo', 'standard', 'support'];
+const TYPE_LABELS = {
+  bruiser: 'Bagarreur', horde: 'Horde', leader: 'Chef', minion: 'Sbire',
+  ranged: 'À distance', skulk: 'Rôdeur', social: 'Social', solo: 'Solo', standard: 'Standard', support: 'Soutien',
+};
+const ADV_CONDS = ['Vulnérable', 'Entravé', 'Caché', 'Empoisonné'];
 
 export async function render(main, params) {
   main.classList.add('wide');
@@ -12,21 +24,28 @@ export async function render(main, params) {
   main.innerHTML = `
   <div class="view">
     <h1 class="page-title">Outils du MJ</h1>
-    <p class="page-sub">Pool de Peur, comptes à rebours, bestiaire SRD 2.0, environnements et référence rapide des règles.</p>
+    <p class="page-sub">Pool de Peur, comptes à rebours, tracker d'affrontement, bestiaire SRD 2.0, environnements et référence rapide des règles.</p>
 
     <div class="filter-row" id="gm-tabs" style="margin:.8rem 0">
-      ${[['fear', '⏳ Pool & comptes à rebours'], ['bestiary', '💀 Bestiaire'], ['environments', '🌳 Environnements'], ['rules', '📜 Règles']]
-        .map(([id, label]) => `<button class="filter-chip ${gmUi.tab === id ? 'active' : ''}" data-gmtab="${id}">${label}</button>`).join('')}
+      ${[
+        ['fear', '⏳ Pool & comptes à rebours'],
+        ['encounter', `⚔ Affrontement${st.encounter?.active?.length ? ` (${st.encounter.active.length})` : ''}`],
+        ['bestiary', '💀 Bestiaire'],
+        ['environments', '🌳 Environnements'],
+        ['rules', '📜 Règles'],
+      ].map(([id, label]) => `<button class="filter-chip ${gmUi.tab === id ? 'active' : ''}" data-gmtab="${id}">${label}</button>`).join('')}
     </div>
     <div id="gm-body"></div>
   </div>`;
 
   $$('#gm-tabs [data-gmtab]', main).forEach(b => b.addEventListener('click', () => {
-    gmUi.tab = b.dataset.gmtab; render(main);
+    gmUi.tab = b.dataset.gmtab;
+    render(main);
   }));
 
   const body = $('#gm-body', main);
   if (gmUi.tab === 'fear') await drawFear(body, main, st);
+  else if (gmUi.tab === 'encounter') await drawEncounter(body, main, st);
   else if (gmUi.tab === 'bestiary') await drawBestiary(body, main);
   else if (gmUi.tab === 'environments') await drawEnvironments(body, main);
   else if (gmUi.tab === 'rules') await drawRules(body, main);
@@ -38,21 +57,21 @@ async function drawFear(main, root, st) {
     <div class="section-title" style="margin-top:0">Pool de Peur</div>
     <div class="card">
       <div class="fear-pool" id="fear-pool"></div>
-      <div style="display:flex;gap:.5rem;margin-top:.9rem">
+      <div style="display:flex;gap:.5rem;margin-top:.9rem;flex-wrap:wrap">
         <button class="btn ghost small" id="fear-add">＋ Peur</button>
         <button class="btn ghost small" id="fear-rem">− Peur</button>
         <button class="btn ghost small" id="fear-reset">Réinitialiser</button>
       </div>
-      <p class="ch-desc" style="margin-top:.7rem;font-size:.78rem">Les jets avec Peur des joueurs vous donnent une Peur. Dépensez-la pour mettre en avant un adversaire (1 Peur) ou déclencher un acte de Peur.</p>
+      <p class="ch-desc" style="margin-top:.7rem;font-size:.78rem">Les jets avec Peur des joueurs vous donnent une Peur (max recommandé 12). Dépensez-la pour mettre en avant un adversaire (1 Peur) ou déclencher un acte de Peur.</p>
     </div>
 
     <div class="section-title">Comptes à rebours</div>
     <div id="cds"></div>
     <div class="card">
-      <div style="display:flex;gap:.5rem">
-        <input type="text" id="cd-new" placeholder="Nom (ex. : Le portail s'ouvre…)" style="flex:1;background:var(--panel-3);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:.55rem .7rem">
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+        <input type="text" id="cd-new" placeholder="Nom (ex. : Le portail s'ouvre…)" style="flex:1;min-width:180px;background:var(--panel-3);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:.55rem .7rem">
         <select id="cd-max" style="background:var(--panel-3);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:.55rem">
-          ${[3, 4, 5, 6, 8, 10].map(n => `<option>${n}</option>`).join('')}
+          ${[3, 4, 5, 6, 8, 10, 12].map(n => `<option>${n}</option>`).join('')}
         </select>
         <button class="btn small" id="cd-add">Ajouter</button>
       </div>
@@ -61,27 +80,25 @@ async function drawFear(main, root, st) {
     <div class="section-title">Actes du MJ (dépenser la Peur)</div>
     <div class="card">
       <p class="ch-desc"><b style="color:var(--golden)">Mettre en avant (1 Peur)</b> — un adversaire agit immédiatement après la mise en avant d'un PJ.</p>
-      <p class="ch-desc" style="margin-top:.4rem"><b style="color:var(--golden)">Acte de Peur (1+ Peur)</b> — le MJ fait agir un adversaire et gagne un avantage ou complique la situation pour les PJ.</p>
-      <p class="ch-desc" style="margin-top:.4rem"><b style="color:var(--golden)">Acte standard</b> — n'importe quel adversaire agit une fois.</p>
+      <p class="ch-desc" style="margin-top:.4rem"><b style="color:var(--golden)">Acte de Peur (1+ Peur)</b> — le MJ déclenche une feature de Peur d'un adversaire ou d'un environnement.</p>
+      <p class="ch-desc" style="margin-top:.4rem"><b style="color:var(--golden)">Acte standard</b> — n'importe quel adversaire agit une fois lorsque les projecteurs passent au MJ.</p>
     </div>`;
 
-  // fear pool
   const pool = $('#fear-pool', main);
-  const drawFear = () => {
-    pool.innerHTML = Array.from({ length: Math.max(st.fear, 6) }, (_, i) =>
+  const drawFearPips = () => {
+    pool.innerHTML = Array.from({ length: Math.max(st.fear, 12) }, (_, i) =>
       `<span class="fear-pip ${i < st.fear ? 'on' : ''}" data-fear="${i}"></span>`).join('');
     $$('.fear-pip', pool).forEach(p => p.addEventListener('click', () => {
       const i = +p.dataset.fear;
       setState(s => { s.fear = (i < s.fear) ? i : i + 1; });
-      drawFear();
+      drawFearPips();
     }));
   };
-  drawFear();
-  $('#fear-add', main).addEventListener('click', () => { setState(s => { s.fear = Math.min(30, s.fear + 1); }); drawFear(); });
-  $('#fear-rem', main).addEventListener('click', () => { setState(s => { s.fear = Math.max(0, s.fear - 1); }); drawFear(); });
-  $('#fear-reset', main).addEventListener('click', () => { setState(s => { s.fear = 0; }); drawFear(); });
+  drawFearPips();
+  $('#fear-add', main).addEventListener('click', () => { setState(s => { s.fear = Math.min(30, s.fear + 1); }); drawFearPips(); });
+  $('#fear-rem', main).addEventListener('click', () => { setState(s => { s.fear = Math.max(0, s.fear - 1); }); drawFearPips(); });
+  $('#fear-reset', main).addEventListener('click', () => { setState(s => { s.fear = 0; }); drawFearPips(); });
 
-  // countdowns
   const cds = $('#cds', main);
   const drawCds = () => {
     cds.innerHTML = '';
@@ -91,7 +108,7 @@ async function drawFear(main, root, st) {
     for (const cd of st.countdowns) {
       const box = el(`<div class="card" style="margin-bottom:.6rem">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
-          <span class="li-name">${esc(cd.name)}</span>
+          <span class="li-name">${esc(cd.name)} <span class="tag">${cd.value}/${cd.max}</span></span>
           <button class="icon-btn" style="width:30px;height:30px" data-cd-del="${cd.id}"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
         </div>
         <div class="pip-track">
@@ -119,16 +136,316 @@ async function drawFear(main, root, st) {
     const name = $('#cd-new', main).value.trim();
     if (!name) { toast('Donnez un nom au compte à rebours.'); return; }
     const max = +$('#cd-max', main).value;
-    setState(s => { s.countdowns.push({ id: Date.now().toString(36), name, max, value: 0 }); });
+    setState(s => { s.countdowns.push({ id: uid(), name, max, value: 0 }); });
     $('#cd-new', main).value = '';
     drawCds();
   });
 }
 
-/* ---------- Bestiaire : statblocks complets SRD 2.0 ---------- */
-const TYPES = ['bruiser', 'horde', 'leader', 'minion', 'ranged', 'skulk', 'social', 'solo', 'standard', 'support'];
-const TYPE_LABELS = { bruiser: 'Bagarreur', horde: 'Horde', leader: 'Chef', minion: 'Sbire', ranged: 'À distance', skulk: 'Rôdeur', social: 'Social', solo: 'Solo', standard: 'Standard', support: 'Soutien' };
+/* ---------- Tracker d'Affrontement & Calculateur de Points de Combat ---------- */
+async function drawEncounter(body, main, st) {
+  const [adversaries, environments] = await Promise.all([data('adversaries'), data('environments')]);
+  st.encounter = st.encounter || { pcCount: 4, adj: {}, active: [], environmentId: null };
+  const enc = st.encounter;
+  const pcCount = enc.pcCount || 4;
+  const adj = enc.adj || {};
+  const budget = calcEncounterBudget(pcCount, adj);
+  const spent = calcEncounterSpent(enc.active);
+  const activeEnv = enc.environmentId ? environments.find(e => e.id === enc.environmentId) : null;
 
+  body.innerHTML = `
+    <div class="section-title" style="margin-top:0">Budget de points de combat (SRD 2.0)</div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.7rem;margin-bottom:.7rem">
+        <div style="display:flex;align-items:center;gap:.5rem">
+          <span class="li-name">Joueurs (PJ) :</span>
+          <button class="btn ghost small" id="enc-pc-dec">−</button>
+          <b style="color:var(--golden);font-size:1.1rem;min-width:1.6rem;text-align:center">${pcCount}</b>
+          <button class="btn ghost small" id="enc-pc-inc">+</button>
+        </div>
+        <div class="tag" style="font-size:.85rem;padding:.35rem .7rem;${spent > budget ? 'border-color:#d46868;color:#ffb4b4' : ''}">
+          Dépensés : <b>${spent}</b> / <b>${budget}</b> pts
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:.45rem;font-size:.76rem">
+        ${[
+          ['easier', '−1 Combat plus court/facile'],
+          ['twoSolos', '−2 ≥2 adversaires Solo'],
+          ['extraDmg', '−2 Dégâts adversaires +1d4/+2'],
+          ['lowerTier', '+1 Adversaire palier inférieur'],
+          ['noHeavy', '+1 Aucun Bagarreur/Horde/Chef/Solo'],
+          ['harder', '+2 Combat plus long/difficile'],
+        ].map(([k, lbl]) => `
+          <label class="filter-chip ${adj[k] ? 'active' : ''}" style="cursor:pointer;display:inline-flex;align-items:center;gap:.35rem">
+            <input type="checkbox" data-enc-adj="${k}" ${adj[k] ? 'checked' : ''} style="accent-color:var(--golden)"> ${lbl}
+          </label>`).join('')}
+      </div>
+    </div>
+
+    <div class="section-title">Environnement actif de la scène</div>
+    <div class="card">
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center">
+        <select id="enc-env-sel" style="flex:1;min-width:200px;background:var(--panel-3);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:.55rem .7rem">
+          <option value="">— Aucun environnement sélectionné —</option>
+          ${environments.slice().sort((a, b) => a.tier - b.tier || (a.fr || a.en).localeCompare(b.fr || b.en, 'fr')).map(e =>
+            `<option value="${esc(e.id)}" ${enc.environmentId === e.id ? 'selected' : ''}>P${e.tier} · ${esc(e.fr || e.en)}${e.difficulty ? ` (Diff ${e.difficulty})` : ''}</option>`
+          ).join('')}
+        </select>
+        ${activeEnv ? `<button class="btn ghost small" id="enc-env-clear">Retirer</button>` : ''}
+      </div>
+      ${activeEnv ? `
+        <div style="margin-top:.7rem;padding-top:.7rem;border-top:1px solid var(--border)">
+          <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+            <b style="color:var(--golden)">${esc(activeEnv.fr || activeEnv.en)}</b>
+            <span class="tag">${esc(activeEnv.category)}</span>
+            <span class="tag">${T.tiers[activeEnv.tier]}</span>
+            ${activeEnv.difficulty ? `<span class="tag">Diff. ${activeEnv.difficulty}</span>` : ''}
+          </div>
+          <p class="ch-desc" style="margin-top:.35rem">${esc(activeEnv.descFr || activeEnv.desc)}</p>
+          ${activeEnv.impulsesFr || activeEnv.impulses ? `<p class="ch-desc" style="margin-top:.3rem"><b style="color:var(--golden)">Impulsions :</b> ${esc(activeEnv.impulsesFr || activeEnv.impulses)}</p>` : ''}
+          <details style="margin-top:.45rem"><summary style="cursor:pointer;font-size:.8rem;color:var(--golden)">Features de l'environnement (${activeEnv.features.length})</summary>
+            <div style="margin-top:.45rem">${activeEnv.features.map(f => `<p class="ch-desc" style="margin-bottom:.4rem"><b>${esc(f.name)}</b> <span class="tag">${esc(f.kind)}</span> — ${esc(f.desc)}</p>`).join('')}</div>
+          </details>
+        </div>` : ''}
+    </div>
+
+    <div class="section-title">Adversaires en jeu (${enc.active.length})</div>
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.8rem">
+      <button class="btn small" id="enc-pick-adv">＋ Ajouter depuis le Bestiaire</button>
+      <button class="btn ghost small" id="enc-add-custom">✎ Adversaire rapide</button>
+      ${enc.active.length ? '<button class="btn danger small" id="enc-clear">Vider la scène</button>' : ''}
+    </div>
+    <div id="enc-list"></div>`;
+
+  const listEl = $('#enc-list', body);
+  if (!enc.active.length) {
+    listEl.innerHTML = '<div class="empty"><div class="e-title">Scène vide</div><div class="e-sub">Ajoutez des adversaires depuis le Bestiaire (ou ci-dessus) pour suivre leurs PV, Stress, états et lancer leurs jets d\'attaque/dégâts en 1 clic.</div></div>';
+  } else {
+    for (const inst of enc.active) {
+      const def = inst.advId ? adversaries.find(a => a.id === inst.advId) : null;
+      const defeated = inst.hpMax > 0 && inst.hpMarked >= inst.hpMax;
+      const cost = ADVERSARY_POINT_COST[inst.type] ?? 2;
+      const card = el(`<div class="card" style="margin-bottom:.75rem;${defeated ? 'opacity:.62;border-color:rgba(212,104,104,.4)' : ''}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem;flex-wrap:wrap">
+          <div>
+            <span class="li-name">${esc(inst.name)}</span>
+            <span class="tag">${TYPE_LABELS[inst.type] || inst.type} (${cost} pt${cost > 1 ? 's' : ''})</span>
+            ${defeated ? '<span class="tag" style="background:rgba(166,46,60,.3);border-color:#d46868;color:#ffb4b4">Vaincu</span>' : ''}
+            <div class="ms-meta" style="margin-top:.2rem">Diff ${inst.difficulty ?? '—'} · Seuils ${inst.major ?? '—'}/${inst.severe ?? '—'}${inst.atkBonus !== null && inst.atkBonus !== undefined ? ` · ATQ ${inst.atkBonus >= 0 ? '+' : ''}${inst.atkBonus}` : ''}</div>
+          </div>
+          <div style="display:flex;gap:.35rem;flex-wrap:wrap">
+            ${inst.atkBonus !== null && inst.atkBonus !== undefined ? `<button class="btn small" data-enc-atk="${inst.uid}" title="Jet d'attaque d20 ${inst.atkBonus >= 0 ? '+' : ''}${inst.atkBonus}">⚔ ATQ ${inst.atkBonus >= 0 ? '+' : ''}${inst.atkBonus}</button>` : ''}
+            ${inst.atkDamage ? `<button class="btn ghost small" data-enc-dmg="${inst.uid}" title="Lancer les dégâts (${inst.atkDamage})">🎲 ${esc(inst.atkDamage)}</button>` : ''}
+            <button class="icon-btn" style="width:32px;height:32px" data-enc-del="${inst.uid}" title="Retirer"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.6rem;margin-top:.65rem">
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--text-dim);margin-bottom:.25rem">
+              <span>PV marqués : <b style="color:var(--golden)">${inst.hpMarked}</b> / ${inst.hpMax}</span>
+              <span><button class="btn ghost small" style="padding:1px 7px" data-enc-hp="${inst.uid}:-1">−</button> <button class="btn ghost small" style="padding:1px 7px" data-enc-hp="${inst.uid}:1">+</button></span>
+            </div>
+            <div class="pip-track">${Array.from({ length: Math.min(20, Math.max(1, inst.hpMax)) }, (_, i) => `<span class="pip ${i < inst.hpMarked ? 'on' : ''}" data-enc-hppip="${inst.uid}:${i}"></span>`).join('')}</div>
+          </div>
+          ${inst.stressMax > 0 ? `
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--text-dim);margin-bottom:.25rem">
+              <span>Stress : <b style="color:var(--golden)">${inst.stressMarked}</b> / ${inst.stressMax}</span>
+              <span><button class="btn ghost small" style="padding:1px 7px" data-enc-st="${inst.uid}:-1">−</button> <button class="btn ghost small" style="padding:1px 7px" data-enc-st="${inst.uid}:1">+</button></span>
+            </div>
+            <div class="pip-track">${Array.from({ length: Math.min(12, inst.stressMax) }, (_, i) => `<span class="pip ${i < inst.stressMarked ? 'on stress' : ''}" data-enc-stpip="${inst.uid}:${i}"></span>`).join('')}</div>
+          </div>` : ''}
+        </div>
+
+        <div style="display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.6rem">
+          ${ADV_CONDS.map(cond => {
+            const on = (inst.conditions || []).includes(cond);
+            return `<button class="filter-chip ${on ? 'active' : ''}" style="padding:.2rem .55rem;font-size:.72rem" data-enc-cond="${inst.uid}:${esc(cond)}">${cond}</button>`;
+          }).join('')}
+        </div>
+
+        ${def?.features?.length ? `
+          <details style="margin-top:.55rem">
+            <summary style="cursor:pointer;font-size:.76rem;color:var(--text-faint)">Statblock &amp; Features (${def.features.length})</summary>
+            <div style="margin-top:.4rem">
+              ${def.motives ? `<p class="ch-desc" style="font-size:.78rem"><b style="color:var(--golden)">Motivations :</b> ${esc(def.motives)}</p>` : ''}
+              ${def.features.map(f => `<p class="ch-desc" style="font-size:.78rem;margin-top:.3rem"><b>${esc(f.name)}</b> <span class="tag">${esc(f.kind)}</span> — ${esc(f.desc)}</p>`).join('')}
+            </div>
+          </details>` : ''}
+      </div>`);
+      listEl.appendChild(card);
+    }
+  }
+
+  $('#enc-pc-dec', body).addEventListener('click', () => { setState(s => { s.encounter.pcCount = Math.max(1, (s.encounter.pcCount || 4) - 1); }); render(main); });
+  $('#enc-pc-inc', body).addEventListener('click', () => { setState(s => { s.encounter.pcCount = Math.min(10, (s.encounter.pcCount || 4) + 1); }); render(main); });
+  $$('[data-enc-adj]', body).forEach(cb => cb.addEventListener('change', () => {
+    const k = cb.dataset.encAdj;
+    setState(s => { s.encounter.adj = s.encounter.adj || {}; s.encounter.adj[k] = cb.checked; });
+    render(main);
+  }));
+  $('#enc-env-sel', body).addEventListener('change', (e) => {
+    setState(s => { s.encounter.environmentId = e.target.value || null; });
+    render(main);
+  });
+  $('#enc-env-clear', body)?.addEventListener('click', () => {
+    setState(s => { s.encounter.environmentId = null; });
+    render(main);
+  });
+  $('#enc-pick-adv', body).addEventListener('click', () => { gmUi.tab = 'bestiary'; render(main); });
+  $('#enc-add-custom', body).addEventListener('click', () => openCustomAdversaryModal(() => render(main)));
+  $('#enc-clear', body)?.addEventListener('click', () => {
+    if (!confirm('Retirer tous les adversaires de l\'affrontement ?')) return;
+    setState(s => { s.encounter.active = []; });
+    render(main);
+  });
+
+  $$('[data-enc-del]', body).forEach(b => b.addEventListener('click', () => {
+    setState(s => { s.encounter.active = s.encounter.active.filter(x => x.uid !== b.dataset.encDel); });
+    render(main);
+  }));
+  $$('[data-enc-hp]', body).forEach(b => b.addEventListener('click', () => {
+    const [u, d] = b.dataset.encHp.split(':');
+    setState(s => {
+      const it = s.encounter.active.find(x => x.uid === u);
+      if (it) it.hpMarked = Math.max(0, Math.min(it.hpMax, (it.hpMarked || 0) + Number(d)));
+    });
+    render(main);
+  }));
+  $$('[data-enc-hppip]', body).forEach(p => p.addEventListener('click', () => {
+    const [u, idx] = p.dataset.encHppip.split(':');
+    const i = +idx;
+    setState(s => {
+      const it = s.encounter.active.find(x => x.uid === u);
+      if (it) it.hpMarked = (i < it.hpMarked) ? i : i + 1;
+    });
+    render(main);
+  }));
+  $$('[data-enc-st]', body).forEach(b => b.addEventListener('click', () => {
+    const [u, d] = b.dataset.encSt.split(':');
+    setState(s => {
+      const it = s.encounter.active.find(x => x.uid === u);
+      if (it) it.stressMarked = Math.max(0, Math.min(it.stressMax, (it.stressMarked || 0) + Number(d)));
+    });
+    render(main);
+  }));
+  $$('[data-enc-stpip]', body).forEach(p => p.addEventListener('click', () => {
+    const [u, idx] = p.dataset.encStpip.split(':');
+    const i = +idx;
+    setState(s => {
+      const it = s.encounter.active.find(x => x.uid === u);
+      if (it) it.stressMarked = (i < it.stressMarked) ? i : i + 1;
+    });
+    render(main);
+  }));
+  $$('[data-enc-cond]', body).forEach(b => b.addEventListener('click', () => {
+    const [u, cond] = b.dataset.encCond.split(':');
+    setState(s => {
+      const it = s.encounter.active.find(x => x.uid === u);
+      if (!it) return;
+      it.conditions = it.conditions || [];
+      if (it.conditions.includes(cond)) it.conditions = it.conditions.filter(x => x !== cond);
+      else it.conditions.push(cond);
+    });
+    render(main);
+  }));
+  $$('[data-enc-atk]', body).forEach(b => b.addEventListener('click', () => {
+    const it = st.encounter.active.find(x => x.uid === b.dataset.encAtk);
+    if (!it) return;
+    const bonus = parseInt(it.atkBonus, 10) || 0;
+    const note = bonus ? `1d20${bonus >= 0 ? '+' + bonus : bonus}` : '1d20';
+    rollDice(note, { label: `Attaque — ${it.name}${it.atkName ? ' (' + it.atkName + ')' : ''}` });
+  }));
+  $$('[data-enc-dmg]', body).forEach(b => b.addEventListener('click', () => {
+    const it = st.encounter.active.find(x => x.uid === b.dataset.encDmg);
+    if (!it || !it.atkDamage) return;
+    const m = String(it.atkDamage).match(/\d*d\d+(?:\s*[+-]\s*\d+)?/i);
+    if (!m) { toast(`Notation non lançable : ${it.atkDamage}`); return; }
+    rollDice(m[0].replace(/\s+/g, ''), { label: `Dégâts — ${it.name}` });
+  }));
+}
+
+function addAdversaryToEncounter(a) {
+  setState(s => {
+    s.encounter = s.encounter || { pcCount: 4, adj: {}, active: [], environmentId: null };
+    const sameCount = s.encounter.active.filter(x => x.advId === a.id).length;
+    s.encounter.active.push({
+      uid: uid(),
+      advId: a.id,
+      name: sameCount ? `${a.en} #${sameCount + 1}` : a.en,
+      type: a.type || 'standard',
+      tier: a.tier || 1,
+      difficulty: a.difficulty ?? 12,
+      hpMax: Number(a.hp) || 4,
+      hpMarked: 0,
+      stressMax: Number(a.stress) || 0,
+      stressMarked: 0,
+      major: a.major ?? null,
+      severe: a.severe ?? null,
+      atkBonus: a.atkBonus ?? 0,
+      atkName: a.atkName || '',
+      atkDamage: a.atkDamage || '',
+      conditions: [],
+    });
+  });
+  toast(`⚔ « ${a.en} » ajouté à l'affrontement.`);
+}
+
+function openCustomAdversaryModal(onDone) {
+  const back = el(`<div class="modal-back"></div>`);
+  const sheet = el(`<div class="modal-sheet"></div>`);
+  back.appendChild(sheet);
+  document.body.appendChild(back);
+  back.addEventListener('click', (e) => { if (e.target === back) back.remove(); });
+  sheet.innerHTML = `
+    <h3>Nouvel adversaire rapide</h3>
+    <div class="field"><label>Nom *</label><input type="text" id="ca-name" placeholder="Ex. : Bandit du col"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem">
+      <div class="field"><label>Type</label>
+        <select id="ca-type" style="background:var(--panel-3);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:.5rem;width:100%">
+          ${TYPES.map(t => `<option value="${t}" ${t === 'standard' ? 'selected' : ''}>${TYPE_LABELS[t]}</option>`).join('')}
+        </select></div>
+      <div class="field"><label>Difficulté</label><input type="number" id="ca-diff" value="12" min="1" max="30"></div>
+      <div class="field"><label>PV max</label><input type="number" id="ca-hp" value="5" min="1" max="40"></div>
+      <div class="field"><label>Stress max</label><input type="number" id="ca-st" value="3" min="0" max="20"></div>
+      <div class="field"><label>Seuil Majeur</label><input type="number" id="ca-maj" value="7" min="1" max="50"></div>
+      <div class="field"><label>Seuil Grave</label><input type="number" id="ca-sev" value="14" min="1" max="80"></div>
+      <div class="field"><label>Bonus ATQ</label><input type="number" id="ca-atk" value="2" min="-5" max="20"></div>
+      <div class="field"><label>Dégâts (ex. 1d8+3)</label><input type="text" id="ca-dmg" value="1d8+2"></div>
+    </div>
+    <div style="display:flex;gap:.5rem;justify-content:flex-end;margin-top:.7rem">
+      <button class="btn ghost small" id="ca-cancel">Annuler</button>
+      <button class="btn small" id="ca-ok">Ajouter</button>
+    </div>`;
+  $('#ca-cancel', sheet).addEventListener('click', () => back.remove());
+  $('#ca-ok', sheet).addEventListener('click', () => {
+    const name = $('#ca-name', sheet).value.trim();
+    if (!name) { toast('Indiquez un nom.'); return; }
+    setState(s => {
+      s.encounter = s.encounter || { pcCount: 4, adj: {}, active: [], environmentId: null };
+      s.encounter.active.push({
+        uid: uid(), advId: null, name,
+        type: $('#ca-type', sheet).value,
+        difficulty: parseInt($('#ca-diff', sheet).value, 10) || 12,
+        hpMax: parseInt($('#ca-hp', sheet).value, 10) || 5,
+        hpMarked: 0,
+        stressMax: parseInt($('#ca-st', sheet).value, 10) || 0,
+        stressMarked: 0,
+        major: parseInt($('#ca-maj', sheet).value, 10) || 7,
+        severe: parseInt($('#ca-sev', sheet).value, 10) || 14,
+        atkBonus: parseInt($('#ca-atk', sheet).value, 10) || 0,
+        atkName: 'Attaque',
+        atkDamage: $('#ca-dmg', sheet).value.trim() || '1d8',
+        conditions: [],
+      });
+    });
+    back.remove();
+    onDone();
+  });
+}
+
+/* ---------- Bestiaire : statblocks complets SRD 2.0 ---------- */
 async function drawBestiary(body, main) {
   const all = (await data('adversaries')).sort((a, b) => a.en.localeCompare(b.en));
 
@@ -152,24 +469,42 @@ async function drawBestiary(body, main) {
     const list = all
       .filter(a => (!gmUi.tier || a.tier === gmUi.tier) && (!gmUi.type || a.type === gmUi.type))
       .filter(a => !gmUi.q || (a.en + ' ' + a.desc).toLowerCase().includes(gmUi.q));
-    $('#gm-adv-count', body).textContent = `${list.length} adversaire(s) — SRD 2.0 · cliquez pour déplier le statblock`;
+    $('#gm-adv-count', body).textContent = `${list.length} adversaire(s) — SRD 2.0 · cliquez pour déplier ou ajouter à l'affrontement`;
     const advList = $('#gm-adv-list', body);
     advList.innerHTML = '';
     for (const a of list) {
       const box = el(`<details class="rules-block adv-block">
         <summary><b>${esc(a.en)}</b> <span class="tag">${TYPE_LABELS[a.type] || a.type}</span> <span class="ms-meta" style="display:inline">${T.tiers[a.tier]} · Diff ${a.difficulty ?? '—'} · PV ${a.hp ?? '—'} · Stress ${a.stress ?? '—'}</span></summary>
+        <div style="display:flex;gap:.5rem;margin-bottom:.55rem;flex-wrap:wrap">
+          <button class="btn small" data-add-enc="${a.id}">⚔ Ajouter à l'affrontement</button>
+          ${a.atkBonus !== null && a.atkBonus !== undefined ? `<button class="btn ghost small" data-adv-atk="${a.id}">🎲 ATQ ${a.atkBonus >= 0 ? '+' : ''}${a.atkBonus}</button>` : ''}
+        </div>
         <div class="statblock">
           <div class="sb-row"><span class="sb-k">PV</span><span class="sb-v">${a.hp ?? '—'}</span><span class="sb-k">Stress</span><span class="sb-v">${a.stress ?? '—'}</span><span class="sb-k">Seuils</span><span class="sb-v">${a.major ?? '—'} / ${a.severe ?? '—'}</span>${a.horde ? `<span class="sb-k">Horde</span><span class="sb-v">${a.horde}/PV</span>` : ''}</div>
           ${a.atkName ? `<div class="sb-row"><span class="sb-k">ATQ</span><span class="sb-v">${a.atkBonus >= 0 ? '+' : ''}${a.atkBonus}</span><span class="sb-k">Attaque</span><span class="sb-v">${esc(a.atkName)} (${esc(a.atkRange)})</span><span class="sb-k">Dégâts</span><span class="sb-v">${esc(a.atkDamage || '—')}</span></div>` : ''}
           ${a.experience ? `<div class="sb-row"><span class="sb-k">Expérience</span><span class="sb-v">${esc(a.experience)}</span></div>` : ''}
         </div>
         <p class="ch-desc">${esc(a.desc)}</p>
-        ${a.motives ? `<p class="ch-desc"><b style="color:var(--golden)">Motivations & tactiques :</b> ${esc(a.motives)}</p>` : ''}
+        ${a.motives ? `<p class="ch-desc"><b style="color:var(--golden)">Motivations &amp; tactiques :</b> ${esc(a.motives)}</p>` : ''}
         <div class="section-title" style="margin-top:.6rem">Features</div>
         ${a.features.map(f => `<p class="ch-desc" style="margin-bottom:.5rem"><b>${esc(f.name)}</b> <span class="tag">${esc(f.kind)}</span> — ${esc(f.desc)}</p>`).join('')}
       </details>`);
       advList.appendChild(box);
     }
+    $$('[data-add-enc]', advList).forEach(b => b.addEventListener('click', () => {
+      const a = all.find(x => x.id === b.dataset.addEnc);
+      if (a) {
+        addAdversaryToEncounter(a);
+        const encTab = $('[data-gmtab="encounter"]', main);
+        if (encTab) encTab.textContent = `⚔ Affrontement (${getState().encounter.active.length})`;
+      }
+    }));
+    $$('[data-adv-atk]', advList).forEach(b => b.addEventListener('click', () => {
+      const a = all.find(x => x.id === b.dataset.advAtk);
+      if (!a) return;
+      const bonus = parseInt(a.atkBonus, 10) || 0;
+      rollDice(bonus ? `1d20${bonus >= 0 ? '+' + bonus : bonus}` : '1d20', { label: `Attaque — ${a.en}` });
+    }));
   };
   renderList();
 
@@ -188,7 +523,7 @@ async function drawBestiary(body, main) {
 
 /* ---------- Environnements SRD 2.0 ---------- */
 async function drawEnvironments(body, main) {
-  const all = (await data('environments')).sort((a, b) => a.tier - b.tier || a.en.localeCompare(b.en));
+  const all = (await data('environments')).sort((a, b) => a.tier - b.tier || (a.fr || a.en).localeCompare(b.fr || b.en, 'fr'));
 
   body.innerHTML = `
     <div class="search-bar" style="margin-bottom:.6rem">
@@ -205,21 +540,30 @@ async function drawEnvironments(body, main) {
   const renderList = () => {
     const list = all
       .filter(e => (!gmUi.tier || e.tier === gmUi.tier))
-      .filter(e => !gmUi.q || (e.en + ' ' + e.desc).toLowerCase().includes(gmUi.q));
+      .filter(e => !gmUi.q || ((e.fr || '') + ' ' + e.en + ' ' + (e.descFr || '') + ' ' + e.desc).toLowerCase().includes(gmUi.q));
     $('#gm-env-count', body).textContent = `${list.length} environnement(s) — SRD 2.0`;
     const envList = $('#gm-env-list', body);
     envList.innerHTML = '';
     for (const e of list) {
       const box = el(`<details class="rules-block adv-block">
-        <summary><b>${esc(e.en)}</b> <span class="tag">${esc(e.category)}</span> <span class="ms-meta" style="display:inline">${T.tiers[e.tier]}${e.difficulty ? ' · Difficulté ' + e.difficulty : ''}</span></summary>
-        <p class="ch-desc">${esc(e.desc)}</p>
-        ${e.impulses ? `<p class="ch-desc"><b style="color:var(--golden)">Impulsions :</b> ${esc(e.impulses)}</p>` : ''}
+        <summary><b>${esc(e.fr || e.en)}</b>${e.fr ? ` <span class="ms-meta" style="display:inline">(${esc(e.en)})</span>` : ''} <span class="tag">${esc(e.category)}</span> <span class="ms-meta" style="display:inline">${T.tiers[e.tier]}${e.difficulty ? ' · Difficulté ' + e.difficulty : ''}</span></summary>
+        <div style="margin-bottom:.55rem">
+          <button class="btn small" data-set-env="${e.id}">🌳 Activer dans l'affrontement</button>
+        </div>
+        <p class="ch-desc">${esc(e.descFr || e.desc)}</p>
+        ${(e.impulsesFr || e.impulses) ? `<p class="ch-desc"><b style="color:var(--golden)">Impulsions :</b> ${esc(e.impulsesFr || e.impulses)}</p>` : ''}
         ${e.adversaries ? `<p class="ch-desc"><b style="color:var(--golden)">Adversaires potentiels :</b> ${esc(e.adversaries)}</p>` : ''}
         <div class="section-title" style="margin-top:.6rem">Features</div>
         ${e.features.map(f => `<p class="ch-desc" style="margin-bottom:.5rem"><b>${esc(f.name)}</b> <span class="tag">${esc(f.kind)}</span> — ${esc(f.desc)}</p>`).join('')}
       </details>`);
       envList.appendChild(box);
     }
+    $$('[data-set-env]', envList).forEach(b => b.addEventListener('click', () => {
+      const e = all.find(x => x.id === b.dataset.setEnv);
+      if (!e) return;
+      setState(s => { s.encounter = s.encounter || { pcCount: 4, adj: {}, active: [], environmentId: null }; s.encounter.environmentId = e.id; });
+      toast(`🌳 Environnement « ${e.fr || e.en} » activé pour l'affrontement.`);
+    }));
   };
   renderList();
 
@@ -231,17 +575,37 @@ async function drawEnvironments(body, main) {
   }));
 }
 
-/* ---------- Référence de règles ---------- */
+/* ---------- Référence complète de règles SRD 2.0 ---------- */
 async function drawRules(body, main) {
   body.innerHTML = `
     <details class="rules-block" open>
+      <summary>Seuils de dégâts &amp; Armure — SRD 2.0</summary>
+      <div class="card"><p class="ch-desc">${esc(RULES_THRESHOLDS.desc)}</p></div>
+    </details>
+
+    <details class="rules-block">
+      <summary>Mouvements de mort &amp; Cicatrices — SRD 2.0</summary>
+      ${RULES_DEATH.map(r => `<div class="card" style="margin-bottom:.5rem"><b style="color:var(--golden)">${esc(r.name)}</b> <span class="tag">${esc(r.tag)}</span><p class="ch-desc" style="margin-top:.3rem">${esc(r.desc)}</p></div>`).join('')}
+    </details>
+
+    <details class="rules-block">
+      <summary>Travail d'équipe, Tag Team &amp; Jets spéciaux — SRD 2.0</summary>
+      ${RULES_TEAMWORK.map(r => `<div class="card" style="margin-bottom:.5rem"><b style="color:var(--golden)">${esc(r.name)}</b> <span class="tag">${esc(r.tag)}</span><p class="ch-desc" style="margin-top:.3rem">${esc(r.desc)}</p></div>`).join('')}
+    </details>
+
+    <details class="rules-block">
       <summary>Conditions (états) — SRD 2.0</summary>
-      ${RULES_CONDITIONS.map(c => `<div class="card" style="margin-bottom:.5rem"><b style="color:var(--golden)">${c.name}</b> <span class="tag">${c.tag}</span><p class="ch-desc" style="margin-top:.3rem">${esc(c.desc)}</p></div>`).join('')}
+      ${RULES_CONDITIONS.map(c => `<div class="card" style="margin-bottom:.5rem"><b style="color:var(--golden)">${esc(c.name)}</b> <span class="tag">${esc(c.tag)}</span><p class="ch-desc" style="margin-top:.3rem">${esc(c.desc)}</p></div>`).join('')}
     </details>
 
     <details class="rules-block">
       <summary>Repos &amp; temps morts (Downtime) — SRD 2.0</summary>
-      ${RULES_REST.map(r => `<div class="card" style="margin-bottom:.5rem"><b style="color:var(--golden)">${r.name}</b> <span class="tag">${r.tag}</span><p class="ch-desc" style="margin-top:.3rem">${esc(r.desc)}</p></div>`).join('')}
+      ${RULES_REST.map(r => `<div class="card" style="margin-bottom:.5rem"><b style="color:var(--golden)">${esc(r.name)}</b> <span class="tag">${esc(r.tag)}</span><p class="ch-desc" style="margin-top:.3rem">${esc(r.desc)}</p></div>`).join('')}
+    </details>
+
+    <details class="rules-block">
+      <summary>Dangers spéciaux, Chutes &amp; Résistances — SRD 2.0</summary>
+      ${RULES_HAZARDS.map(r => `<div class="card" style="margin-bottom:.5rem"><b style="color:var(--golden)">${esc(r.name)}</b> <span class="tag">${esc(r.tag)}</span><p class="ch-desc" style="margin-top:.3rem">${esc(r.desc)}</p></div>`).join('')}
     </details>
 
     <details class="rules-block">
@@ -252,14 +616,14 @@ async function drawRules(body, main) {
     </details>
 
     <details class="rules-block">
-      <summary>Seuils de dégâts — SRD 2.0</summary>
-      <div class="card"><p class="ch-desc">${esc(RULES_THRESHOLDS.desc)}</p></div>
-    </details>
-
-    <details class="rules-block">
       <summary>Multiclassage (niveau 5+) — SRD 2.0</summary>
       <div class="card"><p class="ch-desc">${esc(RULES_MULTICLASS.when)}</p>
         <ul class="rules-list">${RULES_MULTICLASS.what.map(w => `<li>${esc(w)}</li>`).join('')}</ul>
         <p class="ch-desc" style="margin-top:.4rem">${esc(RULES_MULTICLASS.cards)}</p></div>
+    </details>
+
+    <details class="rules-block">
+      <summary>Cadres de campagne (Campaign Frames) — SRD 2.0</summary>
+      ${RULES_CAMPAIGN_FRAMES.map(r => `<div class="card" style="margin-bottom:.5rem"><b style="color:var(--golden)">${esc(r.name)}</b> <span class="tag">${esc(r.tag)}</span><p class="ch-desc" style="margin-top:.3rem">${esc(r.desc)}</p></div>`).join('')}
     </details>`;
 }

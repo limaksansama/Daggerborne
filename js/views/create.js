@@ -21,7 +21,8 @@ function initWiz() {
   return {
     step: 0,
     classId: null, subclassId: null,
-    ancestryId: null, communityId: null,
+    ancestryId: null, mixedAncestry: false, ancestry2Id: null, mixedFirstFrom: 1, mixedName: '',
+    communityId: null,
     traits: { agility: null, strength: null, finesse: null, instinct: null, presence: null, knowledge: null },
     primaryWeaponId: null, secondaryWeaponId: null, armorId: null, twoHanded: false,
     includeCampaignGear: false,
@@ -102,7 +103,7 @@ async function validate(main, stepId) {
   const need = {
     class: [wiz.classId, 'Choisissez une classe pour continuer.'],
     subclass: [wiz.subclassId, 'Choisissez une sous-classe.'],
-    ancestry: [wiz.ancestryId, 'Choisissez une ascendance.'],
+    ancestry: [wiz.ancestryId && (!wiz.mixedAncestry || wiz.ancestry2Id), wiz.mixedAncestry ? 'Choisissez vos deux ascendances pour l\'Ascendance mixte.' : 'Choisissez une ascendance.'],
     community: [wiz.communityId, 'Choisissez une communauté.'],
     traits: [Object.values(wiz.traits).every(v => v !== null), 'Répartissez tous les modificateurs de trait (+2, +1, +1, 0, 0, −1).'],
     equipment: [wiz.primaryWeaponId && wiz.armorId, 'Choisissez au moins une arme principale et une armure.'],
@@ -179,21 +180,78 @@ async function stepSubclass(body) {
   }
 }
 
-/* ================= STEP 3: ANCESTRY ================= */
+/* ================= STEP 3: ANCESTRY (avec Ascendance mixte SRD 2.0) ================= */
 async function stepAncestry(body) {
   const ancestries = await data('ancestries');
   const sorted = [...ancestries].sort((a, b) => a.fr.localeCompare(b.fr, 'fr'));
-  body.innerHTML = `<p class="page-sub" style="margin-bottom:.8rem">Votre ascendance est la lignée de votre personnage : elle accorde deux aptitudes d'ascendance.</p>
+  const a1 = ancestries.find(x => x.id === wiz.ancestryId);
+  const a2 = ancestries.find(x => x.id === wiz.ancestry2Id);
+
+  body.innerHTML = `
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.6rem;margin-bottom:.7rem">
+    <p class="page-sub" style="margin:0">Votre ascendance accorde deux aptitudes. En <b>Ascendance mixte</b>, prenez la 1re aptitude d'une lignée et la 2e d'une autre.</p>
+    <label style="display:inline-flex;align-items:center;gap:.45rem;font-size:.82rem;color:var(--golden);cursor:pointer;background:var(--panel-2);padding:.4rem .7rem;border-radius:10px;border:1px solid var(--border)">
+      <input type="checkbox" id="anc-mixed" ${wiz.mixedAncestry ? 'checked' : ''} style="accent-color:var(--golden)"> Ascendance mixte (SRD 2.0)
+    </label>
+  </div>
+  ${wiz.mixedAncestry ? `
+  <div class="card" style="margin-bottom:.9rem">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:.7rem">
+      <div class="field" style="margin:0"><label>1re ascendance</label>
+        <select id="anc-s1" style="background:var(--panel-3);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:.5rem;width:100%">
+          <option value="">— Choisir —</option>
+          ${sorted.map(a => `<option value="${a.id}" ${wiz.ancestryId === a.id ? 'selected' : ''}>${esc(a.fr)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field" style="margin:0"><label>2e ascendance</label>
+        <select id="anc-s2" style="background:var(--panel-3);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:.5rem;width:100%">
+          <option value="">— Choisir —</option>
+          ${sorted.map(a => `<option value="${a.id}" ${wiz.ancestry2Id === a.id ? 'selected' : ''}>${esc(a.fr)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field" style="margin:0"><label>Nom d'héritage (optionnel)</label>
+        <input type="text" id="anc-mname" value="${esc(wiz.mixedName)}" placeholder="${a1 && a2 ? esc(`${a1.fr}-${a2.fr}`) : 'Ex. : Gobelin-Orc'}">
+      </div>
+    </div>
+    ${a1 && a2 ? `
+    <div style="margin-top:.75rem;display:flex;gap:.5rem;flex-wrap:wrap">
+      <button class="btn small ${wiz.mixedFirstFrom === 1 ? '' : 'ghost'}" data-mix-ord="1">1re apt. de ${esc(a1.fr)} (${esc(a1.abilities[0]?.fr || '')}) + 2e apt. de ${esc(a2.fr)} (${esc(a2.abilities[1]?.fr || '')})</button>
+      <button class="btn small ${wiz.mixedFirstFrom === 2 ? '' : 'ghost'}" data-mix-ord="2">1re apt. de ${esc(a2.fr)} (${esc(a2.abilities[0]?.fr || '')}) + 2e apt. de ${esc(a1.fr)} (${esc(a1.abilities[1]?.fr || '')})</button>
+    </div>` : '<p class="dh-help" style="margin-top:.5rem">Sélectionnez deux ascendances ci-dessus ou cliquez dans la grille ci-dessous.</p>'}
+  </div>` : ''}
   <div class="choice-grid" id="grid"></div>`;
+
+  $('#anc-mixed', body).addEventListener('change', (e) => {
+    wiz.mixedAncestry = e.target.checked;
+    draw(getMain());
+  });
+  $('#anc-s1', body)?.addEventListener('change', (e) => { wiz.ancestryId = e.target.value || null; draw(getMain()); });
+  $('#anc-s2', body)?.addEventListener('change', (e) => { wiz.ancestry2Id = e.target.value || null; draw(getMain()); });
+  $('#anc-mname', body)?.addEventListener('input', (e) => { wiz.mixedName = e.target.value; });
+  $$('[data-mix-ord]', body).forEach(b => b.addEventListener('click', () => {
+    wiz.mixedFirstFrom = +b.dataset.mixOrd;
+    draw(getMain());
+  }));
+
   const grid = $('#grid', body);
   for (const a of sorted) {
-    const btn = el(`<button class="choice ${wiz.ancestryId === a.id ? 'selected' : ''}" data-id="${a.id}">
-      <div class="ch-head"><span class="ch-name">${esc(a.fr)}</span>${a.fan ? '<span class="tag fan">Hope & Fear</span>' : ''}</div>
+    const isSel = wiz.ancestryId === a.id || (wiz.mixedAncestry && wiz.ancestry2Id === a.id);
+    const badge = wiz.mixedAncestry
+      ? (wiz.ancestryId === a.id ? '<span class="tag">Lignée 1</span>' : wiz.ancestry2Id === a.id ? '<span class="tag">Lignée 2</span>' : '')
+      : '';
+    const btn = el(`<button class="choice ${isSel ? 'selected' : ''}" data-id="${a.id}">
+      <div class="ch-head"><span class="ch-name">${esc(a.fr)}</span>${badge}${a.fan ? '<span class="tag fan">Hope & Fear</span>' : ''}</div>
       <div class="ch-desc">${esc(a.desc)}</div>
-      ${a.abilities.map(ab => `<div class="ch-desc" style="font-size:.78rem"><b style="color:var(--golden)">${esc(ab.fr)}.</b> ${esc(ab.desc)}</div>`).join('')}
+      ${a.abilities.map((ab, idx) => `<div class="ch-desc" style="font-size:.78rem"><b style="color:var(--golden)">${idx + 1}. ${esc(ab.fr)}.</b> ${esc(ab.desc)}</div>`).join('')}
     </button>`);
     btn.addEventListener('click', () => {
-      wiz.ancestryId = a.id; /* re-clic : conserve la sélection */
+      if (!wiz.mixedAncestry) {
+        wiz.ancestryId = a.id;
+      } else if (!wiz.ancestryId || wiz.ancestryId === a.id) {
+        wiz.ancestryId = a.id;
+      } else {
+        wiz.ancestry2Id = a.id;
+      }
       draw(getMain());
     });
     grid.appendChild(btn);
@@ -512,38 +570,65 @@ async function finish(main) {
   const subclasses = await data('subclasses');
   const sub = subclasses.find(s => s.id === wiz.subclassId);
   const armor = armors.find(a => a.id === wiz.armorId);
+  const anc2 = wiz.mixedAncestry ? ancestries.find(a => a.id === wiz.ancestry2Id) : null;
 
-  const hpMax = cl.hp + (anc?.fr === 'Géant' ? 1 : 0);
-  const stressMax = 6 + (anc?.fr === 'Humain' ? 1 : 0);
-  const evade = cl.evasion + (anc?.fr === 'Simiah' ? 1 : 0);
+  let finalAncestry = anc ? { id: anc.id, fr: anc.fr, abilities: anc.abilities } : null;
+  let heritageLabel = anc?.fr || '';
+  if (wiz.mixedAncestry && anc && anc2) {
+    const primary = wiz.mixedFirstFrom === 2 ? anc2 : anc;
+    const secondary = wiz.mixedFirstFrom === 2 ? anc : anc2;
+    const chosenAbilities = [primary.abilities?.[0], secondary.abilities?.[1]].filter(Boolean);
+    heritageLabel = wiz.mixedName.trim() || `${anc.fr}-${anc2.fr}`;
+    finalAncestry = {
+      id: `${anc.id}+${anc2.id}`,
+      fr: heritageLabel,
+      abilities: chosenAbilities,
+    };
+  }
+
+  const hasAbility = (frName) => (finalAncestry?.abilities || []).some(ab => ab.fr === frName);
+  const hpMax = cl.hp + (hasAbility('Endurance') ? 1 : 0);
+  const stressMax = 6 + (hasAbility('Résilience élevée') ? 1 : 0);
+  const evade = cl.evasion + (hasAbility('Leste') ? 1 : 0);
+
+  const isBeastbound = sub?.en === 'Beastbound' || sub?.id === 'TIUsIlTS1WkK5vr2';
+  const companionInit = isBeastbound ? {
+    name: 'Compagnon animal',
+    species: 'Louveteau / Faucon / Lynx…',
+    evasion: 10,
+    dice: 'd6',
+    range: 'Mêlée',
+    dmgType: 'phy',
+    attackName: 'Attaque coordonnée',
+    stress: { max: 3, current: 0 },
+    experiences: [{ name: 'Pistage', mod: 2 }, { name: 'Protection', mod: 2 }],
+    upgrades: [],
+  } : null;
 
   const c = newCharacter({
     name: wiz.name.trim(),
     pronouns: wiz.pronouns.trim(),
     classId: wiz.classId,
     subclassId: wiz.subclassId,
-    ancestry: anc ? { id: anc.id, fr: anc.fr, abilities: anc.abilities } : null,
+    ancestry: finalAncestry,
+    mixedAncestry: wiz.mixedAncestry && anc && anc2 ? { primaryId: anc.id, secondaryId: anc2.id, firstFrom: wiz.mixedFirstFrom } : null,
     community: com ? { id: com.id, fr: com.fr, ability: com.ability } : null,
     subclassName: sub?.fr || null,
-    /* champs affichés par la fiche : pré-remplis depuis les choix du wizard
-       (newCharacter() les initialise vides, la migration ne comblerait pas) */
-    heritage: anc?.fr || '',
+    heritage: heritageLabel,
     subclassText: sub?.fr || '',
     transformation: wiz.transformation || '',
+    companion: companionInit,
     traits: { ...wiz.traits },
     experiences: wiz.experiences.map(e => ({ name: e.name.trim(), mod: 2 })),
-    hp: { max: hpMax, current: hpMax },
-    stress: { max: stressMax, current: 0 },
+    hp: { max: hpMax, current: hpMax, active: hpMax, unlocked: 0 },
+    stress: { max: stressMax, current: 0, active: stressMax, unlocked: 0 },
     hope: { max: 6, current: 2 },
     evasion: evade,
-    thresholds: { major: (armor?.major || 0) + 1, severe: (armor?.severe || 0) + 1 },
-    armorSlots: { max: armor?.armorScore || 0, used: 0 },
+    thresholds: { bonus: 0 },
+    armorSlots: { max: 12, used: 0 },
     primaryWeaponId: wiz.primaryWeaponId,
     secondaryWeaponId: wiz.secondaryWeaponId,
     armorId: wiz.armorId,
-    /* cartes d'arme directes : la fiche lit c.weapons/c.armorCard — sans ça,
-       newCharacter() les initialise vides et la migration ne les reconstruit pas
-       (elles existent mais sont vides, pas absentes) */
     weapons: [
       ...(weapons.find(w => w.id === wiz.primaryWeaponId) ? [{
         uid: uid(), compendiumId: wiz.primaryWeaponId,

@@ -1,5 +1,5 @@
 /* Liste des personnages */
-import { $, $$, el, esc, go, data, getState, toast, uid, ensureCharacter } from '../core.js';
+import { $, $$, el, esc, go, getState, toast, importCharacterFromText, openPasteJsonModal } from '../core.js';
 
 export async function render(main, params) {
   main.classList.remove('wide');
@@ -11,9 +11,12 @@ export async function render(main, params) {
     <button class="btn block" id="btn-new" style="max-width:420px">✦ Nouveau personnage</button>
     <div id="list" style="margin-top:1rem"></div>
     <div class="section-title">Importer</div>
-    <p class="page-sub">Chargez un personnage exporté au format JSON.</p>
-    <button class="btn ghost" id="btn-import">⬇ Choisir un fichier…</button>
-    <input type="file" id="file-import" accept="application/json" style="display:none">
+    <p class="page-sub">Chargez un personnage exporté au format JSON (fichier ou texte collé).</p>
+    <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+      <button class="btn ghost" id="btn-import">⬇ Choisir un fichier…</button>
+      <button class="btn ghost" id="btn-paste-import">📋 Coller un JSON</button>
+    </div>
+    <input type="file" id="file-import" accept=".json,application/json,text/plain" style="display:none">
   </div>`;
 
   const list = $('#list', main);
@@ -28,7 +31,7 @@ export async function render(main, params) {
           <span class="cc-meta">
             <span>${esc(c.className || '')}</span>
             <span>Niv. ${c.level}</span>
-            <span>${esc(c.ancestry?.fr || '')}</span>
+            <span>${esc(c.heritage || c.ancestry?.fr || '')}</span>
           </span>
           <span class="cc-hp">♥ ${c.hp.current}/${c.hp.max} · ✦ ${c.hope.current} · Stress ${c.stress.current}/${c.stress.max}</span>
         </span>
@@ -40,24 +43,26 @@ export async function render(main, params) {
 
   $('#btn-new', main).addEventListener('click', () => go('create'));
   $('#btn-import', main).addEventListener('click', () => $('#file-import', main).click());
+  $('#btn-paste-import', main).addEventListener('click', () => {
+    openPasteJsonModal({
+      title: 'Importer un personnage (JSON)',
+      onImport: (raw, close) => {
+        const obj = importCharacterFromText(raw);
+        close();
+        toast(`« ${obj.name} » importé.`);
+        render(main, params);
+      },
+    });
+  });
   $('#file-import', main).addEventListener('change', (e) => {
     const f = e.target.files[0];
     if (!f) return;
     const rd = new FileReader();
     rd.onload = () => {
       try {
-        const obj = JSON.parse(rd.result);
-        if (!obj.name || !obj.traits) throw new Error('format');
-        ensureCharacter(obj); /* complète les champs manquants (anciens exports) */
-        import('../core.js').then(({ setState }) => {
-          setState(s => {
-            obj.id = uid();
-            obj.updatedAt = Date.now();
-            s.characters.push(obj);
-          });
-          toast(`« ${obj.name} » importé.`);
-          render(main, params);
-        });
+        const obj = importCharacterFromText(rd.result);
+        toast(`« ${obj.name} » importé.`);
+        render(main, params);
       } catch (err) {
         toast('Fichier invalide : export de personnage attendu.');
       }

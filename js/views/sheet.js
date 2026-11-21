@@ -2,7 +2,7 @@
    en-tête identité + badge Niveau · bande Évasion/Armure + 6 cartes de traits ·
    2 colonnes (Dégâts&Santé/Espoir/Expériences/Or/Aptitude || Armes/Armure/Inventaire).
    Thème sombre conservé, mobile = onglets Combat / Stats / Équipement / Plus. */
-import { $, $$, el, esc, go, T, data, toast, getChar, saveChar, setState, uid, rollD, ensureCharacter } from '../core.js';
+import { $, $$, el, esc, go, T, data, toast, getChar, saveChar, setState, uid, rollD, ensureCharacter, exportJsonFile } from '../core.js';
 import { rollDuality, rollDice, rollAttack, rollDamage, isRolling } from '../dice3d.js';
 import { openLevelUp } from './levelup.js';
 
@@ -197,7 +197,7 @@ export async function render(main, params) {
       <button class="btn ghost small" id="btn-export" title="Exporter en JSON">⬆</button>
       <button class="btn ghost small" id="btn-import" title="Importer un personnage JSON">⬇</button>
       <button class="btn danger small" id="btn-delete" title="Supprimer le personnage">🗑</button>
-      <input type="file" id="file-import" accept="application/json" style="display:none">
+      <input type="file" id="file-import" accept=".json,application/json,text/plain" style="display:none">
     </div>
 
     <!-- ===== ONGLETS MOBILE (sticky, sous le header) ===== -->
@@ -1007,12 +1007,8 @@ function bindAll(root, c, ctx) {
     toast('Repos long : ressources restaurées.');
   });
   $('#btn-export', root).addEventListener('click', () => {
-    const blob = new Blob([JSON.stringify(c, null, 2)], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `daggerheart-${(c.name || 'perso').toLowerCase().replace(/\s+/g, '-')}.json`;
-    a.click();
-    URL.revokeObjectURL(a.href);
+    const slug = (c.name || 'perso').toLowerCase().replace(/[^a-z0-9_-]+/gi, '-').replace(/^-+|-+$/g, '') || 'perso';
+    exportJsonFile(`daggerborne-${slug}.json`, c, `Exporter ${c.name || 'le personnage'}`);
   });
   $('#btn-import', root).addEventListener('click', () => $('#file-import', root).click());
   $('#file-import', root).addEventListener('change', (e) => {

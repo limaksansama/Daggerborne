@@ -1,195 +1,158 @@
 [
- {
-  "id": "demigod",
-  "en": "Demigod",
-  "fr": "Demi-dieu",
-  "desc": "Demigods are mortal creatures whose veins flow with the\nblood of the gods. They typically gain their power from divine\nparentage, accomplishing an incredible feat, or receiving a gift through the veil of death with necromantic rites, alchemical\nfrom a god. Many demigods appear as a typical member of\ntheir mortal ancestry, but all possess a subtle luminosity and\na gleam in their eyes. They’re also known to have pearlescent\nor metallic skin, and they might grow in size or gain physical\nfeatures related to their power when it reveals itself. Because\nthey share the blood of a Faint Divinity, a Forgotten God, a\n\nNew God, or any other deity, no two demigods look the same.\n\nDemigods are bestowed with a fragment of deific power, but\nnot everything a demigod inherits is a blessing. Though they\noften excel at tasks they’re well suited for, the expectations\nset upon them are often difficult and costly to live up to.",
-  "features": [
-   {
-    "name": "Gifted",
-    "desc": "You gain a +1 bonus to action, reaction, and damage"
-   },
-   {
-    "name": "Weight of Divinity",
-    "desc": "When you fail a roll, you must mark a Stress or the GM gains a Fear."
-   }
-  ],
-  "questions": [
-   "Your divinity has affected an aspect of your",
-   "appearance. In what way do you look different from",
-   "others?",
-   "Who bestowed demigod status upon you, and what",
-   "trial did you complete to earn this gift?",
-   "You were made fun of as a child for your divine",
-   "parentage. Why?",
-   "Why was the knowledge that you are a demigod kept",
-   "from you for many years? Who kept this secret?",
-   "You have an obligation you must fulfill due to the",
-   "immortal blood that runs in your veins. What is this",
-   "duty?",
-   "In what way did your divinity initially manifest? Why",
-   "did it surprise you?"
-  ]
- },
- {
-  "id": "reanimated",
-  "en": "Reanimated",
-  "fr": "Ranimé",
-  "desc": "Reanimated are corpses who have been brought back to life.\n Whether through a spell, a holy ritual, arcane experimentation,\n or other unnatural methods, these mortals have returned\n from beyond the veil of death as undead and are bound to\n their decaying bodies. Newly reanimated are more likely to\n look like a typical member of their ancestry, but as they go on, transform into any ancestry—one moment living as a small\n they must patch and repair their bodies with bones, flesh, and\n other materials harvested from the recently deceased. While\n some repair their wounds and decay with needle, thread, and\n herbs, others use magic to incorporate these materials into\n\n themselves.\n\n Many stories of the reanimated describe them as possessing\n increased durability or, in some cases, immunity to pain.\n This may be true for some reanimated, but many experience\n prolonged agony—whether from the physical echoes of their\n own demise, the discomfort of moving a decomposing body,\n\n the trouble controlling their amalgamated parts, or the mental\n\n anguish of being forcibly pulled back from death into a second\n\n life.",
-  "features": [
-   {
-    "name": "Corpse",
-    "desc": "During a rest, you can clear Hit Points only if you have access to remains from a recently deceased creature. Describe how you use these materials to maintain your corpse."
-   },
-   {
-    "name": "Won’t Stay Dead",
-    "desc": "When you choose the Risk It All death move and fail, you can permanently mark a Hit Point to succeed instead. When you do, you still use the Hope Die’s value to"
-   }
-  ],
-  "questions": [
-   "How did you first die, and how has that death",
-   "affected your view on life?",
-   "A fragment of memory from your first life haunts",
-   "you. What is the memory, and why do you think it’s",
-   "important?",
-   "You had a dream for your life that you now believe",
-   "you can never reach. What was your dream, and why",
-   "do you think being reanimated makes it impossible to",
-   "fulfill?",
-   "How were you brought back from the dead, and how",
-   "did the process change your body?",
-   "Someone brought you back from death. Who were",
-   "they, and how do you feel about this person and what",
-   "they did to you?",
-   "In the brief time you passed through the veil of death,",
-   "you saw something that changed you forever. What",
-   "was it?"
-  ]
- },
- {
-  "id": "vampire",
-  "en": "Vampire",
-  "fr": "Vampire",
-  "desc": "Vampires are undead creatures with sharp fangs who feed on\nthe blood of the living. They aren’t born, but created—sired\nby another vampire through a bite and exchange of blood,\ntransformed through an occult ritual, or changed through\nother mysterious methods. Because those who become\nvampires die and come back as supernatural entities, they\nmust consume the blood—the life essence—of others to\nsurvive.\n\nAt first glance, many vampires are indistinguishable from\n\ntypical members of their ancestry. Beyond their telltale fangs,\n\nthey can be affected by their vampirism in myriad subtle or\nconspicuous ways, displaying traits such as sallow skin, visible Werewolves often struggle to control their hunting instinct and\nveins, eyes that shine in the dark, or, in some cases, enhanced\nbeauty. Depending on the nature of their vampiric origin,\nindividuals may stop aging at the time of their transformation\nand remain vibrant and powerful long after their cohorts\nhave succumbed to the ravages of time. No matter their\nappearance, all vampires possess enhanced abilities that can\nresult in a terrifying end for their targets.",
-  "features": [
-   {
-    "name": "Fangs",
-    "desc": "Make an attack using a trait of your choice to bite a target within Melee range. On a success, deal d6 physical damage using your Proficiency."
-   },
-   {
-    "name": "Feed",
-    "desc": "On a successful “Fangs” attack against a creature that"
-   }
-  ],
-  "questions": [
-   "Who did you have to leave behind when you became",
-   "a vampire, and why was it so hard to let them go?",
-   "You once killed an innocent for their blood. What",
-   "characteristic of theirs do you notice most in others?",
-   "What does your vampirisim make you particularly",
-   "vulnerable to?",
-   "Who were you able to save using your vampiric",
-   "power? What happened, and how do they feel about",
-   "you now?",
-   "How does your hunger for blood change you?",
-   "The vampire who sired you still has a hold over you.",
-   "What’s their name, and what do they want you to do",
-   "for them?"
-  ]
- },
- {
-  "id": "ghost",
-  "en": "Ghost",
-  "fr": "Fantôme",
-  "desc": "Ghosts are the spirits of the once-living who are bound to\nthe Mortal Realm. They could be called forth after passing\n\nexperimentation, the desperation of a loved one—or they\nmay never have passed through the veil at all. Those who met\na horrific end, were killed with a cursed weapon, or died in\na place of power might have become trapped in the Mortal\nRealm instead of passing on.\n\nBecause they occupy the space between life and death, a ghost\n\ncan shift between the physical and the spectral and, at times,\npass through solid objects. While some ghosts are almost\nindistinguishable from the living, others emanate spectral\nauras, appear desaturated in color, or bear physical evidence\nof their cause of death. When a ghost becomes incorporeal—\nwhich can occur at will, due to heightened emotions, or\nseemingly at random—they might appear semitranslucent,\nlike a breath of fog that could dissipate in the wind.\n\nSome ghosts return for revenge, some to save a loved one, and\n\nothers to meet a goal or discover hidden knowledge. Their drive\nto accomplish this goal is the force that allows them to exist in\nthe Mortal Realm. When they complete that goal, their work is\ndone, and they immediately pass beyond the veil of death.",
-  "features": [
-   {
-    "name": "Unfinished Business",
-    "desc": "Work with your GM to decide what purpose or desire keeps you bound to the Mortal Realm. When you fulfill it, you cross through the veil of death."
-   },
-   {
-    "name": "Ephemeral",
-    "desc": "Your body wavers in and out of being corporeal. You are resistant to physical damage, take double magic damage, and can mark 2 Stress to momentarily pass through a solid object."
-   }
-  ],
-  "questions": [
-   "How did you die, and what fear has your death",
-   "instilled in you?",
-   "What brought you back from beyond the veil of",
-   "death?",
-   "In life, you loved someone dearly. Why do you need",
-   "to find them again?",
-   "What must you accomplish now that you’ve returned",
-   "to the Mortal Realm? How will you meet your goal?",
-   "Who harmed you in your first life? How do you plan",
-   "to deal with them now that you’ve returned?",
-   "You had to sacrifice something dear to you in order",
-   "to come back to the Mortal Realm. What did you give",
-   "up, and who did you give it to?"
-  ]
- },
- {
-  "id": "shapeshifter",
-  "en": "Shapeshifter",
-  "fr": "Changeur de forme",
-  "desc": "Shapeshifters are creatures who can change their physical\nform. Whether they were born with this ability, gained it as\na result of magical craft or a curse, or received this power\nfrom an otherworldly entity, shapeshifters have a unique\nrelationship with their identity. Because shapeshifters can\n\nand nimble faerie and the next as a large and tough galapa—\ntheir experiences with the outside world can vary greatly from\nday to day.\n\nWhile a shapeshifter is typically indistinguishable from another\n\nmember of the ancestry they transform into, each shapeshifter\nhas one characteristic that doesn’t change no matter their\nform, such as their eyes, their coloring, or a unique birthmark.\nThey also can’t mimic a specific person’s appearance, as they\nbecome a different version of themselves in a new body.\n\nTaking on a new form also doesn’t allow them to immediately\n\nhave or use all the new form’s characteristics—they must\n\nfocus their efforts on the physical characteristics they most\n\nwant to use. Shapeshifters might need time to learn how\nto embody a new form, sometimes leading to an uncanny\nappearance or behavior until they’re accustomed to their body.",
-  "features": [
-   {
-    "name": "Change Shape",
-    "desc": "During a rest, you can use a downtime move to swap your current ancestry with another. When you do, describe how your appearance changes."
-   },
-   {
-    "name": "Only Skin Deep",
-    "desc": "You gain the benefit of only one of your"
-   }
-  ],
-  "questions": [
-   "You believe you have a “true form,” but you haven’t",
-   "seen it. What do you think it is, and how do you know",
-   "it’s there?",
-   "What trick have you developed to identify other",
-   "shapeshifters?",
-   "Someone you loved dearly abandoned you when they",
-   "found out about your ability to change shape. Who",
-   "was it, and what happened?",
-   "What is one form you’ve vowed to never take, and",
-   "why?",
-   "Which ancestry do you live as more than others? Why",
-   "do you spend so much time in this form?",
-   "Someone you know can instantly recognize you, no",
-   "matter your form. How do they claim to identify you",
-   "and what does their familiarity mean to you?"
-  ]
- },
- {
-  "id": "werewolf",
-  "en": "Werewolf",
-  "fr": "Loup-garou",
-  "desc": "Werewolves are creatures who transform into large\nsupernatural wolves. While some are born werewolves, others\nundergo this transformation because of a curse, an infection\nthrough another werewolf’s bite, or another unnatural cause.\nWerewolves look like typical members of their ancestry\nuntil they shift, whereupon they transform into a massive\notherworldly wolf. Some might even take on a shape that is an\namalgamation of their ancestry and their wolf form. Stories\ndescribe werewolves shifting with the phases of the moon,\n\nthough an individual’s experience with this change varies based\n\non the cause of their transformation.\n\nviolence while in their wolf form, and they must have immense\nself-discipline, use significant energy, or resort to fleeing or\nlocking themselves away to avoid harming their loved ones.\nThe longer a werewolf has experience with their condition, the\nmore likely they are to have developed methods of controlling\nthemselves.",
-  "features": [
-   {
-    "name": "Wolf Form",
-    "desc": "When you mark 1 or more Hit Points, you can mark a Stress to enter your Wolf Form. While in this form, you gain a 1d10 bonus to attack and damage rolls. When you roll with Hope while in Wolf Form, you must mark a Stress. Your Wolf Form lasts until you go into your “Howling Rampage” or"
-   },
-   {
-    "name": "Howling Rampage",
-    "desc": "When you mark your last Stress while in Wolf Form, you go into a rampage. Roll a number of d20s equal to your tier and deal that much physical damage to all creatures within Very Close range, then drop out of Wolf Form."
-   }
-  ],
-  "questions": [
-   "Someone is hunting you. Who is it, and why do they",
-   "want you dead?",
-   "What were you afraid of before you became a",
-   "werewolf, and how has your new power changed that",
-   "fear?",
-   "You hear your wolf form in your head as if it were",
-   "another entity. What lie does it tell you about",
-   "yourself, and why are you beginning to believe it?",
-   "What led you to kill someone you love during your",
-   "rampage?",
-   "Who cursed you to become a werewolf?",
-   "You were once entreated to join a pack of other",
-   "werewolves. How did you respond?"
-  ]
- }
+  {
+    "id": "demigod",
+    "en": "Demigod",
+    "fr": "Demi-dieu",
+    "desc": "Les demi-dieux sont des créatures mortelles dont les veines charrient le sang des dieux. Ils tirent généralement leur puissance d'une ascendance divine, d'un exploit hors du commun ou d'un don accordé par une divinité. Beaucoup ressemblent aux autres membres de leur ascendance mortelle, mais tous dégagent une subtile luminosité et portent une lueur particulière dans le regard — peau nacrée ou métallique, stature accrue ou traits physiques liés à leur pouvoir. Dotés d'un fragment de puissance divine, ils excellent souvent dans leur domaine de prédilection, mais les attentes qui pèsent sur eux sont lourdes et coûteuses.",
+    "features": [
+      {
+        "name": "Doué",
+        "nameEn": "Gifted",
+        "desc": "Vous gagnez un bonus de +1 à vos jets d'action, de réaction et de dégâts."
+      },
+      {
+        "name": "Poids de la divinité",
+        "nameEn": "Weight of Divinity",
+        "desc": "Lorsque vous échouez à un jet, vous devez marquer 1 Stress ou le MJ gagne 1 Peur."
+      }
+    ],
+    "questions": [
+      "Votre nature divine a marqué votre apparence. En quoi différez-vous des autres ?",
+      "Qui vous a conféré votre statut de demi-dieu, et quelle épreuve avez-vous accomplie pour mériter ce don ?",
+      "On se moquait de vous enfant à cause de votre ascendance divine. Pourquoi ?",
+      "Pourquoi la vérité sur votre nature de demi-dieu vous a-t-elle été cachée pendant des années ? Qui gardait ce secret ?",
+      "Le sang immortel qui coule dans vos veines vous impose un devoir. Quelle est cette obligation ?",
+      "De quelle manière votre divinité s'est-elle manifestée pour la première fois ? Pourquoi cela vous a-t-il surpris ?"
+    ]
+  },
+  {
+    "id": "reanimated",
+    "en": "Reanimated",
+    "fr": "Ranimé",
+    "desc": "Les ranimés sont des cadavres ramenés à la vie par un sort, un rituel sacré, une expérimentation arcanique ou d'autres moyens surnaturels. Revenus d'au-delà du voile de la mort en tant que morts-vivants liés à leur corps en décomposition, ils doivent rapiécer et entretenir leur enveloppe à l'aide d'os, de chair et de matériaux prélevés sur des défunts récents — par la couture et les herbes, ou par la magie. Si les légendes leur prêtent une insensibilité à la douleur, beaucoup endurent une agonie persistante entre échos de leur trépas, lourdeur d'un corps composite et tourment d'avoir été arrachés à la mort.",
+    "features": [
+      {
+        "name": "Cadavre",
+        "nameEn": "Corpse",
+        "desc": "Durant un repos, vous ne pouvez effacer des PV que si vous avez accès aux restes d'une créature récemment décédée. Décrivez comment vous utilisez ces matériaux pour entretenir votre corps."
+      },
+      {
+        "name": "Refus de mourir",
+        "nameEn": "Won’t Stay Dead",
+        "desc": "Lorsque vous choisissez le mouvement de mort « Tout risquer » et que vous échouez, vous pouvez marquer définitivement 1 PV pour réussir à la place. Vous utilisez tout de même la valeur du dé d'Espoir pour effacer PV et Stress. Si vous marquez définitivement votre dernier PV, vous franchissez le voile de la mort."
+      }
+    ],
+    "questions": [
+      "Comment êtes-vous mort la première fois, et comment cette mort a-t-elle changé votre regard sur la vie ?",
+      "Un fragment de souvenir de votre première vie vous hante. Quel est-il, et pourquoi vous semble-t-il important ?",
+      "Vous aviez un rêve que vous pensez désormais inaccessible. Quel était-il, et pourquoi le fait d'être ranimé le rend-il impossible ?",
+      "Comment vous a-t-on ramené d'entre les morts, et comment ce procédé a-t-il transformé votre corps ?",
+      "Quelqu'un vous a arraché à la mort. Qui était-ce, et que ressentez-vous envers cette personne et son geste ?",
+      "Durant votre bref passage au-delà du voile, vous avez vu quelque chose qui vous a marqué à jamais. Qu'avez-vous vu ?"
+    ]
+  },
+  {
+    "id": "vampire",
+    "en": "Vampire",
+    "fr": "Vampire",
+    "desc": "Les vampires sont des morts-vivants dotés de crocs acérés qui se nourrissent du sang des vivants. On ne naît pas vampire : on le devient par la morsure et l'échange de sang d'un pair, un rituel occulte ou un autre phénomène mystérieux. Revenus comme entités surnaturelles, ils doivent consommer l'essence vitale des autres pour subsister. Au premier regard, beaucoup semblent appartenir normalement à leur ascendance, hormis leurs crocs, un teint blafard, des veines saillantes ou des yeux luisant dans le noir. Souvent affranchis du vieillissement, tous disposent de capacités redoutables.",
+    "features": [
+      {
+        "name": "Crocs",
+        "nameEn": "Fangs",
+        "desc": "Effectuez une attaque avec le trait de votre choix pour mordre une cible à portée de Mêlée. En cas de succès, infligez d6 dégâts physiques avec votre Maîtrise."
+      },
+      {
+        "name": "Se nourrir",
+        "nameEn": "Feed",
+        "desc": "Lors d'une attaque « Crocs » réussie contre une créature qui peut saigner, marquez 1 Stress pour vous nourrir : placez sur cette carte un nombre de jetons égal aux PV marqués par la cible (max 6). Avant un jet d'action, dépensez 1 jeton pour remplacer votre dé de Peur par un d20. Lors d'un repos long, retirez 1 jeton. Tant qu'il n'y a aucun jeton sur cette carte, vos jets d'action et de réaction subissent un désavantage."
+      }
+    ],
+    "questions": [
+      "Qui avez-vous dû laisser derrière vous en devenant vampire, et pourquoi cette séparation a-t-elle été si douloureuse ?",
+      "Vous avez un jour tué un innocent pour son sang. Quel trait de cette personne remarquez-vous le plus chez les autres ?",
+      "À quoi votre nature vampirique vous rend-elle particulièrement vulnérable ?",
+      "Qui avez-vous pu sauver grâce à vos pouvoirs vampiriques ? Que s'est-il passé, et que ressent cette personne à votre égard aujourd'hui ?",
+      "Comment votre soif de sang vous transforme-t-elle ?",
+      "Le vampire qui vous a engendré conserve une emprise sur vous. Quel est son nom, et qu'exige-t-il de vous ?"
+    ]
+  },
+  {
+    "id": "ghost",
+    "en": "Ghost",
+    "fr": "Fantôme",
+    "desc": "Les fantômes sont des esprits de défunts demeurés liés au Royaume des Mortels — rappelés par nécromancie, alchimie ou désespoir d'un proche, ou retenus après une mort tragique par arme maudite ou en lieu de pouvoir. Existant entre vie et mort, ils oscillent entre forme physique et spectrale et peuvent traverser la matière solide. Semi-translucides sous l'emprise d'une émotion forte ou de leur volonté, ils portent souvent la marque de leur trépas. C'est leur quête inachevée qui les maintient ici-bas : une fois accomplie, ils franchissent aussitôt le voile.",
+    "features": [
+      {
+        "name": "Affaire inachevée",
+        "nameEn": "Unfinished Business",
+        "desc": "Déterminez avec votre MJ quel but ou désir vous retient dans le Royaume des Mortels. Dès que vous l'accomplissez, vous franchissez le voile de la mort."
+      },
+      {
+        "name": "Éphémère",
+        "nameEn": "Ephemeral",
+        "desc": "Votre corps oscille entre matérialité et état spectral. Vous êtes résistant aux dégâts physiques, subissez le double des dégâts magiques, et pouvez marquer 2 Stress pour traverser momentanément un objet solide."
+      }
+    ],
+    "questions": [
+      "Comment êtes-vous mort, et quelle peur votre décès a-t-il ancrée en vous ?",
+      "Qu'est-ce qui vous a ramené d'au-delà du voile de la mort ?",
+      "De votre vivant, vous aimiez quelqu'un éperdument. Pourquoi devez-vous retrouver cette personne ?",
+      "Que devez-vous accomplir maintenant que vous êtes revenu dans le Royaume des Mortels ? Comment comptez-vous y parvenir ?",
+      "Qui vous a fait du tort dans votre première vie ? Comment envisagez-vous de régler vos comptes ?",
+      "Vous avez dû sacrifier quelque chose de cher pour revenir. Qu'avez-vous abandonné, et à qui ?"
+    ]
+  },
+  {
+    "id": "shapeshifter",
+    "en": "Shapeshifter",
+    "fr": "Changeur de forme",
+    "desc": "Les changeurs de forme peuvent altérer leur apparence physique d'une ascendance à une autre — don inné, magie, malédiction ou faveur d'une entité d'outre-monde. Ils se fondent aisément dans n'importe quelle lignée sans jamais pouvoir imiter un individu précis, conservant toujours un signe distinctif immuable (regard, teinte ou marque de naissance). Adopter un nouveau corps demande toutefois de se concentrer sur les caractéristiques physiques les plus marquantes, d'où une gestuelle parfois singulière le temps de s'y habituer.",
+    "features": [
+      {
+        "name": "Changer d'apparence",
+        "nameEn": "Change Shape",
+        "desc": "Durant un repos, utilisez un mouvement de temps mort pour échanger votre ascendance actuelle contre une autre. Décrivez comment votre apparence change."
+      },
+      {
+        "name": "À fleur de peau",
+        "nameEn": "Only Skin Deep",
+        "desc": "Vous ne bénéficiez que d'une seule des aptitudes de votre ascendance choisie, sélectionnée au moment où vous adoptez cette ascendance. Vous pouvez utiliser un mouvement de temps mort pour choisir l'autre aptitude de cette ascendance."
+      }
+    ],
+    "questions": [
+      "Vous êtes convaincu d'avoir une « vraie forme » sans l'avoir jamais vue. À quoi ressemble-t-elle selon vous ?",
+      "Quelle astuce avez-vous développée pour repérer d'autres changeurs de forme ?",
+      "Un être cher vous a abandonné en découvrant votre don. Qui était-ce, et que s'est-il passé ?",
+      "Quelle forme avez-vous juré de ne jamais prendre, et pourquoi ?",
+      "Sous quelle ascendance vivez-vous le plus souvent ? Pourquoi privilégiez-vous cette apparence ?",
+      "Quelqu'un vous reconnaît instantanément quelle que soit votre forme. Comment fait-il, et que représente ce lien ?"
+    ]
+  },
+  {
+    "id": "werewolf",
+    "en": "Werewolf",
+    "fr": "Loup-garou",
+    "desc": "Les loups-garous se métamorphosent en loups surnaturels gigantesques, par naissance, malédiction ou morsure. À l'état ordinaire, ils ressemblent aux membres de leur ascendance jusqu'à l'instant où la transformation frappe — parfois liée aux phases de la lune, parfois à la douleur ou à la rage. Sous forme lupine, ils doivent puiser dans une discipline de fer pour maîtriser leur instinct de chasseur et éviter de s'en prendre à leurs proches.",
+    "features": [
+      {
+        "name": "Forme de loup",
+        "nameEn": "Wolf Form",
+        "desc": "Lorsque vous marquez 1 PV ou plus, marquez 1 Stress pour prendre votre Forme de loup : vous gagnez un bonus de +1d10 aux jets d'attaque et de dégâts. Lorsque vous obtenez un résultat avec Espoir sous cette forme, vous devez marquer 1 Stress. Cette forme dure jusqu'à votre « Furie hurlante » ou votre prochain repos."
+      },
+      {
+        "name": "Furie hurlante",
+        "nameEn": "Howling Rampage",
+        "desc": "Lorsque vous marquez votre dernier Stress en Forme de loup, vous entrez en furie : lancez un nombre de d20 égal à votre Palier et infligez autant de dégâts physiques à toutes les créatures à portée Très Courte, puis quittez la Forme de loup."
+      }
+    ],
+    "questions": [
+      "Quelqu'un vous traque. Qui est-ce, et pourquoi veut-il votre mort ?",
+      "Que redoutiez-vous avant de devenir loup-garou, et comment ce pouvoir a-t-il transformé cette peur ?",
+      "Vous entendez la voix du loup dans votre esprit comme une entité distincte. Quel mensonge vous murmure-t-elle ?",
+      "Qu'est-ce qui vous a conduit à tuer un être aimé lors d'une crise de furie ?",
+      "Qui vous a maudit et fait de vous un loup-garou ?",
+      "Une meute d'autres loups-garous vous a un jour proposé de les rejoindre. Qu'avez-vous répondu ?"
+    ]
+  }
 ]

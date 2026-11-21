@@ -1,20 +1,50 @@
-/* Réglages + À propos */
-import { $, $$, el, esc, go, data, getState, setState, toast } from '../core.js';
+/* Réglages + Sauvegardes + Option Cloud Pro + À propos */
+import {
+  $, esc, getState, setState, toast, exportJsonFile,
+  importFullBackupFromText, openPasteJsonModal, getStorageInfo, cloudSync,
+} from '../core.js';
 
 export async function render(main, params) {
   main.classList.remove('wide');
+  const st = getState();
+  const info = getStorageInfo();
+  const cs = cloudSync.getStatus();
+
   main.innerHTML = `
   <div class="view">
     <h1 class="page-title">Réglages</h1>
 
-    <div class="section-title" style="margin-top:0">Données</div>
+    <div class="section-title" style="margin-top:0">Données &amp; Sauvegarde locale</div>
     <div class="card">
-      <p class="ch-desc" style="margin-bottom:.8rem">Vos personnages, jets et outils MJ sont stockés localement sur cet appareil (localStorage). Aucune donnée n'est envoyée en ligne.</p>
-      <div style="display:flex;gap:.6rem;flex-wrap:wrap">
-        <button class="btn ghost small" id="exp-all">⬆ Exporter tout (JSON)</button>
+      <p class="ch-desc" style="margin-bottom:.6rem">
+        Vos données sont enregistrées localement sur cet appareil (${info.idb ? 'IndexedDB haute capacité + repli localStorage' : 'localStorage'}) —
+        <b>${info.chars}</b> personnage(s), <b>${info.rolls}</b> jet(s), <b>${info.kb} Ko</b> utilisés.
+      </p>
+      <div style="display:flex;gap:.55rem;flex-wrap:wrap">
+        <button class="btn small" id="exp-all">⬆ Exporter tout (JSON)</button>
+        <button class="btn ghost small" id="imp-all">⬇ Importer sauvegarde (fichier)</button>
+        <button class="btn ghost small" id="imp-paste">📋 Coller une sauvegarde</button>
         <button class="btn ghost small" id="wipe">Effacer les jets</button>
         <button class="btn danger small" id="wipe-all">Tout effacer</button>
       </div>
+      <input type="file" id="file-backup" accept=".json,application/json,text/plain" style="display:none">
+    </div>
+
+    <div class="section-title">Synchronisation Cloud</div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.4rem">
+        <b style="color:var(--golden)">☁ Google Drive</b>
+        <span class="tag">${esc(cs.tierLabel)}</span>
+      </div>
+      <p class="ch-desc">${esc(cs.summary)}</p>
+    </div>
+
+    <div class="section-title">Règles optionnelles (SRD 2.0)</div>
+    <div class="card">
+      <label style="display:flex;align-items:flex-start;gap:.6rem;cursor:pointer;font-size:.86rem;color:var(--text-dim)">
+        <input type="checkbox" id="opt-massive" ${st.settings?.massiveDamageRule ? 'checked' : ''} style="margin-top:.2rem;accent-color:var(--golden)">
+        <span><b style="color:var(--text)">Dégâts Massifs (SRD 2.0, p. 50)</b><br>Si un personnage subit des dégâts ≥ 2 × son seuil Grave, il marque <b>4 PV</b> au lieu de 3.</span>
+      </label>
     </div>
 
     <div class="section-title">À propos</div>
@@ -38,7 +68,6 @@ export async function render(main, params) {
       <span style="font-size:.8rem;color:var(--text-dim);line-height:1.6;display:inline-block;margin-top:.3rem">This product includes materials from the Daggerheart System Reference Document 2.0, Critical Role, LLC. under the terms of the Darrington Press Community Gaming (DPCGL) License. More information can be found at https://www.daggerheart.com. This content has been translated into French and adapted for an interactive digital character sheet.</span>
     </div>
     <div class="license-box">
-      <!-- logo communautaire officiel DPCGL (section 2.5(b)) — rendu en petit à côté de la mention légale -->
       <div class="license-logo-row">
         <img src="public/assets/dpcgl-community-logo.png" alt="Daggerheart Compatible">
         <div>
@@ -61,21 +90,53 @@ export async function render(main, params) {
     </p>
   </div>`;
 
+  const applyBackupText = (rawText) => {
+    const replace = confirm('Importer cette sauvegarde :\n• OK = Fusionner avec vos personnages existants (recommandé)\n• Annuler = Annuler l\'import');
+    if (!replace) return;
+    const res = importFullBackupFromText(rawText, 'merge');
+    toast(`Sauvegarde importée : ${res.added} ajouté(s), ${res.updated} mis à jour.`);
+    render(main, params);
+  };
+
   $('#exp-all', main).addEventListener('click', () => {
-    const blob = new Blob([JSON.stringify(getState(), null, 2)], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'daggerborne-sauvegarde.json';
-    a.click();
-    URL.revokeObjectURL(a.href);
+    exportJsonFile('daggerborne-sauvegarde.json', cloudSync.exportPayload(), 'Exporter toute la sauvegarde');
+  });
+  $('#imp-all', main).addEventListener('click', () => $('#file-backup', main).click());
+  $('#file-backup', main).addEventListener('change', (e) => {
+    const f = e.target.files?.[0];
+    e.target.value = '';
+    if (!f) return;
+    const rd = new FileReader();
+    rd.onload = () => {
+      try { applyBackupText(rd.result); }
+      catch (err) { toast(err?.message || 'Fichier de sauvegarde invalide.'); }
+    };
+    rd.readAsText(f);
+  });
+  $('#imp-paste', main).addEventListener('click', () => {
+    openPasteJsonModal({
+      title: 'Importer une sauvegarde complète (JSON)',
+      onImport: (raw, close) => {
+        const res = importFullBackupFromText(raw, 'merge');
+        close();
+        toast(`Sauvegarde importée : ${res.added} ajouté(s), ${res.updated} mis à jour.`);
+        render(main, params);
+      },
+    });
+  });
+  $('#opt-massive', main).addEventListener('change', (e) => {
+    setState(s => { s.settings = s.settings || {}; s.settings.massiveDamageRule = e.target.checked; });
+    toast(e.target.checked ? 'Règle Dégâts Massifs activée.' : 'Règle Dégâts Massifs désactivée.');
   });
   $('#wipe', main).addEventListener('click', () => {
     setState(s => { s.rolls = []; });
     toast('Historique de jets effacé.');
+    render(main, params);
   });
   $('#wipe-all', main).addEventListener('click', () => {
     if (!confirm('Effacer TOUS les personnages, jets et outils ? Irréversible.')) return;
-    setState(s => { s.characters = []; s.rolls = []; s.fear = 0; s.countdowns = []; });
+    setState(s => { s.characters = []; s.rolls = []; s.fear = 0; s.countdowns = []; s.encounter = { pcCount: 4, adj: {}, active: [], environmentId: null }; });
     toast('Données effacées.');
+    render(main, params);
   });
 }

@@ -1,0 +1,594 @@
+[
+  {
+    "id": "agile-scout",
+    "tier": 1,
+    "en": "Agile Scout",
+    "fr": "Éclaireur agile",
+    "examples": "Renard, Souris, Belette, etc.",
+    "trait": "agility",
+    "traitBonus": 1,
+    "evasionBonus": 2,
+    "range": "Mêlée",
+    "dmgDice": "d4",
+    "dmgBonus": 0,
+    "dmgType": "phy",
+    "advantages": ["tromper", "repérer", "se faufiler"],
+    "features": [
+      {
+        "name": "Agile",
+        "desc": "Vos déplacements sont silencieux et vous pouvez dépenser 1 Espoir pour vous déplacer jusqu'à portée Lointaine sans effectuer de jet."
+      },
+      {
+        "name": "Fragile",
+        "desc": "Lorsque vous subissez des dégâts Majeurs ou supérieurs, vous quittez votre Forme bestiale."
+      }
+    ]
+  },
+  {
+    "id": "household-friend",
+    "tier": 1,
+    "en": "Household Friend",
+    "fr": "Compagnon familier",
+    "examples": "Chat, Chien, Lapin, etc.",
+    "trait": "instinct",
+    "traitBonus": 1,
+    "evasionBonus": 2,
+    "range": "Mêlée",
+    "dmgDice": "d6",
+    "dmgBonus": 0,
+    "dmgType": "phy",
+    "advantages": ["escalader", "repérer", "protéger"],
+    "features": [
+      {
+        "name": "Compagnon",
+        "desc": "Lorsque vous utilisez Aider un allié, vous pouvez lancer un d8 comme dé d'avantage."
+      },
+      {
+        "name": "Fragile",
+        "desc": "Lorsque vous subissez des dégâts Majeurs ou supérieurs, vous quittez votre Forme bestiale."
+      }
+    ]
+  },
+  {
+    "id": "nimble-grazer",
+    "tier": 1,
+    "en": "Nimble Grazer",
+    "fr": "Herbivore vif",
+    "examples": "Cerf, Gazelle, Chèvre, etc.",
+    "trait": "agility",
+    "traitBonus": 1,
+    "evasionBonus": 3,
+    "range": "Mêlée",
+    "dmgDice": "d6",
+    "dmgBonus": 0,
+    "dmgType": "phy",
+    "advantages": ["sauter", "se faufiler", "sprinter"],
+    "features": [
+      {
+        "name": "Proie insaisissable",
+        "desc": "Lorsqu'un jet d'attaque contre vous devrait réussir, vous pouvez marquer 1 Stress et lancer un d4. Ajoutez le résultat à votre Évasion contre cette attaque."
+      },
+      {
+        "name": "Fragile",
+        "desc": "Lorsque vous subissez des dégâts Majeurs ou supérieurs, vous quittez votre Forme bestiale."
+      }
+    ]
+  },
+  {
+    "id": "pack-predator",
+    "tier": 1,
+    "en": "Pack Predator",
+    "fr": "Prédateur de meute",
+    "examples": "Coyote, Hyène, Loup, etc.",
+    "trait": "strength",
+    "traitBonus": 2,
+    "evasionBonus": 1,
+    "range": "Mêlée",
+    "dmgDice": "d8",
+    "dmgBonus": 2,
+    "dmgType": "phy",
+    "advantages": ["attaquer", "sprinter", "pister"],
+    "features": [
+      {
+        "name": "Frappe incapacitante",
+        "desc": "Lorsque vous réussissez une attaque contre une cible à portée de Mêlée, vous pouvez marquer 1 Stress pour la rendre temporairement Vulnérable."
+      },
+      {
+        "name": "Chasse en meute",
+        "desc": "Lorsque vous réussissez une attaque contre la même cible qu'un allié ayant agi juste avant vous, ajoutez 1d8 à votre jet de dégâts."
+      }
+    ]
+  },
+  {
+    "id": "aquatic-scout",
+    "tier": 1,
+    "en": "Aquatic Scout",
+    "fr": "Éclaireur aquatique",
+    "examples": "Anguille, Poisson, Pieuvre, etc.",
+    "trait": "agility",
+    "traitBonus": 1,
+    "evasionBonus": 2,
+    "range": "Mêlée",
+    "dmgDice": "d4",
+    "dmgBonus": 0,
+    "dmgType": "phy",
+    "advantages": ["s'orienter", "se faufiler", "nager"],
+    "features": [
+      {
+        "name": "Aquatique",
+        "desc": "Vous pouvez respirer et vous déplacer naturellement sous l'eau."
+      },
+      {
+        "name": "Fragile",
+        "desc": "Lorsque vous subissez des dégâts Majeurs ou supérieurs, vous quittez votre Forme bestiale."
+      }
+    ]
+  },
+  {
+    "id": "stalking-arachnid",
+    "tier": 1,
+    "en": "Stalking Arachnid",
+    "fr": "Arachnide rôdeuse",
+    "examples": "Tarentule, Araignée-loup, etc.",
+    "trait": "finesse",
+    "traitBonus": 1,
+    "evasionBonus": 2,
+    "range": "Mêlée",
+    "dmgDice": "d6",
+    "dmgBonus": 1,
+    "dmgType": "phy",
+    "advantages": ["attaquer", "escalader", "se faufiler"],
+    "features": [
+      {
+        "name": "Morsure venimeuse",
+        "desc": "Lorsque vous réussissez une attaque contre une cible à portée de Mêlée, elle devient temporairement Empoisonnée. Une créature Empoisonnée subit 1d10 dégâts physiques directs chaque fois qu'elle agit."
+      },
+      {
+        "name": "Tisse-toile",
+        "desc": "Vous pouvez produire une toile robuste pour l'exploration et le combat, assez solide pour soutenir une créature. Vous pouvez Entraver temporairement une cible à portée Courte en réussissant un jet de Finesse contre elle."
+      }
+    ]
+  },
+  {
+    "id": "armored-sentry",
+    "tier": 2,
+    "en": "Armored Sentry",
+    "fr": "Sentinelle cuirassée",
+    "examples": "Tatou, Pangolin, Tortue, etc.",
+    "trait": "strength",
+    "traitBonus": 1,
+    "evasionBonus": 1,
+    "range": "Mêlée",
+    "dmgDice": "d8",
+    "dmgBonus": 2,
+    "dmgType": "phy",
+    "advantages": ["creuser", "repérer", "protéger"],
+    "features": [
+      {
+        "name": "Carapace blindée",
+        "desc": "Votre enveloppe durcie vous confère la résistance aux dégâts physiques. De plus, marquez 1 Emplacement d'armure pour vous rétracter dans votre carapace : les dégâts physiques sont alors réduits de votre score d'Armure (après résistance), mais vous ne pouvez faire aucune autre action sans quitter cette forme."
+      },
+      {
+        "name": "Boulet de canon",
+        "desc": "Marquez 1 Stress pour permettre à un allié de vous lancer sur un adversaire. L'allié fait un jet d'attaque (Agilité ou Force) à portée Courte : en cas de succès, la cible subit d12+2 dégâts physiques avec la Maîtrise du lanceur. Dépensez 1 Espoir pour viser un adversaire supplémentaire à portée Très Courte du premier (qui subit la moitié des dégâts)."
+      }
+    ]
+  },
+  {
+    "id": "powerful-beast",
+    "tier": 2,
+    "en": "Powerful Beast",
+    "fr": "Bête puissante",
+    "examples": "Ours, Taureau, Élan, etc.",
+    "trait": "strength",
+    "traitBonus": 3,
+    "evasionBonus": 1,
+    "range": "Mêlée",
+    "dmgDice": "d10",
+    "dmgBonus": 4,
+    "dmgType": "phy",
+    "advantages": ["s'orienter", "protéger", "effrayer"],
+    "features": [
+      {
+        "name": "Saccage",
+        "desc": "Lorsque vous obtenez 1 sur un dé de dégâts, vous pouvez lancer 1d10 et l'ajouter au total de dégâts. De plus, avant un jet d'attaque, marquez 1 Stress pour gagner +1 en Maîtrise sur cette attaque."
+      },
+      {
+        "name": "Peau épaisse",
+        "desc": "Vous gagnez un bonus de +2 à vos seuils de dégâts."
+      }
+    ]
+  },
+  {
+    "id": "mighty-strider",
+    "tier": 2,
+    "en": "Mighty Strider",
+    "fr": "Coureur vigoureux",
+    "examples": "Chameau, Cheval, Zèbre, etc.",
+    "trait": "agility",
+    "traitBonus": 1,
+    "evasionBonus": 2,
+    "range": "Mêlée",
+    "dmgDice": "d8",
+    "dmgBonus": 1,
+    "dmgType": "phy",
+    "advantages": ["sauter", "s'orienter", "sprinter"],
+    "features": [
+      {
+        "name": "Porteur",
+        "desc": "Vous pouvez porter jusqu'à deux alliés consentants lorsque vous vous déplacez."
+      },
+      {
+        "name": "Piétinement",
+        "desc": "Marquez 1 Stress pour vous déplacer jusqu'à portée Courte en ligne droite et attaquer toutes les cibles à portée de Mêlée de cette ligne. Les cibles touchées subissent d8+1 dégâts physiques avec votre Maîtrise et sont temporairement Vulnérables."
+      }
+    ]
+  },
+  {
+    "id": "striking-serpent",
+    "tier": 2,
+    "en": "Striking Serpent",
+    "fr": "Serpent vif",
+    "examples": "Cobra, Crotale, Vipère, etc.",
+    "trait": "finesse",
+    "traitBonus": 1,
+    "evasionBonus": 2,
+    "range": "Très Courte",
+    "dmgDice": "d8",
+    "dmgBonus": 4,
+    "dmgType": "phy",
+    "advantages": ["escalader", "tromper", "sprinter"],
+    "features": [
+      {
+        "name": "Morsure venimeuse",
+        "desc": "Attaquez n'importe quel nombre de cibles à portée Très Courte. En cas de succès, la cible est temporairement Empoisonnée et subit 1d10 dégâts physiques directs chaque fois qu'elle agit."
+      },
+      {
+        "name": "Sifflement d'alerte",
+        "desc": "Marquez 1 Stress pour forcer n'importe quel nombre de cibles à portée de Mêlée à reculer jusqu'à portée Très Courte."
+      }
+    ]
+  },
+  {
+    "id": "pouncing-predator",
+    "tier": 2,
+    "en": "Pouncing Predator",
+    "fr": "Prédateur bondissant",
+    "examples": "Guépard, Lion, Panthère, etc.",
+    "trait": "instinct",
+    "traitBonus": 1,
+    "evasionBonus": 3,
+    "range": "Mêlée",
+    "dmgDice": "d8",
+    "dmgBonus": 6,
+    "dmgType": "phy",
+    "advantages": ["attaquer", "escalader", "se faufiler"],
+    "features": [
+      {
+        "name": "Véloce",
+        "desc": "Dépensez 1 Espoir pour vous déplacer jusqu'à portée Lointaine sans effectuer de jet."
+      },
+      {
+        "name": "Mise à terre",
+        "desc": "Marquez 1 Stress pour arriver à portée de Mêlée d'une cible et effectuer un jet d'attaque contre elle. En cas de succès, vous gagnez +2 en Maîtrise pour cette attaque et la cible doit marquer 1 Stress."
+      }
+    ]
+  },
+  {
+    "id": "winged-beast",
+    "tier": 2,
+    "en": "Winged Beast",
+    "fr": "Bête ailée",
+    "examples": "Faucon, Hibou, Corbeau, etc.",
+    "trait": "finesse",
+    "traitBonus": 1,
+    "evasionBonus": 3,
+    "range": "Mêlée",
+    "dmgDice": "d4",
+    "dmgBonus": 2,
+    "dmgType": "phy",
+    "advantages": ["tromper", "repérer", "effrayer"],
+    "features": [
+      {
+        "name": "Vue d'oiseau",
+        "desc": "Vous pouvez voler à volonté. Une fois par repos en vol, vous pouvez poser une question au MJ sur la scène en dessous sans jeter les dés ; le premier personnage qui agit selon cette information gagne un avantage à son jet."
+      },
+      {
+        "name": "Os creux",
+        "desc": "Vous subissez un malus de −2 à vos seuils de dégâts."
+      }
+    ]
+  },
+  {
+    "id": "great-predator",
+    "tier": 3,
+    "en": "Great Predator",
+    "fr": "Grand prédateur",
+    "examples": "Loup sanguinaire, Vélociraptor, Tigre à dents de sabre, etc.",
+    "trait": "strength",
+    "traitBonus": 2,
+    "evasionBonus": 2,
+    "range": "Mêlée",
+    "dmgDice": "d12",
+    "dmgBonus": 8,
+    "dmgType": "phy",
+    "advantages": ["attaquer", "se faufiler", "sprinter"],
+    "features": [
+      {
+        "name": "Porteur",
+        "desc": "Vous pouvez porter jusqu'à deux alliés consentants lorsque vous vous déplacez."
+      },
+      {
+        "name": "Mutilation vicieuse",
+        "desc": "Lorsque vous réussissez une attaque contre une cible, vous pouvez dépenser 1 Espoir pour la rendre temporairement Vulnérable et gagner +1 en Maîtrise sur cette attaque."
+      }
+    ]
+  },
+  {
+    "id": "mighty-lizard",
+    "tier": 3,
+    "en": "Mighty Lizard",
+    "fr": "Saurien puissant",
+    "examples": "Alligator, Crocodile, Monstre de Gila, etc.",
+    "trait": "instinct",
+    "traitBonus": 2,
+    "evasionBonus": 1,
+    "range": "Mêlée",
+    "dmgDice": "d10",
+    "dmgBonus": 7,
+    "dmgType": "phy",
+    "advantages": ["attaquer", "se faufiler", "pister"],
+    "features": [
+      {
+        "name": "Défense physique",
+        "desc": "Vous gagnez un bonus de +3 à vos seuils de dégâts."
+      },
+      {
+        "name": "Mâchoire claquante",
+        "desc": "Lorsque vous réussissez une attaque contre une cible à portée de Mêlée, vous pouvez dépenser 1 Espoir pour la saisir entre vos mâchoires : elle est temporairement Entravée et Vulnérable."
+      }
+    ]
+  },
+  {
+    "id": "great-winged-beast",
+    "tier": 3,
+    "en": "Great Winged Beast",
+    "fr": "Grande bête ailée",
+    "examples": "Aigle géant, Faucon géant, etc.",
+    "trait": "finesse",
+    "traitBonus": 2,
+    "evasionBonus": 3,
+    "range": "Mêlée",
+    "dmgDice": "d8",
+    "dmgBonus": 6,
+    "dmgType": "phy",
+    "advantages": ["tromper", "distraire", "repérer"],
+    "features": [
+      {
+        "name": "Vue d'oiseau",
+        "desc": "Vous pouvez voler à volonté. Une fois par repos en vol, posez une question au MJ sur la scène en dessous sans jeter les dés ; le premier personnage agissant sur cette information gagne un avantage à son jet."
+      },
+      {
+        "name": "Porteur",
+        "desc": "Vous pouvez porter jusqu'à deux alliés consentants lorsque vous vous déplacez."
+      }
+    ]
+  },
+  {
+    "id": "aquatic-predator",
+    "tier": 3,
+    "en": "Aquatic Predator",
+    "fr": "Prédateur aquatique",
+    "examples": "Dauphin, Orque, Requin, etc.",
+    "trait": "agility",
+    "traitBonus": 2,
+    "evasionBonus": 4,
+    "range": "Mêlée",
+    "dmgDice": "d10",
+    "dmgBonus": 6,
+    "dmgType": "phy",
+    "advantages": ["attaquer", "nager", "pister"],
+    "features": [
+      {
+        "name": "Aquatique",
+        "desc": "Vous pouvez respirer et vous déplacer naturellement sous l'eau."
+      },
+      {
+        "name": "Mutilation vicieuse",
+        "desc": "Lorsque vous réussissez une attaque contre une cible, dépensez 1 Espoir pour la rendre temporairement Vulnérable et gagner +1 en Maîtrise sur cette attaque."
+      }
+    ]
+  },
+  {
+    "id": "legendary-beast",
+    "tier": 3,
+    "en": "Legendary Beast",
+    "fr": "Bête légendaire",
+    "examples": "Version évoluée d'une forme du Palier 1",
+    "trait": "variable",
+    "traitBonus": 1,
+    "evasionBonus": 2,
+    "range": "Mêlée",
+    "dmgDice": "variable",
+    "dmgBonus": 6,
+    "dmgType": "phy",
+    "evolved": true,
+    "advantages": ["Selon la forme de Palier 1 choisie"],
+    "features": [
+      {
+        "name": "Évolué (Palier 1)",
+        "desc": "Choisissez une option de Palier 1 et prenez-en une version plus grande et puissante : vous conservez ses traits et features et gagnez +6 aux jets de dégâts, +1 au trait de la forme et +2 en Évasion."
+      }
+    ]
+  },
+  {
+    "id": "legendary-hybrid",
+    "tier": 3,
+    "en": "Legendary Hybrid",
+    "fr": "Hybride légendaire",
+    "examples": "Griffon, Sphinx, etc.",
+    "trait": "strength",
+    "traitBonus": 2,
+    "evasionBonus": 3,
+    "range": "Mêlée",
+    "dmgDice": "d10",
+    "dmgBonus": 8,
+    "dmgType": "phy",
+    "hybrid": true,
+    "advantages": ["4 avantages au choix parmi 2 formes (Paliers 1–2)"],
+    "features": [
+      {
+        "name": "Features hybrides",
+        "desc": "Marquez 1 Stress supplémentaire pour vous transformer. Choisissez deux formes bestiales des Paliers 1–2, puis sélectionnez au total 4 avantages et 2 features parmi celles-ci."
+      }
+    ]
+  },
+  {
+    "id": "massive-behemoth",
+    "tier": 4,
+    "en": "Massive Behemoth",
+    "fr": "Béhémoth massif",
+    "examples": "Éléphant, Mammouth, Rhinocéros, etc.",
+    "trait": "strength",
+    "traitBonus": 3,
+    "evasionBonus": 1,
+    "range": "Mêlée",
+    "dmgDice": "d12",
+    "dmgBonus": 12,
+    "dmgType": "phy",
+    "advantages": ["repérer", "protéger", "effrayer", "sprinter"],
+    "features": [
+      {
+        "name": "Porteur",
+        "desc": "Vous pouvez porter jusqu'à quatre alliés consentants lorsque vous vous déplacez."
+      },
+      {
+        "name": "Démolition",
+        "desc": "Dépensez 1 Espoir pour vous déplacer jusqu'à portée Lointaine en ligne droite et attaquer toutes les cibles à portée de Mêlée de cette ligne : les cibles touchées subissent d8+10 dégâts physiques avec votre Maîtrise et sont temporairement Vulnérables."
+      },
+      {
+        "name": "Indomptable",
+        "desc": "Vous gagnez un bonus de +2 à tous vos seuils de dégâts."
+      }
+    ]
+  },
+  {
+    "id": "terrible-lizard",
+    "tier": 4,
+    "en": "Terrible Lizard",
+    "fr": "Lézard terrible",
+    "examples": "Brachiosaure, Tyrannosaure, etc.",
+    "trait": "strength",
+    "traitBonus": 3,
+    "evasionBonus": 2,
+    "range": "Mêlée",
+    "dmgDice": "d12",
+    "dmgBonus": 10,
+    "dmgType": "phy",
+    "advantages": ["attaquer", "tromper", "effrayer", "pister"],
+    "features": [
+      {
+        "name": "Frappes dévastatrices",
+        "desc": "Lorsque vous infligez des dégâts Graves à une cible à portée de Mêlée, marquez 1 Stress pour lui faire marquer 1 PV supplémentaire."
+      },
+      {
+        "name": "Foulée colossale",
+        "desc": "Vous pouvez vous déplacer jusqu'à portée Lointaine sans effectuer de jet et ignorez les terrains difficiles (à la discrétion du MJ)."
+      }
+    ]
+  },
+  {
+    "id": "mythic-aerial-hunter",
+    "tier": 4,
+    "en": "Mythic Aerial Hunter",
+    "fr": "Chasseur aérien mythique",
+    "examples": "Dragon, Ptérodactyle, Roc, Wyverne, etc.",
+    "trait": "finesse",
+    "traitBonus": 3,
+    "evasionBonus": 4,
+    "range": "Mêlée",
+    "dmgDice": "d10",
+    "dmgBonus": 11,
+    "dmgType": "phy",
+    "advantages": ["attaquer", "tromper", "repérer", "s'orienter"],
+    "features": [
+      {
+        "name": "Porteur",
+        "desc": "Vous pouvez porter jusqu'à trois alliés consentants lorsque vous vous déplacez."
+      },
+      {
+        "name": "Rapace mortel",
+        "desc": "Vous pouvez voler à volonté et vous déplacer jusqu'à portée Lointaine dans le cadre de votre action. En piqué en ligne droite d'au moins portée Courte jusqu'en Mêlée avec attaque dans la même action, relancez tous les dés de dégâts inférieurs à votre Maîtrise."
+      }
+    ]
+  },
+  {
+    "id": "epic-aquatic-beast",
+    "tier": 4,
+    "en": "Epic Aquatic Beast",
+    "fr": "Bête aquatique épique",
+    "examples": "Calmar géant, Baleine, etc.",
+    "trait": "agility",
+    "traitBonus": 3,
+    "evasionBonus": 3,
+    "range": "Mêlée",
+    "dmgDice": "d10",
+    "dmgBonus": 10,
+    "dmgType": "phy",
+    "advantages": ["repérer", "protéger", "effrayer", "pister"],
+    "features": [
+      {
+        "name": "Maître des océans",
+        "desc": "Vous respirez et nagez naturellement sous l'eau. Lorsque vous réussissez une attaque à portée de Mêlée, vous pouvez temporairement Entraver la cible."
+      },
+      {
+        "name": "Inflexible",
+        "desc": "Lorsque vous devriez marquer un Emplacement d'armure, lancez 1d6 : sur 5 ou plus, réduisez la gravité d'un palier sans marquer d'Emplacement d'armure."
+      }
+    ]
+  },
+  {
+    "id": "mythic-beast",
+    "tier": 4,
+    "en": "Mythic Beast",
+    "fr": "Bête mythique",
+    "examples": "Version évoluée d'une forme des Paliers 1 ou 2",
+    "trait": "variable",
+    "traitBonus": 2,
+    "evasionBonus": 3,
+    "range": "Mêlée",
+    "dmgDice": "variable",
+    "dmgBonus": 9,
+    "dmgType": "phy",
+    "evolved": true,
+    "advantages": ["Selon la forme de Palier 1 ou 2 choisie"],
+    "features": [
+      {
+        "name": "Évolué (Paliers 1–2)",
+        "desc": "Choisissez une forme des Paliers 1 ou 2 et incarnez-en une version colossale et mythique : conservez ses traits et features, et gagnez +9 aux dégâts, +2 au trait de la forme, +3 en Évasion et votre dé de dégâts augmente d'un cran (d6→d8, d8→d10, etc.)."
+      }
+    ]
+  },
+  {
+    "id": "mythic-hybrid",
+    "tier": 4,
+    "en": "Mythic Hybrid",
+    "fr": "Hybride mythique",
+    "examples": "Chimère, Cocatrix, Manticore, etc.",
+    "trait": "strength",
+    "traitBonus": 3,
+    "evasionBonus": 2,
+    "range": "Mêlée",
+    "dmgDice": "d12",
+    "dmgBonus": 10,
+    "dmgType": "phy",
+    "hybrid": true,
+    "advantages": ["5 avantages au choix parmi 3 formes (Paliers 1–3)"],
+    "features": [
+      {
+        "name": "Features hybrides",
+        "desc": "Marquez 2 Stress supplémentaires pour vous transformer. Choisissez trois formes bestiales des Paliers 1–3, puis sélectionnez au total 5 avantages et 3 features parmi celles-ci."
+      }
+    ]
+  }
+]

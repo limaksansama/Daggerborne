@@ -101,28 +101,29 @@ const rng = (n) => 1 + Math.floor(Math.random() * n);
    Fallback : on tire la valeur localement — l'animation 3D reste visuelle, la valeur de jeu est juste. */
 const safeValue = (r, sides) => (Number.isInteger(r?.value) && r.value >= 1 && r.value <= sides ? r.value : rng(sides));
 
-/* ---------- jet de Dualité : 2d12 Espoir + Peur, avec modificateur ---------- */
-async function rollDuality({ mod = 0, label = '', charId = null, weaponUid = null }) {
+/* ---------- jet de Dualité : 2d12 Espoir + Peur (+ d6 avantage/désavantage optionnel) ---------- */
+async function rollDuality({ mod = 0, label = '', charId = null, weaponUid = null, advantage = false, disadvantage = false }) {
   if (busy) return null;
   busy = true;
   try {
     const db = await ensureInit();
-    /* les deux dés avec leur thème propre + teinte themeColor :
-       d12 « hope » doré lumineux #fbbf24 (chiffres blancs peints dans la texture)
-       + d12 « fear » indigo profond #5b21b6 (chiffres blancs peints). Les deux
-       thèmes partagent les masques de chiffres HD du thème default. */
-    const rolls = await db.roll([
+    const diceReq = [
       { sides: 12, qty: 1, theme: 'hope', themeColor: '#fbbf24' },
       { sides: 12, qty: 1, theme: 'fear', themeColor: '#5b21b6' },
-    ]);
+    ];
+    const hasAdvDis = Boolean(advantage ^ disadvantage);
+    if (hasAdvDis) diceReq.push({ sides: 6, qty: 1, theme: 'nebula-gold' });
+    const rolls = await db.roll(diceReq);
     const hope = safeValue(rolls[0], 12);
     const fear = safeValue(rolls[1], 12);
-    const total = hope + fear + mod;
+    const advVal = (hasAdvDis && advantage) ? safeValue(rolls[2], 6) : 0;
+    const disVal = (hasAdvDis && disadvantage) ? safeValue(rolls[2], 6) : 0;
+    const total = hope + fear + mod + advVal - disVal;
     const result = hope === fear ? 'crit' : hope > fear ? 'hope' : 'fear';
     const word = result === 'crit' ? '★ Succès Critique !' : result === 'hope' ? 'Avec Espoir' : 'Avec Peur';
 
-    /* effets de jeu : gain d'Espoir / Peur du MJ (via core.dualityRoll côté données) */
-    const rec = { hope, fear, mod, total, result, label };
+    /* effets de jeu : gain d'Espoir / Peur du MJ */
+    const rec = { hope, fear, mod, adv: advVal || null, dis: disVal || null, total, result, label };
     if (charId) {
       const c = getChar(charId);
       if (c) {
@@ -136,19 +137,21 @@ async function rollDuality({ mod = 0, label = '', charId = null, weaponUid = nul
     }
 
     /* historique de session */
+    const fullLabel = `${label || 'Jet de Dualité'}${advVal ? ` · ▲ Avantage +${advVal}` : ''}${disVal ? ` · ▼ Désavantage −${disVal}` : ''}`;
     setState(s => {
-      s.rolls.unshift({ id: 'r' + Date.now(), t: Date.now(), hope, fear, mod, total, result, label: label || 'Jet de Dualité', charName: charId ? getChar(charId)?.name : null });
+      s.rolls.unshift({ id: 'r' + Date.now(), t: Date.now(), hope, fear, mod, adv: advVal || null, dis: disVal || null, total, result, label: fullLabel, charName: charId ? getChar(charId)?.name : null });
       s.rolls = s.rolls.slice(0, 60);
     });
 
     /* bannière interactive */
     const modTxt = mod ? ` ${fmt(mod)} (${label})` : (label ? ` (${label})` : '');
+    const advTxt = advVal ? ` + ${advVal} (Avantage)` : disVal ? ` − ${disVal} (Désavantage)` : '';
     pendingDamage = (charId && weaponUid) ? { charId, weaponUid } : null;
     showBanner(`
-      <div class="d3d-dice"><span class="d3d-die hope">${hope}</span><span class="d3d-die fear">${fear}</span></div>
+      <div class="d3d-dice"><span class="d3d-die hope">${hope}</span><span class="d3d-die fear">${fear}</span>${advVal ? `<span class="d3d-die" title="Avantage d6">+${advVal}</span>` : ''}${disVal ? `<span class="d3d-die" title="Désavantage d6">−${disVal}</span>` : ''}</div>
       <div class="d3d-total">${total}</div>
       <div class="d3d-status ${result}">${word}</div>
-      <div class="d3d-detail">Espoir ${hope} · Peur ${fear}${modTxt} = ${total}</div>`,
+      <div class="d3d-detail">Espoir ${hope} · Peur ${fear}${modTxt}${advTxt} = ${total}</div>`,
       {
         buttons: [
           ...(result === 'hope' || result === 'crit'
@@ -221,16 +224,20 @@ export async function rollDamage(charId, weaponUid) {
 }
 
 /* ---------- jet d'attaque d'arme : Dualité + Trait de l'arme ---------- */
-export async function rollAttack(charId, weaponUid) {
+export async function rollAttack(charId, weaponUid, opts = {}) {
   const c = getChar(charId);
   if (!c) return null;
   const w = c.weapons?.find(x => x.uid === weaponUid);
   if (!w) return null;
-  const mod = c.traits[w.trait] || 0;
+  const baseMod = c.traits[w.trait] || 0;
+  const extraMod = parseInt(opts.extraMod, 10) || 0;
+  const extraTxt = opts.extraLabel ? ` + ${opts.extraLabel}` : '';
   return rollDuality({
-    mod,
-    label: `${w.name} · ${w.trait ? (await traitLabel(w.trait)) : ''}`.trim(),
+    mod: baseMod + extraMod,
+    label: `${w.name} · ${w.trait ? (await traitLabel(w.trait)) : ''}${extraTxt}`.trim(),
     charId, weaponUid,
+    advantage: !!opts.advantage,
+    disadvantage: !!opts.disadvantage,
   });
 }
 async function traitLabel(k) {
