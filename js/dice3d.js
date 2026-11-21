@@ -113,8 +113,8 @@ async function rollDuality({ mod = 0, label = '', charId = null, weaponUid = nul
       try {
         const db = await ensureInit();
         const diceReq = [
-          { sides: 12, qty: 1, theme: 'hope', themeColor: '#fbbf24' },
-          { sides: 12, qty: 1, theme: 'fear', themeColor: '#5b21b6' },
+          { sides: 12, qty: 1, theme: 'hope' },
+          { sides: 12, qty: 1, theme: 'fear' },
         ];
         if (hasAdvDis) diceReq.push({ sides: 6, qty: 1, theme: 'nebula-gold' });
         const rolls = await db.roll(diceReq);

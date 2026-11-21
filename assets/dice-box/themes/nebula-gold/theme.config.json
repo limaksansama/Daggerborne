@@ -2,19 +2,14 @@
   "name": "Nébuleuse Dorée",
   "systemName": "nebula-gold",
   "author": "Compagnon Daggerheart",
-  "version": 2.0,
+  "version": 3.0,
   "meshFile": "default.json",
   "material": {
-    "type": "color",
-    "diffuseTexture": {
-      "light": "diffuse-light.png",
-      "dark": "diffuse-dark.png"
-    },
+    "type": "standard",
+    "diffuseTexture": "diffuse-light.png",
     "diffuseLevel": 1,
-    "bumpTexture": "normal.png",
-    "bumpLevel": 0.5,
     "specularTexture": "specular.jpg",
-    "specularPower": 1
+    "specularPower": 64
   },
   "diceAvailable": ["d4","d6","d8","d10","d12","d20","d100"]
 }

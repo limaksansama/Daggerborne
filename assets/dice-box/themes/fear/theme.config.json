@@ -2,19 +2,14 @@
   "name": "Peur Indigo",
   "systemName": "fear",
   "author": "Compagnon Daggerheart",
-  "version": 1.0,
+  "version": 2.0,
   "meshFile": "default.json",
   "material": {
-    "type": "color",
-    "diffuseTexture": {
-      "light": "diffuse-light.png",
-      "dark": "diffuse-dark.png"
-    },
+    "type": "standard",
+    "diffuseTexture": "diffuse-light.png",
     "diffuseLevel": 1,
-    "bumpTexture": "normal.png",
-    "bumpLevel": 0.25,
     "specularTexture": "specular.jpg",
-    "specularPower": 1
+    "specularPower": 64
   },
   "diceAvailable": [
     "d4",

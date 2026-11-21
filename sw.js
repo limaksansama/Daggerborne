@@ -1,5 +1,5 @@
 /* Service worker — cache-first PWA for Daggerborne */
-const VERSION = 'daggerborne-v39';
+const VERSION = 'daggerborne-v40';
 const CORE = [
   './', './index.html', './manifest.webmanifest',
   './css/app.css', './css/sheet2.css', './css/dice-box.css', './js/app.js', './js/core.js',
@@ -26,17 +26,14 @@ const CORE = [
   /* logo communautaire officiel DPCGL (fiole d'alchimie) — requis hors-ligne */
   './public/assets/dpcgl-community-logo.png',
   './public/assets/dpcgl-community-logo-light.png',
-  /* ---- moteur de dés 3D : physique WASM + thèmes (set unifié HOPE/FEAR/NEBULA, v33) ---- */
+  /* ---- moteur de dés 3D : physique WASM + thèmes résine calligraphiés (v40) ---- */
   './assets/dice-box/ammo/ammo.wasm.wasm',
   './assets/dice-box/themes/nebula-gold/theme.config.json', './assets/dice-box/themes/nebula-gold/default.json',
-  './assets/dice-box/themes/nebula-gold/diffuse-dark.png', './assets/dice-box/themes/nebula-gold/diffuse-light.png',
-  './assets/dice-box/themes/nebula-gold/normal.png', './assets/dice-box/themes/nebula-gold/specular.jpg',
+  './assets/dice-box/themes/nebula-gold/diffuse-light.png', './assets/dice-box/themes/nebula-gold/specular.jpg',
   './assets/dice-box/themes/hope/theme.config.json', './assets/dice-box/themes/hope/default.json',
-  './assets/dice-box/themes/hope/diffuse-dark.png', './assets/dice-box/themes/hope/diffuse-light.png',
-  './assets/dice-box/themes/hope/normal.png', './assets/dice-box/themes/hope/specular.jpg',
+  './assets/dice-box/themes/hope/diffuse-light.png', './assets/dice-box/themes/hope/specular.jpg',
   './assets/dice-box/themes/fear/theme.config.json', './assets/dice-box/themes/fear/default.json',
-  './assets/dice-box/themes/fear/diffuse-dark.png', './assets/dice-box/themes/fear/diffuse-light.png',
-  './assets/dice-box/themes/fear/normal.png', './assets/dice-box/themes/fear/specular.jpg',
+  './assets/dice-box/themes/fear/diffuse-light.png', './assets/dice-box/themes/fear/specular.jpg',
 ];
 
 self.addEventListener('install', (e) => {
