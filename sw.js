@@ -1,5 +1,5 @@
 /* Service worker — cache-first PWA for Daggerborne */
-const VERSION = 'daggerborne-v53';
+const VERSION = 'daggerborne-v54';
 const CORE = [
   './', './index.html', './manifest.webmanifest',
   './css/app.css', './css/sheet2.css', './css/dice-box.css', './js/app.js', './js/core.js',
@@ -43,8 +43,16 @@ const CORE = [
 self.addEventListener('install', (e) => {
   e.waitUntil((async () => {
     const cache = await caches.open(VERSION);
-    await Promise.allSettled(CORE.map(u => cache.add(u)));
-    self.skipWaiting();
+    const results = await Promise.allSettled(CORE.map(u => cache.add(u)));
+    const failed = CORE.filter((_, i) => results[i].status === 'rejected');
+    if (failed.length) {
+      /* Précache atomique : une installation partielle donne une PWA « installée »
+         mais cassée hors-ligne. On annule et on journalise les URL fautives. */
+      await caches.delete(VERSION);
+      console.error(`[sw] précache incomplet (${failed.length}/${CORE.length}) — installation annulée :`, failed);
+      throw new Error(`Service worker : ${failed.length} ressource(s) non précachée(s)`);
+    }
+    await self.skipWaiting();
   })());
 });
 
@@ -66,6 +74,20 @@ self.addEventListener('fetch', (e) => {
   if (url.origin !== location.origin) return;
   e.respondWith((async () => {
     const cache = await caches.open(VERSION);
+    /* Navigations : réseau d'abord, pour qu'un déploiement soit visible au
+       rechargement (le cache-first servait indéfiniment l'ancien index.html),
+       avec repli sur le cache en hors-ligne. */
+    if (e.request.mode === 'navigate') {
+      try {
+        const r = await fetch(e.request);
+        if (r.ok) cache.put('./index.html', r.clone());
+        return r;
+      } catch (err) {
+        const fallback = await cache.match('./index.html');
+        if (fallback) return fallback;
+        throw err;
+      }
+    }
     const cached = await cache.match(e.request, { ignoreSearch: true });
     if (cached) {
       // revalidate in background

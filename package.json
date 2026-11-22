@@ -6,8 +6,10 @@
   "scripts": {
     "dev": "node server.js",
     "start": "node server.js",
-    "build": "node -e \"console.log('Static site ready')\"",
-    "lint": "node --check server.js",
+    "test": "node --test tests/*.test.js",
+    "lint": "node --check server.js && node scripts/lint.mjs",
+    "verify": "npm run lint && npm test",
+    "build": "npm run verify && node -e \"console.log('Static site ready')\"",
     "build:android": "npx cap sync android"
   },
   "dependencies": {
