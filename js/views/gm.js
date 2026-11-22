@@ -170,7 +170,7 @@ async function drawEncounter(body, main, st, seq = gmSeq) {
   const pcCount = enc.pcCount || 4;
   const adj = enc.adj || {};
   const budget = calcEncounterBudget(pcCount, adj);
-  const spent = calcEncounterSpent(enc.active);
+  const spent = calcEncounterSpent(enc.active, pcCount);
   const activeEnv = enc.environmentId ? environments.find(e => e.id === enc.environmentId) : null;
 
   body.innerHTML = `
@@ -223,7 +223,7 @@ async function drawEncounter(body, main, st, seq = gmSeq) {
           </div>
           <p class="ch-desc" style="margin-top:.35rem">${esc(activeEnv.descFr || activeEnv.desc)}</p>
           ${activeEnv.impulsesFr || activeEnv.impulses ? `<p class="ch-desc" style="margin-top:.3rem"><b style="color:var(--golden)">Impulsions :</b> ${esc(activeEnv.impulsesFr || activeEnv.impulses)}</p>` : ''}
-          <details style="margin-top:.45rem"><summary style="cursor:pointer;font-size:.8rem;color:var(--golden)">Features de l'environnement (${activeEnv.features.length})</summary>
+          <details style="margin-top:.45rem"><summary style="cursor:pointer;font-size:.8rem;color:var(--golden)">Aptitudes de l'environnement (${activeEnv.features.length})</summary>
             <div style="margin-top:.45rem">${activeEnv.features.map(f => `<p class="ch-desc" style="margin-bottom:.4rem"><b>${esc(f.name)}</b> <span class="tag">${esc(f.kind)}</span> — ${esc(f.desc)}</p>`).join('')}</div>
           </details>
         </div>` : ''}
@@ -256,7 +256,7 @@ async function drawEncounter(body, main, st, seq = gmSeq) {
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem;flex-wrap:wrap">
           <div>
             <span class="li-name">${esc(inst.name)}</span>
-            <span class="tag">${TYPE_LABELS[inst.type] || inst.type} (${cost} pt${cost > 1 ? 's' : ''})</span>
+            <span class="tag">${TYPE_LABELS[inst.type] || inst.type} (${inst.type === 'minion' ? `1 pt / groupe de ${pcCount}` : `${cost} pt${cost > 1 ? 's' : ''}`})</span>
             ${defeated ? '<span class="tag" style="background:rgba(166,46,60,.3);border-color:#d46868;color:#ffb4b4">' + t('gmDefeated') + '</span>' : ''}
             <div class="ms-meta" style="margin-top:.2rem">Diff ${inst.difficulty ?? '—'} · Seuils ${inst.major ?? '—'}/${inst.severe ?? '—'}${atkFmt ? ` · ATQ ${esc(atkFmt)}` : ''}</div>
           </div>
@@ -294,7 +294,7 @@ async function drawEncounter(body, main, st, seq = gmSeq) {
 
         ${def?.features?.length ? `
           <details style="margin-top:.55rem" data-enc-det="${inst.uid}" ${openEncDetails.has(inst.uid) ? 'open' : ''}>
-            <summary style="cursor:pointer;font-size:.76rem;color:var(--text-faint)">Statblock &amp; Features (${def.features.length})</summary>
+            <summary style="cursor:pointer;font-size:.76rem;color:var(--text-faint)">Bloc de statistiques &amp; aptitudes (${def.features.length})</summary>
             <div style="margin-top:.4rem">
               ${def.motives ? `<p class="ch-desc" style="font-size:.78rem"><b style="color:var(--golden)">${t('gmMotives')}</b> ${esc(def.motives)}</p>` : ''}
               ${def.features.map(f => `<p class="ch-desc" style="font-size:.78rem;margin-top:.3rem"><b>${esc(f.name)}</b> <span class="tag">${esc(f.kind)}</span> — ${esc(f.desc)}</p>`).join('')}

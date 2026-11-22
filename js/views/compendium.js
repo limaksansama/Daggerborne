@@ -27,6 +27,82 @@ const fmtBonus = (b) => {
   return n ? (n > 0 ? `+${n}` : `${n}`) : '';
 };
 
+/* ============ CARTES « CODEX » ============ */
+const CODEX_KINDS = new Set(['card', 'class', 'ancestry', 'community', 'transformation']);
+const CODEX_ICONS = { domain: '❖', class: '⚔', ancestry: '✦', community: '⌂', transformation: '☾' };
+
+function codexEmblem({ icons = [], monogram = '', glyph = '✦' }) {
+  if (icons.length) {
+    return `<div class="cc-emblem cc-emblem-icons">${icons.map(src => `<img src="${esc(src)}" alt="">`).join('')}</div>`;
+  }
+  return `<div class="cc-emblem cc-emblem-letter"><b>${esc(monogram)}</b><span>${esc(glyph)}</span></div>`;
+}
+
+function codexStats(stats) {
+  return `<div class="cc-stats">${stats.map(([label, value]) => `<div class="cc-stat"><span>${esc(label)}</span><b>${esc(String(value))}</b></div>`).join('')}</div>`;
+}
+
+function codexCard({ kind, kicker, title, subtitle = '', stats = [], body = '', footLeft = 'SRD 2.0', footRight = 'Daggerborne', fan = false, icons = [], monogram = '', glyph = CODEX_ICONS[kind] || '✦', badge = '' }) {
+  const emblem = codexEmblem({ icons, monogram, glyph });
+  const ribbon = icons.length
+    ? `<span class="cc-ribbon-icons">${icons.map(src => `<img src="${esc(src)}" alt="">`).join('')}</span>`
+    : `<span class="cc-ribbon-glyph">${esc(glyph)}</span>`;
+  return `<section class="dh-codex-card" data-kind="${kind}">
+    <div class="cc-frame">
+      <span class="cc-fleur tl" aria-hidden="true"></span>
+      <span class="cc-fleur tr" aria-hidden="true"></span>
+      <span class="cc-fleur bl" aria-hidden="true"></span>
+      <span class="cc-fleur br" aria-hidden="true"></span>
+      <div class="cc-art">
+        <span class="cc-halo" aria-hidden="true"></span>
+        ${emblem}
+        <div class="cc-ribbon">${ribbon}${badge ? `<b class="cc-level">${esc(String(badge))}</b>` : ''}</div>
+        <div class="cc-plate">
+          <span class="cc-kicker">${esc(kicker)}</span>
+          <span class="cc-title">${esc(title)}</span>
+          ${subtitle ? `<span class="cc-sub">${esc(subtitle)}</span>` : ''}
+          ${fan ? '<span class="cc-fan">Hope &amp; Fear</span>' : ''}
+        </div>
+      </div>
+      <div class="cc-divider" aria-hidden="true"><span>✦</span></div>
+      <div class="cc-content">
+        ${stats.length ? codexStats(stats) : ''}
+        <div class="cc-body">${body}</div>
+      </div>
+      <footer class="cc-foot"><span>${esc(footLeft)}</span><span>${esc(footRight)}</span></footer>
+    </div>
+  </section>`;
+}
+
+function codexFeature(name, desc) {
+  return `<div class="cc-feature"><b>${esc(name)}.</b> <span>${esc(desc)}</span></div>`;
+}
+
+function codexTile(item) {
+  const emblem = codexEmblem(item);
+  const ribbon = item.icons?.length
+    ? `<span class="ct-ribbon-icons">${item.icons.map(src => `<img src="${esc(src)}" alt="">`).join('')}</span>`
+    : esc(item.glyph || CODEX_ICONS[item.kind] || '✦');
+  const btn = el(`<button class="codex-tile" data-kind="${item.kind}">
+    <span class="ct-art">
+      <span class="ct-halo" aria-hidden="true"></span>
+      ${emblem}
+      <span class="ct-ribbon">${ribbon}</span>
+      <span class="ct-plate">
+        <span class="ct-kicker">${esc(item.kicker)}</span>
+        <span class="ct-name">${esc(item.name)}</span>
+      </span>
+    </span>
+    <span class="ct-content">
+      <span class="ct-sub">${esc(item.sub || '')}</span>
+      ${item.fan ? '<span class="ct-fan">H&amp;F</span>' : ''}
+      <span class="ct-foot">${esc(item.foot || 'SRD 2.0')}</span>
+    </span>
+  </button>`);
+  btn.addEventListener('click', item.onClick);
+  return btn;
+}
+
 export async function render(main, params) {
   const seq = ++renderSeq;
   main.classList.add('wide');
@@ -139,20 +215,47 @@ async function listResults(main, seq = renderSeq) {
     if (stale()) return;
     let list = [...classes].sort((a, b) => a.fr.localeCompare(b.fr, 'fr'));
     if (q) list = list.filter(c => (c.fr + ' ' + c.desc).toLowerCase().includes(q));
+    res.insertAdjacentHTML('beforeend', `<p class="page-sub">${list.length} classe(s) — cartes de classe du SRD 2.0</p>`);
+    const grid = el('<div class="codex-grid"></div>');
+    res.appendChild(grid);
     for (const c of list) {
-      mk({ key: c.id, type: 'class', raw: c, name: c.fr, sub: c.domains.map(d => domains[d].fr).join(' · ') + ` · PV ${c.hp} · Évasion ${c.evasion}`, fanTag: c.fan ? '<span class="tag fan">H&F</span>' : '' });
+      grid.appendChild(codexTile({
+        kind: 'class', kicker: 'Classe', name: c.fr,
+        icons: c.domains.map(d => `assets/icons/domain-card/${d}.png`), glyph: '⚔',
+        sub: `${c.domains.map(d => domains[d]?.fr || d).join(' · ')} · PV ${c.hp} · Évasion ${c.evasion}`,
+        fan: c.fan, foot: `${c.features.length} ${t('sheetFeatures').toLowerCase()}`,
+        onClick: () => showDetail(main, c, 'class'),
+      }));
     }
   } else if (ui.tab === 'ancestries') {
     const list = (await data('ancestries')).sort((a, b) => a.fr.localeCompare(b.fr, 'fr'));
     if (stale()) return;
-    for (const a of (q ? list.filter(a => (a.fr + a.desc).toLowerCase().includes(q)) : list)) {
-      mk({ key: a.id, type: 'ancestry', raw: a, name: a.fr, sub: a.abilities.map(x => x.fr).join(' · '), fanTag: a.fan ? '<span class="tag fan">H&F</span>' : '' });
+    const f = q ? list.filter(a => (a.fr + a.desc).toLowerCase().includes(q)) : list;
+    res.insertAdjacentHTML('beforeend', `<p class="page-sub">${f.length} ascendance(s) — cartes d'ascendance du SRD 2.0</p>`);
+    const grid = el('<div class="codex-grid"></div>');
+    res.appendChild(grid);
+    for (const a of f) {
+      grid.appendChild(codexTile({
+        kind: 'ancestry', kicker: 'Ascendance', name: a.fr,
+        monogram: a.fr.slice(0, 1), glyph: '✦',
+        sub: a.abilities.map(x => x.fr).join(' · '), fan: a.fan, foot: `${a.abilities.length} ${t('cmpAbilities').toLowerCase()}`,
+        onClick: () => showDetail(main, a, 'ancestry'),
+      }));
     }
   } else if (ui.tab === 'communities') {
     const list = (await data('communities')).sort((a, b) => a.fr.localeCompare(b.fr, 'fr'));
     if (stale()) return;
-    for (const c of (q ? list.filter(c => (c.fr + c.desc).toLowerCase().includes(q)) : list)) {
-      mk({ key: c.id, type: 'community', raw: c, name: c.fr, sub: c.ability ? c.ability.fr : '', fanTag: c.fan ? '<span class="tag fan">H&F</span>' : '' });
+    const f = q ? list.filter(c => (c.fr + c.desc).toLowerCase().includes(q)) : list;
+    res.insertAdjacentHTML('beforeend', `<p class="page-sub">${f.length} communauté(s) — cartes de communauté du SRD 2.0</p>`);
+    const grid = el('<div class="codex-grid"></div>');
+    res.appendChild(grid);
+    for (const c of f) {
+      grid.appendChild(codexTile({
+        kind: 'community', kicker: 'Communauté', name: c.fr,
+        monogram: c.fr.slice(0, 1), glyph: '⌂',
+        sub: c.ability ? c.ability.fr : '', fan: c.fan, foot: 'SRD 2.0',
+        onClick: () => showDetail(main, c, 'community'),
+      }));
     }
   } else if (ui.tab === 'weapons') {
     const list = (await data('weapons')).filter(w => (!ui.tier || w.tier === ui.tier));
@@ -212,15 +315,22 @@ async function listResults(main, seq = renderSeq) {
     const f = q ? list.filter(e => ((e.fr || '') + ' ' + e.en + ' ' + (e.descFr || '') + ' ' + e.desc).toLowerCase().includes(q)) : list;
     res.insertAdjacentHTML('beforeend', `<p class="page-sub">${f.length} environnement(s) — SRD 2.0 (Paliers 1 à 4)</p>`);
     for (const e of f.sort((a, b) => a.tier - b.tier || (a.fr || a.en).localeCompare(b.fr || b.en, 'fr'))) {
-      mk({ key: e.id, type: 'environment', raw: e, name: e.fr || e.en, sub: `${T.tiers[e.tier]} · ${e.category}${e.difficulty ? ' · Difficulté ' + e.difficulty : ''} · ${e.features.length} features` });
+      mk({ key: e.id, type: 'environment', raw: e, name: e.fr || e.en, sub: `${T.tiers[e.tier]} · ${e.category}${e.difficulty ? ' · Difficulté ' + e.difficulty : ''} · ${e.features.length} ${t('sheetFeatures').toLowerCase()}` });
     }
   } else if (ui.tab === 'transformations') {
     const list = (await data('transformations'));
     if (stale()) return;
     const f = q ? list.filter(t => (t.fr + ' ' + t.en + ' ' + t.desc).toLowerCase().includes(q)) : list;
     res.insertAdjacentHTML('beforeend', `<p class="page-sub">${f.length} transformation(s) — options de personnage optionnelles du SRD 2.0</p>`);
-    for (const t of f.sort((a, b) => a.fr.localeCompare(b.fr, 'fr'))) {
-      mk({ key: t.id, type: 'transformation', raw: t, name: t.fr, sub: `${t.features.length} features · ${t.questions.length} questions d'identité` });
+    const grid = el('<div class="codex-grid"></div>');
+    res.appendChild(grid);
+    for (const tr of f.sort((a, b) => a.fr.localeCompare(b.fr, 'fr'))) {
+      grid.appendChild(codexTile({
+        kind: 'transformation', kicker: 'Transformation', name: tr.fr,
+        monogram: tr.fr.slice(0, 1), glyph: '☾',
+        sub: `${tr.features.length} ${t('sheetFeatures').toLowerCase()} · ${tr.questions.length} ${t('cmpIdentityQuestions').toLowerCase()}`,
+        foot: 'SRD 2.0', onClick: () => showDetail(main, tr, 'transformation'),
+      }));
     }
   }
 }
@@ -228,6 +338,8 @@ async function listResults(main, seq = renderSeq) {
 async function showDetail(main, raw, type) {
   const back = el(`<div class="modal-back"></div>`);
   const sheet = el(`<div class="modal-sheet"></div>`);
+  const isCodex = CODEX_KINDS.has(type);
+  if (isCodex) sheet.classList.add('dh-codex-modal');
   back.appendChild(sheet);
   document.body.appendChild(back);
   back.addEventListener('click', (e) => { if (e.target === back) back.remove(); });
@@ -235,26 +347,55 @@ async function showDetail(main, raw, type) {
   let inner = '';
   if (type === 'card') {
     const domains = await data('domains');
-    inner = `
-      <h3>${esc(raw.fr)}</h3>
-      <div class="ms-meta">${esc(domains[raw.domain]?.fr || raw.domain)} · ${T.cardType[raw.type]} · Niveau ${raw.level} · Prix de rappel ${raw.recall} ${raw.fan ? '· <span style="color:#c9a3d3">' + t('cmpFanTrad') + '</span>' : ''}</div>
-      <div class="ms-body"><p>${esc(raw.desc)}</p></div>`;
+    const domainName = domains[raw.domain]?.fr || raw.domain;
+    inner = codexCard({
+      kind: 'domain',
+      kicker: `${t('sheetDomainCards')} · ${domainName}`,
+      title: raw.fr,
+      subtitle: `${T.cardType[raw.type]} · Niveau ${raw.level}`,
+      stats: [[t('cmpRecall'), raw.recall]],
+      icons: [`assets/icons/domain-card/${raw.domain}.png`], glyph: '❖', badge: raw.level,
+      body: `<p class="cc-lead">${esc(raw.desc)}</p>`,
+      footLeft: raw.fan ? 'Hope & Fear' : 'SRD 2.0',
+      footRight: domainName,
+      fan: !!raw.fan,
+    });
   } else if (type === 'class') {
-    inner = `
-      <h3>${esc(raw.fr)}</h3>
-      <div class="ms-meta">PV ${raw.hp} · Évasion ${raw.evasion} ${raw.fan ? '· <span style="color:#c9a3d3">' + t('sheetHopeFear') + '</span>' : ''}</div>
-      <div class="ms-body"><p>${esc(raw.desc)}</p><p><b style="color:var(--golden)">✦ ${esc(raw.hopeAbility)} (3 Espoirs) :</b> ${esc(raw.hopeDesc)}</p>
-      ${raw.features.map(f => `<p><b>${esc(f.name)} :</b> ${esc(f.desc)}</p>`).join('')}</div>`;
+    const domains = await data('domains');
+    const domainTxt = raw.domains.map(d => domains[d]?.fr || d).join(' · ');
+    inner = codexCard({
+      kind: 'class',
+      kicker: 'Classe',
+      title: raw.fr,
+      subtitle: `${getLang() === 'en' ? '' : raw.en + ' · '}${domainTxt}`,
+      stats: [['PV', raw.hp], [t('sheetEvasion'), raw.evasion]],
+      icons: raw.domains.map(d => `assets/icons/domain-card/${d}.png`), glyph: '⚔',
+      body: `<p class="cc-lead">${esc(raw.desc)}</p>
+        <div class="cc-callout"><b>✦ ${esc(raw.hopeAbility)} <span>(${getLang() === 'en' ? '3 Hope' : '3 Espoirs'})</span></b><p>${esc(raw.hopeDesc)}</p></div>
+        <div class="cc-section">${t('sheetFeatures')}</div>
+        ${raw.features.map(f => codexFeature(f.name, f.desc)).join('')}`,
+      footLeft: 'SRD 2.0', footRight: 'Daggerborne', fan: !!raw.fan,
+    });
   } else if (type === 'ancestry') {
-    inner = `
-      <h3>${esc(raw.fr)}</h3>
-      <div class="ms-meta">Ascendance ${raw.fan ? '· <span style="color:#c9a3d3">' + t('sheetHopeFear') + '</span>' : ''}</div>
-      <div class="ms-body"><p>${esc(raw.desc)}</p>${raw.abilities.map(a => `<p><b style="color:var(--golden)">${esc(a.fr)}.</b> ${esc(a.desc)}</p>`).join('')}</div>`;
+    inner = codexCard({
+      kind: 'ancestry',
+      kicker: 'Ascendance',
+      title: raw.fr,
+      subtitle: getLang() === 'en' ? '' : raw.en,
+      monogram: raw.fr.slice(0, 1), glyph: '✦',
+      body: `<p class="cc-lead">${esc(raw.desc)}</p><div class="cc-section">${t('cmpAbilities')}</div>${raw.abilities.map(a => codexFeature(a.fr, a.desc)).join('')}`,
+      footLeft: 'SRD 2.0', footRight: 'Daggerborne', fan: !!raw.fan,
+    });
   } else if (type === 'community') {
-    inner = `
-      <h3>${esc(raw.fr)}</h3>
-      <div class="ms-meta">Communauté ${raw.fan ? '· <span style="color:#c9a3d3">' + t('sheetHopeFear') + '</span>' : ''}</div>
-      <div class="ms-body"><p>${esc(raw.desc)}</p>${raw.ability ? `<p><b style="color:var(--golden)">${esc(raw.ability.fr)}.</b> ${esc(raw.ability.desc)}</p>` : ''}</div>`;
+    inner = codexCard({
+      kind: 'community',
+      kicker: 'Communauté',
+      title: raw.fr,
+      subtitle: getLang() === 'en' ? '' : raw.en,
+      monogram: raw.fr.slice(0, 1), glyph: '⌂',
+      body: `<p class="cc-lead">${esc(raw.desc)}</p>${raw.ability ? `<div class="cc-callout"><b>${esc(raw.ability.fr)}</b><p>${esc(raw.ability.desc)}</p></div>` : ''}`,
+      footLeft: 'SRD 2.0', footRight: 'Daggerborne', fan: !!raw.fan,
+    });
   } else if (type === 'weapon') {
     inner = `
       <h3>${esc(raw.fr)}</h3>
@@ -323,20 +464,30 @@ async function showDetail(main, raw, type) {
   } else if (type === 'transformation') {
     /* ne pas nommer cette variable « t » : elle masquait la fonction de traduction */
     const tr = raw;
-    inner = `
-      <h3>${esc(tr.fr)}${getLang() === 'en' ? '' : ` <span class="ms-meta" style="display:inline">(${esc(tr.en)})</span>`}</h3>
-      <div class="ms-meta">${t('sheetTransformation2')}</div>
-      <div class="ms-body"><p>${esc(tr.desc)}</p>
-      <div class="section-title" style="margin-top:.8rem">${t('sheetFeatures')}</div>
-      ${tr.features.map(f => `<p><b style="color:var(--golden)">${esc(f.name)}.</b> ${esc(f.desc)}</p>`).join('')}
-      ${tr.questions.length ? `<div class="section-title" style="margin-top:.8rem">Questions d'identité</div>${tr.questions.map(q => `<p class="q-line">• ${esc(q)}</p>`).join('')}` : ''}
-      </div>`;
+    inner = codexCard({
+      kind: 'transformation',
+      kicker: 'Transformation',
+      title: tr.fr,
+      subtitle: getLang() === 'en' ? '' : tr.en,
+      monogram: tr.fr.slice(0, 1), glyph: '☾',
+      body: `<p class="cc-lead">${esc(tr.desc)}</p>
+        <div class="cc-section">${t('sheetFeatures')}</div>
+        ${tr.features.map(f => codexFeature(f.name, f.desc)).join('')}
+        ${tr.questions.length ? `<div class="cc-section">${t('cmpIdentityQuestions')}</div>${tr.questions.map(q => `<p class="cc-question">• ${esc(q)}</p>`).join('')}` : ''}`,
+      footLeft: 'SRD 2.0', footRight: 'Daggerborne', fan: !!tr.fan,
+    });
   }
 
-  sheet.innerHTML = inner + `
-    ${type === 'card' ? `<div style="margin-top:1rem"><button class="btn" id="ms-add">＋ Ajouter à un personnage</button></div>` : ''}
-    ${(type === 'item' || type === 'weapon' || type === 'armor') ? `<div style="margin-top:1rem"><button class="btn" id="ms-add-item">＋ Ajouter à l'inventaire</button></div>` : ''}
-    <div class="modal-close-row"><button class="btn ghost small" id="ms-close">Fermer</button></div>`;
+  if (isCodex) {
+    sheet.innerHTML = inner + `<div class="cc-actions">
+      ${type === 'card' ? '<button class="btn" id="ms-add">＋ Ajouter à un personnage</button>' : ''}
+      <button class="btn ghost small" id="ms-close">Fermer</button>
+    </div>`;
+  } else {
+    sheet.innerHTML = inner + `
+      ${(type === 'item' || type === 'weapon' || type === 'armor') ? `<div style="margin-top:1rem"><button class="btn" id="ms-add-item">＋ Ajouter à l'inventaire</button></div>` : ''}
+      <div class="modal-close-row"><button class="btn ghost small" id="ms-close">Fermer</button></div>`;
+  }
   $('#ms-close', sheet).addEventListener('click', () => back.remove());
   $('#ms-add-item', sheet)?.addEventListener('click', () => {
     const st = getState();
@@ -396,4 +547,9 @@ async function showDetail(main, raw, type) {
     saveChar(c);
     toast(toHand ? `« ${raw.fr} » ajoutée en main de ${c.name}.` : `« ${raw.fr} » ajoutée au caveau de ${c.name} (5 cartes en main maximum).`);
   }
+}
+
+/* Ouvre la même fiche « carte » depuis l'assistant de création. */
+export function openCodexDetail(raw, type) {
+  return showDetail(null, raw, type);
 }

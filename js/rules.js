@@ -52,6 +52,37 @@ export function armorThresholdBonus({ feature = '', spellcastValue = 0, tier = 1
   return { bonus: flat, parts: detail };
 }
 
+/* Malus passifs portés par l'équipement (SRD 2.0), décrits dans le texte de la feature :
+   - Lourde / Heavy               : −1 en Évasion
+   - Très lourde / Very Heavy     : −2 en Évasion ; −1 en Agilité
+   - Encombrante / Cumbersome     : −1 en Finesse
+   - Massive                      : −1 en Évasion
+   La détection est bilingue et insensible à la casse. */
+export function equipmentPenalty(descriptions = []) {
+  const total = { evasion: 0, agility: 0, finesse: 0, parts: [] };
+  for (const raw of descriptions) {
+    const d = String(raw || '');
+    if (!d) continue;
+    if (/\btrès lourde\b|\bvery heavy\b/i.test(d)) {
+      total.evasion -= 2;
+      total.agility -= 1;
+      total.parts.push('Très lourde (−2 Évasion, −1 Agilité)');
+    } else if (/\blourde\b|\bheavy\b/i.test(d)) {
+      total.evasion -= 1;
+      total.parts.push('Lourde (−1 Évasion)');
+    }
+    if (/\bencombrante\b|\bcumbersome\b/i.test(d)) {
+      total.finesse -= 1;
+      total.parts.push('Encombrante (−1 Finesse)');
+    }
+    if (/\bmassive\b/i.test(d)) {
+      total.evasion -= 1;
+      total.parts.push('Massive (−1 Évasion)');
+    }
+  }
+  return total;
+}
+
 export function formatSigned(n) {
   const v = Number(n) || 0;
   return v >= 0 ? `+${v}` : `${v}`;
@@ -207,13 +238,19 @@ export function calcEncounterBudget(pcCount, adj = {}) {
   return Math.max(1, total);
 }
 
-export function calcEncounterSpent(entries = []) {
-  return entries.reduce((sum, e) => {
-    const cost = ADVERSARY_POINT_COST[e.type] ?? 2;
+export function calcEncounterSpent(entries = [], pcCount = 4) {
+  const pcs = Math.max(1, Math.min(10, parseInt(pcCount, 10) || 4));
+  let minions = 0;
+  let total = 0;
+  for (const e of entries) {
     const count = Math.max(1, parseInt(e.qty, 10) || 1);
-    /* pour les Sbires, chaque groupe de la taille du groupe coûte 1 point (1 entrée groupe = 1 pt) */
-    return sum + cost * count;
-  }, 0);
+    /* SRD 2.0 : les Sbires coûtent 1 point par groupe égal à la taille du groupe de PJ,
+       pas 1 point par instance. On cumule donc toutes les instances puis on arrondit au groupe. */
+    if (e.type === 'minion') { minions += count; continue; }
+    total += (ADVERSARY_POINT_COST[e.type] ?? 2) * count;
+  }
+  if (minions) total += Math.ceil(minions / pcs);
+  return total;
 }
 
 const NESTED_PLAIN_KEYS = ['traits', 'hp', 'stress', 'hope', 'thresholds', 'armorSlots', 'armorCard', 'goldTrack'];

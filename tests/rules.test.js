@@ -166,9 +166,13 @@ test('calcEncounterBudget and calcEncounterSpent match SRD 2.0 combat points', (
       { type: 'solo', qty: 1 },
       { type: 'minion', qty: 2 },
       { type: 'standard', qty: 2 },
-    ]),
-    5 + 2 + 4
+    ], 4),
+    5 + 1 + 4
   );
+  /* SRD 2.0 : 1 point par groupe de Sbires égal à la taille du groupe de PJ. */
+  assert.equal(calcEncounterSpent([{ type: 'minion', qty: 4 }], 4), 1);
+  assert.equal(calcEncounterSpent([{ type: 'minion', qty: 5 }], 4), 2);
+  assert.equal(calcEncounterSpent([{ type: 'minion', qty: 8 }], 4), 2);
 });
 
 test('sanitizeCharacter deeply fills nested SRD fields without overwriting existing ones', () => {

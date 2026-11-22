@@ -16,7 +16,7 @@ export const RULES_CONDITIONS = [
 
 export const RULES_REST = [
   { name: 'Repos court', tag: '≈ 1 heure',
-    desc: "Le groupe reprend son souffle. Déplacez gratuitement des cartes de domaine entre votre kit et votre réserve, puis choisissez deux fois un mouvement de temps mort (le même deux fois si vous voulez) : Soigner les blessures (effacez 1d4+Palier PV pour vous ou un allié), Effacer le Stress (effacez 1d4+Palier Stress), Réparer l'armure (effacez 1d4+Palier Emplacements d'armure), Se préparer (gagnez 1 Espoir, ou 2 si vous vous préparez avec un ou plusieurs membres du groupe). Conséquence : le MJ gagne 1d4 Peur. À la fin d'un repos court, les features à usage limité par repos se rechargent et les effets « jusqu'à votre prochain repos » expirent." },
+    desc: "Le groupe reprend son souffle. Déplacez gratuitement des cartes de domaine entre votre kit et votre réserve, puis choisissez deux fois une action de temps mort (la même deux fois si vous voulez) : Soigner les blessures (effacez 1d4+Palier PV pour vous ou un allié), Effacer le Stress (effacez 1d4+Palier Stress), Réparer l'armure (effacez 1d4+Palier Emplacements d'armure), Se préparer (gagnez 1 Espoir, ou 2 si vous vous préparez avec un ou plusieurs membres du groupe). Conséquence : le MJ gagne 1d4 Peur. À la fin d'un repos court, les aptitudes à usage limité par repos se rechargent et les effets « jusqu'à votre prochain repos » expirent." },
   { name: 'Repos long', tag: 'une nuit',
     desc: "Le groupe fait camp et se repose plusieurs heures. Déplacez gratuitement des cartes de domaine, puis choisissez deux fois : Soigner toutes les blessures (effacez tous vos PV ou ceux d'un allié), Effacer tout le Stress, Réparer toute l'armure (effacez tous les Emplacements d'armure), Se préparer (1 Espoir, ou 2 à plusieurs), Travailler sur un projet (avec l'accord du MJ : projet au long cours sur compte à rebours). Conséquence : le MJ gagne (1d4 + nombre de PJ) Peur et peut avancer un compte à rebours à long terme. Après trois repos courts consécutifs, le suivant doit être un repos long." },
 ];
@@ -37,7 +37,7 @@ export const RULES_ENCOUNTER = {
 export const RULES_MULTICLASS = {
   when: "À partir du niveau 5, vous pouvez choisir le multiclassage comme option de montée de niveau. Il coûte deux emplacements de montée de niveau (les deux de ce palier).",
   what: [
-    "Choisissez une classe supplémentaire et gagnez sa feature de classe",
+    "Choisissez une classe supplémentaire et gagnez son aptitude de classe",
     "Choisissez un de ses domaines (vous y avez désormais accès)",
     "Prenez la carte de Fondation d'une de ses sous-classes",
     "Si vos cartes de Fondation indiquent des traits d'Incantation différents, choisissez lequel appliquer lors de vos jets d'Incantation",
@@ -76,7 +76,7 @@ export const RULES_HAZARDS = [
   { name: 'Dégâts directs, Résistance & Immunité', tag: 'dégâts spéciaux',
     desc: "Résistance : divisez les dégâts du type concerné par 2 (arrondi à l'inférieur) avant de comparer aux seuils et avant d'appliquer l'armure. Immunité : ignore totalement les dégâts de ce type. Dégâts directs : impossibles à réduire en marquant des Emplacements d'armure." },
   { name: 'Chutes & collisions', tag: 'environnement',
-    desc: "Chute de portée Très Courte → 1d10+3 dégâts physiques ; Courte → 1d20+5 ; Lointaine / Très Lointaine → 1d100+15 (ou mort à la discrétion du MJ). Collision à grande vitesse → 1d20+5 dégâts physiques directs." },
+    desc: "Chute à portée Très proche → 1d10+3 dégâts physiques ; à portée Rapprochée → 1d20+5 ; à portée Éloignée / Très éloignée → 1d100+15 (ou mort à la discrétion du MJ). Collision à grande vitesse → 1d20+5 dégâts physiques directs." },
   { name: 'Combat sous-marin', tag: 'apnée',
     desc: "Attaquer sous l'eau subit un désavantage par défaut. Une créature incapable de respirer sous l'eau suit un compte à rebours standard (3) qui avance à chaque action (et +1 sur échec ou Peur) ; une fois à terme, elle marque 1 Stress à chaque action." },
 ];

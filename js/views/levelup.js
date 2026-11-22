@@ -290,7 +290,7 @@ async function runLevelUpWizard(c, ctx) {
           ${(classes.find(x => x.id === wiz.multiclassId)?.domains || []).map(d => `
             <button class="lu-tp ${wiz.mcDomain === d ? 'sel' : ''}" data-lumcd="${d}">${esc(domains[d]?.fr || d)}</button>`).join('')}
         </div>
-        <div class="lu-hint">Vous gagnez l'aptitude d'Espoir de la classe secondaire et l'accès aux cartes de ce domaine.</div>` : ''}
+        <div class="lu-hint">Vous gagnez la capacité de classe de la classe secondaire et l'accès aux cartes de ce domaine.</div>` : ''}
       </div>` : ''}`;
     }
     /* ---------------- ÉTAPE 3 : cartes de domaine ---------------- */
@@ -627,11 +627,11 @@ async function runLevelUpWizard(c, ctx) {
       tu[id] = (tu[id] || 0) + 1;
       if (id === 'attributes') wiz.traitPicks.forEach(k => { c.traits[k] = Math.min(9, c.traits[k] + 1); c.traitMarks.push(k); });
       if (id === 'hitPointSlots') {
-        c.hp.active = (c.hp.active || 6) + 1;
+        c.hp.active = Math.min(12, (c.hp.active || 6) + 1);
         c.hp.max = c.hp.active + (c.hp.unlocked || 0);
         c.hp.current = Math.min(c.hp.max, (c.hp.current || 0) + 1);
       }
-      else if (id === 'stressSlots') { c.stress.active = (c.stress.active || 6) + 1; c.stress.max = c.stress.active + (c.stress.unlocked || 0); }
+      else if (id === 'stressSlots') { c.stress.active = Math.min(12, (c.stress.active || 6) + 1); c.stress.max = c.stress.active + (c.stress.unlocked || 0); }
       else if (id === 'experiences') wiz.expPicks.forEach(i => {
         const e = expList()[i];
         if (!e) return;
@@ -657,7 +657,10 @@ async function runLevelUpWizard(c, ctx) {
         c.multiclassClassId = wiz.multiclassId;
         const mcClass = classes.find(x => x.id === wiz.multiclassId);
         if (mcClass) {
-          c.classFeature = (c.classFeature ? c.classFeature + '\n\n' : '') + `〔Multiclassage〕 ${mcClass.fr} — ${mcClass.hopeAbility} : ${mcClass.hopeDesc}`;
+          /* SRD 2.0 : le multiclassage accorde la capacité de classe de la classe secondaire,
+             pas son aptitude d'Espoir. */
+          const mcFeats = (mcClass.features || []).map(f => `✦ ${f.name} — ${f.desc}`).join('\n');
+          c.classFeature = (c.classFeature ? c.classFeature + '\n\n' : '') + `〔Multiclassage〕 ${mcClass.fr}${mcFeats ? '\n' + mcFeats : ''}`;
           if (wiz.mcDomain) {
             c.extraDomains = c.extraDomains || [];
             if (!c.extraDomains.includes(wiz.mcDomain)) c.extraDomains.push(wiz.mcDomain);

@@ -117,6 +117,15 @@ setTimeout(() => document.getElementById('splash')?.classList.add('hide'), 900);
 
 // PWA
 if ('serviceWorker' in navigator) {
+  /* Si un nouveau service worker prend le contrôle, on recharge une seule fois
+     pour que le CSS/JS mis à jour soit réellement affiché. */
+  const hadController = !!navigator.serviceWorker.controller;
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!hadController || refreshing) return;
+    refreshing = true;
+    window.location.reload();
+  });
   navigator.serviceWorker.register('sw.js').then((reg) => {
     reg.addEventListener('updatefound', () => {
       const nw = reg.installing;

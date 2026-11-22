@@ -9,7 +9,7 @@
     "major": 9,
     "severe": 21,
     "heavy": false,
-    "desc": "Protégée : Réduisez les dégâts magiques subis de votre Score d'armure avant de les comparer à vos seuils de dégâts.",
+    "desc": "Protégée : Réduisez les dégâts magiques subis de votre Valeur d'armure avant de les comparer à vos seuils de dégâts.",
     "img": "icons/equipment/chest/breastplate-sculpted-green.webp"
   },
   {
@@ -22,7 +22,7 @@
     "major": 11,
     "severe": 27,
     "heavy": false,
-    "desc": "Magnifique : Bonus à votre Score d'armure égal à votre Présence.",
+    "desc": "Magnifique : Bonus à votre Valeur d'armure égal à votre Présence.",
     "img": "icons/equipment/chest/coat-collared-studded-red.webp"
   },
   {
@@ -178,7 +178,7 @@
     "major": 15,
     "severe": 40,
     "heavy": false,
-    "desc": "Vitrifiée : Contre des dégâts Graves ou plus, cochez 2 emplacements d'armure pour les annuler. Vous subissez −5 aux seuils de dégâts jusqu'à réparation lors d'un temps calme.",
+    "desc": "Vitrifiée : Contre des dégâts Graves ou plus, cochez 2 emplacements d'armure pour les annuler. Vous subissez −5 aux seuils de dégâts jusqu'à réparation lors d'un temps mort.",
     "img": "icons/equipment/chest/breastplate-layered-gilded-black.webp"
   },
   {
@@ -210,7 +210,7 @@
   {
     "id": "crIbCb9NZ4K0VpoU",
     "en": "Advanced Full Plate Armor",
-    "fr": "Armure de plates perfectionné",
+    "fr": "Armure de plates perfectionnée",
     "fan": false,
     "tier": 3,
     "armorScore": 6,
@@ -223,7 +223,7 @@
   {
     "id": "z6C6ll1T4G476zKv",
     "en": "Advanced Scale Mail Armor",
-    "fr": "Cotte d’écailles perfectionné",
+    "fr": "Cotte d’écailles perfectionnée",
     "fan": false,
     "tier": 3,
     "armorScore": 5,
@@ -288,7 +288,7 @@
   {
     "id": "ar3hG23czKmfUYW9",
     "en": "Advanced Banded Armor",
-    "fr": "Armure à bandes perfectionné",
+    "fr": "Armure à bandes perfectionnée",
     "fan": false,
     "tier": 3,
     "armorScore": 6,
@@ -301,7 +301,7 @@
   {
     "id": "z4K0YjsgwkkAruTr",
     "en": "Advanced Brigandine Armor",
-    "fr": "Brigandine perfectionné",
+    "fr": "Brigandine perfectionnée",
     "fan": false,
     "tier": 3,
     "armorScore": 5,
@@ -314,7 +314,7 @@
   {
     "id": "qks7PQ7xkP2Kwedr",
     "en": "Improved Mage Robes",
-    "fr": "Robes d'archimage amélioré",
+    "fr": "Robes d'archimage améliorées",
     "fan": false,
     "tier": 2,
     "armorScore": 3,
@@ -347,7 +347,7 @@
     "major": 9,
     "severe": 20,
     "heavy": false,
-    "desc": "Planeuse : Vous pouvez planer jusqu'à portée Longue et êtes immunisé aux dégâts de chute.",
+    "desc": "Planeuse : Vous pouvez planer jusqu'à portée Éloignée et êtes immunisé aux dégâts de chute.",
     "img": "icons/equipment/chest/breastplate-layered-gold.webp"
   },
   {
@@ -366,7 +366,7 @@
   {
     "id": "qPxlM4h0VzblCEdd",
     "en": "Improved Banded Armor",
-    "fr": "Armure à bandes amélioré",
+    "fr": "Armure à bandes améliorée",
     "fan": false,
     "tier": 2,
     "armorScore": 5,
@@ -412,7 +412,7 @@
     "major": 13,
     "severe": 36,
     "heavy": false,
-    "desc": "Marche-spectre : Une fois par repos, marquez 1 Stress pour traverser des objets solides jusqu'à portée Courte.",
+    "desc": "Marche-spectre : Une fois par repos, marquez 1 Stress pour traverser des objets solides jusqu'à portée Proche.",
     "img": "icons/equipment/chest/breastplate-layered-leather-black.webp"
   },
   {
@@ -470,7 +470,7 @@
   {
     "id": "itSOp2GCyem0f7oM",
     "en": "Advanced Leather Armor",
-    "fr": "Armure de cuir perfectionné",
+    "fr": "Armure de cuir perfectionnée",
     "fan": false,
     "tier": 3,
     "armorScore": 5,
@@ -522,7 +522,7 @@
   {
     "id": "JJ08yuuFq3NjjMRV",
     "en": "Improved Scale Mail Armor",
-    "fr": "Cotte d’écailles amélioré",
+    "fr": "Cotte d’écailles améliorée",
     "fan": false,
     "tier": 2,
     "armorScore": 4,
@@ -535,20 +535,20 @@
   {
     "id": "VD08FahK2W2zXoBK",
     "en": "Wyrdwood Splint Armor",
-    "fr": "Armure à splints de bois-maléfique",
+    "fr": "Armure à lamelles de bois-maléfique",
     "fan": false,
     "tier": 2,
     "armorScore": 5,
     "major": 10,
     "severe": 21,
     "heavy": false,
-    "desc": "Foulée rapide : Vous ne pouvez pas être Entravé et pouvez vous déplacer jusqu'à portée Longue dans le cadre d'un jet d'action.",
+    "desc": "Foulée rapide : Vous ne pouvez pas être Entravé et pouvez vous déplacer jusqu'à portée Éloignée dans le cadre d'un jet d'action.",
     "img": "icons/equipment/chest/breastplate-layered-leather-studded-brown.webp"
   },
   {
     "id": "2ObDhrPlWlsfmnz2",
     "en": "Improved Brigandine Armor",
-    "fr": "Brigandine amélioré",
+    "fr": "Brigandine améliorée",
     "fan": false,
     "tier": 2,
     "armorScore": 4,
@@ -646,7 +646,7 @@
     "major": 13,
     "severe": 36,
     "heavy": false,
-    "desc": "Révélatrice : Cette armure luit lorsqu'une créature à portée Courte profère un mensonge.",
+    "desc": "Révélatrice : Cette armure luit lorsqu'une créature à portée Proche profère un mensonge.",
     "img": "icons/equipment/chest/breastplate-collared-steel-green.webp"
   },
   {
@@ -704,7 +704,7 @@
   {
     "id": "LzLOJ9EVaHWAjoq9",
     "en": "Advanced Chainmail Armor",
-    "fr": "Cotte de mailles perfectionné",
+    "fr": "Cotte de mailles perfectionnée",
     "fan": false,
     "tier": 3,
     "armorScore": 6,
@@ -717,7 +717,7 @@
   {
     "id": "gNuhJUzazz3mKWkU",
     "en": "Advanced Mage Robes",
-    "fr": "Robes d'archimage perfectionné",
+    "fr": "Robes d'archimage perfectionnées",
     "fan": false,
     "tier": 3,
     "armorScore": 4,
@@ -821,7 +821,7 @@
   {
     "id": "K5WkjS0NGqHYmhU3",
     "en": "Improved Chainmail Armor",
-    "fr": "Cotte de mailles amélioré",
+    "fr": "Cotte de mailles améliorée",
     "fan": false,
     "tier": 2,
     "armorScore": 5,
@@ -834,7 +834,7 @@
   {
     "id": "t91M61pSCMKStTNt",
     "en": "Improved Leather Armor",
-    "fr": "Armure de cuir amélioré",
+    "fr": "Armure de cuir améliorée",
     "fan": false,
     "tier": 2,
     "armorScore": 4,
@@ -847,7 +847,7 @@
   {
     "id": "9f7RozpPTqrzJS1m",
     "en": "Improved Full Plate Armor",
-    "fr": "Armure de plates amélioré",
+    "fr": "Armure de plates améliorée",
     "fan": false,
     "tier": 2,
     "armorScore": 5,
@@ -1074,7 +1074,7 @@
     "major": 5,
     "severe": 11,
     "heavy": false,
-    "desc": "Protégée : Réduisez les dégâts magiques subis de votre Score d'armure avant de les comparer à vos seuils de dégâts.",
+    "desc": "Protégée : Réduisez les dégâts magiques subis de votre Valeur d'armure avant de les comparer à vos seuils de dégâts.",
     "campaign": "monster",
     "img": "icons/equipment/chest/breastplate-banded-steel-gold.webp"
   },
@@ -1088,7 +1088,7 @@
     "major": 7,
     "severe": 16,
     "heavy": false,
-    "desc": "Protégée : Réduisez les dégâts magiques subis de votre Score d'armure avant de les comparer à vos seuils de dégâts.",
+    "desc": "Protégée : Réduisez les dégâts magiques subis de votre Valeur d'armure avant de les comparer à vos seuils de dégâts.",
     "campaign": "monster",
     "img": "icons/equipment/chest/breastplate-banded-steel-gold.webp"
   },
@@ -1102,7 +1102,7 @@
     "major": 9,
     "severe": 23,
     "heavy": false,
-    "desc": "Protégée : Réduisez les dégâts magiques subis de votre Score d'armure avant de les comparer à vos seuils de dégâts.",
+    "desc": "Protégée : Réduisez les dégâts magiques subis de votre Valeur d'armure avant de les comparer à vos seuils de dégâts.",
     "campaign": "monster",
     "img": "icons/equipment/chest/breastplate-banded-steel-gold.webp"
   },
@@ -1116,7 +1116,7 @@
     "major": 11,
     "severe": 32,
     "heavy": false,
-    "desc": "Protégée : Réduisez les dégâts magiques subis de votre Score d'armure avant de les comparer à vos seuils de dégâts.",
+    "desc": "Protégée : Réduisez les dégâts magiques subis de votre Valeur d'armure avant de les comparer à vos seuils de dégâts.",
     "campaign": "monster",
     "img": "icons/equipment/chest/breastplate-banded-steel-gold.webp"
   }

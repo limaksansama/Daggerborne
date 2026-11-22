@@ -4,13 +4,13 @@
    Thème sombre conservé, mobile = onglets Combat / Stats / Équipement / Plus. */
 import { $, $$, el, esc, go, T, data, toast, getChar, saveChar, getState, setState, uid, exportJsonFile, importCharacterFromText } from '../core.js';
 import { rollDuality, rollDice, rollAttack, rollDamage, rollCustomDamage, isRolling } from '../dice3d.js';
-import { computeDamageApplication, calcDamageSpec, tierOf, nextDieStep, armorThresholdBonus } from '../rules.js';
+import { computeDamageApplication, calcDamageSpec, tierOf, nextDieStep, armorThresholdBonus, equipmentPenalty } from '../rules.js';
 import { openLevelUp } from './levelup.js';
 
 import { t, getLang } from '../i18n.js';
 const TRAIT_KEYS = ['agility', 'strength', 'finesse', 'instinct', 'presence', 'knowledge'];
 const DICE = ['d4', 'd6', 'd8', 'd10', 'd12', 'd20'];
-const CONDITIONS = ['Vulnérable', 'Entravé', 'Caché', 'Empoisonné'];
+const CONDITIONS = ['Vulnérable', 'Entravé', 'Caché', 'Empoisonné', 'Inconscient'];
 const DRUID_CLASS_ID = 'ZNwUTCyGCEcidZFv';
 const BEASTBOUND_SUBCLASS_ID = 'TIUsIlTS1WkK5vr2';
 const MORE_TABS = [
@@ -134,6 +134,11 @@ function migrate(c, weapons, armors, subclasses, classes) {
   if (c.traitMarks === undefined) { c.traitMarks = []; dirty = true; }
   if (c.subcardTaken === undefined) { c.subcardTaken = {}; dirty = true; }
   if (c.goldTrack.chests > 1) { c.goldTrack.bags += (c.goldTrack.chests - 1) * 10; c.goldTrack.chests = 1; dirty = true; }
+  /* SRD 2.0 : 12 emplacements de PV et de Stress au maximum (anciens personnages inclus). */
+  if (c.hp.active > 12) { c.hp.active = 12; dirty = true; }
+  if (c.hp.unlocked > Math.max(0, 12 - c.hp.active)) { c.hp.unlocked = Math.max(0, 12 - c.hp.active); dirty = true; }
+  if (c.stress.active > 12) { c.stress.active = 12; dirty = true; }
+  if (c.stress.unlocked > Math.max(0, 12 - c.stress.active)) { c.stress.unlocked = Math.max(0, 12 - c.stress.active); dirty = true; }
   const hpMax = c.hp.active + c.hp.unlocked;
   if (c.hp.max !== hpMax) { c.hp.max = hpMax; c.hp.current = Math.min(c.hp.current, hpMax); dirty = true; }
   const stMax = c.stress.active + c.stress.unlocked;
@@ -226,7 +231,13 @@ export async function render(main, params) {
   const bfMeta = c.beastform?.id ? beastforms.find(b => b.id === c.beastform.id) : null;
   const activeBf = resolveBeastform(bfMeta, c.beastform, beastforms, c.traits);
   const traitBonusOf = (k) => (activeBf && activeBf.trait === k ? (activeBf.traitBonus || 0) : 0);
-  const effTrait = (k) => (c.traits[k] || 0) + traitBonusOf(k);
+  /* Malus passifs de l'équipement porté (Lourde, Très lourde, Encombrante, Massive…) */
+  const gearPenalty = equipmentPenalty([
+    c.armorCard?.feature,
+    ...(c.weapons || []).filter(w => (w.state || 'active') === 'active').map(w => w.feature),
+  ]);
+  const effTrait = (k) => (c.traits[k] || 0) + traitBonusOf(k) + (gearPenalty[k] || 0);
+  const effEvasion = Math.max(0, (c.evasion || 0) + (activeBf?.evasionBonus || 0) + (gearPenalty.evasion || 0));
   const armMax = Math.max(0, Math.min(12, c.armorCard.baseScore || 0));
   const effHopeMax = Math.max(0, 6 - (c.scars || 0));
   const thr = thresholds(c, { subclasses });
@@ -303,12 +314,12 @@ export async function render(main, params) {
     <!-- ===== BANDE DÉFENSES : Évasion · Armure + 12 cases · 6 TRAITS ===== -->
     <div class="dh-defstrip s-combat">
       <div class="dh-shield-block">
-        <div class="dh-shield eva" title="Difficulté de base pour vous toucher${activeBf?.evasionBonus ? ` (base ${c.evasion} + ${activeBf.evasionBonus} Forme bestiale = ${(c.evasion || 0) + activeBf.evasionBonus})` : ''}">
+        <div class="dh-shield eva" title="Difficulté de base pour vous toucher · base ${c.evasion}${activeBf?.evasionBonus ? ` + ${activeBf.evasionBonus} Forme bestiale` : ''}${gearPenalty.evasion ? ` ${gearPenalty.evasion} équipement (${gearPenalty.parts.join(' · ')})` : ''}">
           <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polygon points="1,1 99,1 99,72 50,99 1,72"/></svg>
-          <span class="dh-sh-lbl">Évasion${activeBf?.evasionBonus ? ` (+${activeBf.evasionBonus})` : ''}</span>
-          <input type="number" class="dh-sh-val" data-f="evasion" value="${c.evasion}" min="0" max="30">
+          <span class="dh-sh-lbl">Évasion</span>
+          <input type="number" class="dh-sh-val" data-f="evasion" value="${effEvasion}" min="0" max="30">
         </div>
-        <div class="dh-shield arm" title="Score d'armure + emplacements">
+        <div class="dh-shield arm" title="Valeur d'armure + emplacements">
           <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polygon points="1,1 99,1 99,72 50,99 1,72"/></svg>
           <span class="dh-sh-lbl">${t('createArmor')}</span>
           <input type="number" class="dh-sh-val" data-f="armorScore" value="${c.armorCard.baseScore}" min="0" max="12">
@@ -316,7 +327,7 @@ export async function render(main, params) {
         <div class="dh-aspots" title="Emplacements d'armure actifs (${armMax}/12) — cliquez pour marquer les dégâts absorbés">
           ${Array.from({ length: 12 }, (_, i) => {
             const locked = i >= armMax && i >= c.armorSlots.used;
-            return `<button class="dh-aspip ${i < c.armorSlots.used ? 'on' : ''}${locked ? ' locked' : ''}" data-apip="${i}" aria-label="Emplacement d'armure ${i + 1}" aria-pressed="${i < c.armorSlots.used}" ${locked ? `aria-disabled="true" title="Verrouillé — dépasse votre score d'armure (${armMax})"` : ''}><svg viewBox="0 0 22 26" preserveAspectRatio="none" aria-hidden="true"><polygon points="1,1 21,1 21,18 11,25 1,18"/></svg></button>`;
+            return `<button class="dh-aspip ${i < c.armorSlots.used ? 'on' : ''}${locked ? ' locked' : ''}" data-apip="${i}" aria-label="Emplacement d'armure ${i + 1}" aria-pressed="${i < c.armorSlots.used}" ${locked ? `aria-disabled="true" title="Verrouillé — dépasse votre valeur d'armure (${armMax})"` : ''}><svg viewBox="0 0 22 26" preserveAspectRatio="none" aria-hidden="true"><polygon points="1,1 21,1 21,18 11,25 1,18"/></svg></button>`;
           }).join('')}
         </div>
       </div>
@@ -324,7 +335,7 @@ export async function render(main, params) {
         ${TRAIT_KEYS.map(k => {
           const bfB = traitBonusOf(k);
           return `
-        <button class="dh-trait ${c.traitMarks?.includes(k) ? 'marked' : ''}" data-troll="${k}" title="Jet de ${T.traits[k]} — Dés de Dualité (2d12)${bfB ? ` (inclut +${bfB} Forme bestiale)` : ''}${c.traitMarks?.includes(k) ? ' · trait coché (amélioré ce palier)' : ''}">
+        <button class="dh-trait ${c.traitMarks?.includes(k) ? 'marked' : ''}" data-troll="${k}" title="Jet de ${T.traits[k]} — Dés de Dualité (2d12)${bfB ? ` (inclut +${bfB} Forme bestiale)` : ''}${gearPenalty[k] ? ` (${gearPenalty[k]} équipement)` : ''}${c.traitMarks?.includes(k) ? ' · trait coché (amélioré ce palier)' : ''}">
           <span class="dh-tr-head"><span class="dh-tr-name">${T.traits[k]}${bfB ? ` <em style="color:#9fe0b0">+${bfB}</em>` : ''}</span><span class="dh-tr-mark ${c.traitMarks?.includes(k) ? 'on' : ''}" title="${c.traitMarks?.includes(k) ? 'Trait amélioré ce palier' : 'Améliorable à la prochaine montée de niveau'}">${c.traitMarks?.includes(k) ? '✓' : '·'}</span></span>
           <span class="dh-tr-body">${signed(effTrait(k))}</span>
           <span class="dh-tr-verbs">${T.traitVerbs[k].split(' · ').join('<br>')}</span>
@@ -356,7 +367,7 @@ export async function render(main, params) {
               <span class="dh-g-nums"><b>${c.hp.current}</b>/${c.hp.max}</span>
               <span class="dh-g-tools">
                 <button class="dh-g-lock" data-hp-slot="-1" title="Retirer 1 case débloquée" ${c.hp.unlocked <= 0 ? 'disabled' : ''}>−</button>
-                <button class="dh-g-lock" data-hp-slot="1" title="Débloquer 1 case bonus" ${c.hp.max >= 14 ? 'disabled' : ''}>+</button>
+                <button class="dh-g-lock" data-hp-slot="1" title="Débloquer 1 case bonus" ${c.hp.max >= 12 ? 'disabled' : ''}>+</button>
                 <button class="dh-g-lock" data-hlock title="Masquer les cases déblocables vides">⟲</button>
               </span>
             </div>
@@ -376,7 +387,7 @@ export async function render(main, params) {
               <span class="dh-g-nums"><b>${c.stress.current}</b>/${c.stress.max}</span>
               <span class="dh-g-tools">
                 <button class="dh-g-lock" data-st-slot="-1" title="Retirer 1 case débloquée" ${c.stress.unlocked <= 0 ? 'disabled' : ''}>−</button>
-                <button class="dh-g-lock" data-st-slot="1" title="Débloquer 1 case bonus" ${c.stress.max >= 14 ? 'disabled' : ''}>+</button>
+                <button class="dh-g-lock" data-st-slot="1" title="Débloquer 1 case bonus" ${c.stress.max >= 12 ? 'disabled' : ''}>+</button>
                 <button class="dh-g-lock" data-slock title="Masquer les cases déblocables vides">⟲</button>
               </span>
             </div>
@@ -675,7 +686,7 @@ export async function render(main, params) {
   else if (ui.more === 'background') tabBackground(body, c, { main });
   else if (ui.more === 'journal') tabJournal(body, c, { main });
 
-  bindAll(main, c, { main, params, weapons, armors, generalItems, thr, activeBf, traitBonusOf, effTrait, armMax, effHopeMax, subclasses });
+  bindAll(main, c, { main, params, weapons, armors, generalItems, thr, activeBf, traitBonusOf, effTrait, effEvasion, gearPenalty, armMax, effHopeMax, subclasses });
 
   /* B15 : restitue le focus et le scroll après re-render */
   if (focusSel) {
@@ -810,7 +821,11 @@ function bindAll(root, c, ctx) {
   /* --- champs texte/nombre génériques --- */
   $$('[data-f]', root).forEach(inp => inp.addEventListener('change', () => {
     const k = inp.dataset.f;
-    if (k === 'evasion') c.evasion = Math.max(0, Math.min(30, parseInt(inp.value, 10) || 0));
+    if (k === 'evasion') {
+      const bfB = ctx?.activeBf?.evasionBonus || 0;
+      const gearB = ctx?.gearPenalty?.evasion || 0;
+      c.evasion = Math.max(0, Math.min(30, (parseInt(inp.value, 10) || 0) - bfB - gearB));
+    }
     else if (k === 'armorScore') {
       c.armorCard.baseScore = Math.max(0, Math.min(12, parseInt(inp.value, 10) || 0));
       refresh();
@@ -829,7 +844,7 @@ function bindAll(root, c, ctx) {
   $$('[data-apip]', root).forEach(p => p.addEventListener('click', () => {
     const i = +p.dataset.apip;
     if (i >= ctx.armMax && i >= c.armorSlots.used) {
-      toast(`Emplacement verrouillé — dépasse votre score d'armure actif (${ctx.armMax}).`);
+      toast(`Emplacement verrouillé — dépasse votre valeur d'armure active (${ctx.armMax}).`);
       return;
     }
     c.armorSlots.used = (i < c.armorSlots.used) ? i : i + 1;
@@ -863,12 +878,12 @@ function bindAll(root, c, ctx) {
   }));
   $$('[data-hp-slot]', root).forEach(b => b.addEventListener('click', () => {
     const d = +b.dataset.hpSlot;
-    c.hp.unlocked = Math.max(0, Math.min(14 - c.hp.active, (c.hp.unlocked || 0) + d));
+    c.hp.unlocked = Math.max(0, Math.min(12 - c.hp.active, (c.hp.unlocked || 0) + d));
     syncMaxes(c); refresh();
   }));
   $$('[data-st-slot]', root).forEach(b => b.addEventListener('click', () => {
     const d = +b.dataset.stSlot;
-    c.stress.unlocked = Math.max(0, Math.min(14 - c.stress.active, (c.stress.unlocked || 0) + d));
+    c.stress.unlocked = Math.max(0, Math.min(12 - c.stress.active, (c.stress.unlocked || 0) + d));
     syncMaxes(c); refresh();
   }));
   $('[data-hlock]', root)?.addEventListener('click', () => {
@@ -1473,7 +1488,7 @@ function openDeathMoveModal(c, onDone) {
         <span class="is-type">🎲</span>
         <span class="is-body">
           <span class="is-name">Tout risquer</span>
-          <span class="is-sub">Lancez les Dés de Dualité : sur un Double (Critique), tous vos PV et Stress sont restaurés ! Si Espoir &gt; Peur, vous guérissez autant de PV que le dé d'Espoir ; sinon vous mourez.</span>
+          <span class="is-sub">Lancez les Dés de Dualité : sur un Double (Critique), tous vos PV et Stress sont restaurés ! Si Espoir &gt; Peur, vous effacez un total de PV et/ou de Stress égal au dé d'Espoir ; sinon vous mourez.</span>
         </span>
       </button>
       <button class="inv-sug" id="dm-blaze" style="text-align:left">
@@ -1496,6 +1511,8 @@ function openDeathMoveModal(c, onDone) {
   });
   $('#dm-avoid', sheet).addEventListener('click', async () => {
     back.remove();
+    /* SRD 2.0 : vous sombrez dans l'inconscience, puis lancez le dé d'Espoir. */
+    c.conditions = Array.from(new Set([...(c.conditions || []), 'Inconscient']));
     const r = await rollDice('1d12', { label: `Éviter la mort (Niv. ${c.level})` });
     if (!r) return;
     if (r.total <= c.level) {
@@ -1518,13 +1535,55 @@ function openDeathMoveModal(c, onDone) {
       saveChar(c);
       toast(`Tout risquer — Succès Critique (double ${r.hope}) ! Tous les PV (${c.hp.max}) et le Stress sont restaurés !`);
     } else if (r.hope > r.fear) {
-      /* SRD : effacez un total de PV et/ou Stress égal à la valeur du dé d'Espoir. */
-      c.hp.current = Math.min(c.hp.max, c.hp.current + r.hope);
-      saveChar(c);
-      toast(`Tout risquer réussi (${r.hope} vs ${r.fear}) — ${r.hope} PV effacé(s) → ${c.hp.current}/${c.hp.max} !`);
+      /* SRD : effacez un total de PV et/ou de Stress égal à la valeur du dé d'Espoir. */
+      askRiskSplit(c, r.hope, () => { saveChar(c); onDone(); });
+      return;
     } else {
       toast(`Tout risquer échoué (Peur ${r.fear} > Espoir ${r.hope}) — Le personnage succombe.`);
     }
+    onDone();
+  });
+}
+
+/* ============ MODAL : répartition de « Tout risquer » (PV / Stress) ============ */
+function askRiskSplit(c, amount, onDone) {
+  const back = el(`<div class="modal-back"></div>`);
+  const sheet = el(`<div class="modal-sheet"></div>`);
+  back.appendChild(sheet);
+  document.body.appendChild(back);
+  back.addEventListener('click', (e) => { if (e.target === back) back.remove(); });
+
+  sheet.innerHTML = `
+    <h3>🎲 Tout risquer — répartir ${amount} points</h3>
+    <div class="ms-meta">Effacez un total de PV et/ou de Stress égal à la valeur du dé d'Espoir (${amount}).</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin:.8rem 0">
+      <div class="field" style="margin:0"><label>PV effacés</label><input type="number" id="risk-hp" value="${amount}" min="0" max="${amount}"></div>
+      <div class="field" style="margin:0"><label>Stress effacé</label><input type="number" id="risk-st" value="0" min="0" max="${amount}"></div>
+    </div>
+    <div class="panel" id="risk-preview" style="padding:.55rem;font-size:.85rem"></div>
+    <div style="display:flex;gap:.5rem;justify-content:flex-end;margin-top:.8rem">
+      <button class="btn" id="risk-ok">Appliquer</button>
+    </div>`;
+
+  const hpInp = $('#risk-hp', sheet);
+  const stInp = $('#risk-st', sheet);
+  const preview = () => {
+    const hp = Math.max(0, Math.min(amount, parseInt(hpInp.value, 10) || 0));
+    const st = Math.max(0, Math.min(amount, parseInt(stInp.value, 10) || 0));
+    const total = Math.min(amount, hp + st);
+    $('#risk-preview', sheet).innerHTML = `Réparti : <b>${total}</b> / ${amount} — PV marqués : <b>${c.hp.current}</b>/${c.hp.max} · Stress : <b>${c.stress.current}</b>/${c.stress.max}`;
+  };
+  preview();
+  hpInp.addEventListener('input', preview);
+  stInp.addEventListener('input', preview);
+  $('#risk-ok', sheet).addEventListener('click', () => {
+    let hp = Math.max(0, Math.min(amount, parseInt(hpInp.value, 10) || 0));
+    let st = Math.max(0, Math.min(amount, parseInt(stInp.value, 10) || 0));
+    if (hp + st > amount) st = Math.max(0, amount - hp);
+    c.hp.current = Math.min(c.hp.max, c.hp.current + hp);
+    c.stress.current = Math.max(0, c.stress.current - st);
+    back.remove();
+    toast(`Tout risquer — ${hp} PV et ${st} Stress effacé(s) (${hp + st}/${amount} utilisés).`);
     onDone();
   });
 }
@@ -1560,7 +1619,7 @@ function openRestModal(c, mode, onDone) {
     <div class="ms-meta">${isLong
       ? 'Choisissez 2 mouvements de repos long. Les aptitudes 1×/repos et 1×/long repos sont réinitialisées.'
       : `Choisissez jusqu'à 2 mouvements de repos court (Palier ${tier}). Repos courts depuis le dernier long : ${c.shortRestsSinceLong || 0}.`}</div>
-    ${!isLong && (c.shortRestsSinceLong || 0) >= 3 ? '<div class="panel" style="margin:.5rem 0;padding:.5rem;border-color:#d46868;color:#ffb4b4;font-size:.78rem">⚠ Déjà 3 repos courts consécutifs — selon le SRD 2.0, un repos long est nécessaire après 3 repos courts.</div>' : ''}
+    ${!isLong && (c.shortRestsSinceLong || 0) >= 3 ? '<div class="panel" style="margin:.5rem 0;padding:.5rem;border-color:#d46868;color:#ffb4b4;font-size:.78rem">⚠ 3 repos courts consécutifs : un repos long est obligatoire avant de pouvoir reprendre un repos court (SRD 2.0).</div>' : ''}
     <div style="display:flex;flex-direction:column;gap:.4rem;margin:.7rem 0" id="rest-moves">
       ${moves.map(m => `
       <label class="dhr-hopespend" style="align-items:flex-start;margin:0;padding:.4rem .5rem;border:1px solid var(--border);border-radius:8px;background:var(--panel-3)">
@@ -1574,7 +1633,9 @@ function openRestModal(c, mode, onDone) {
     </label>
     <div style="display:flex;gap:.5rem;justify-content:flex-end;margin-top:.8rem">
       <button class="btn ghost" id="rest-cancel">Annuler</button>
-      <button class="btn" id="rest-go">Appliquer le repos</button>
+      ${!isLong && (c.shortRestsSinceLong || 0) >= 3
+        ? '<button class="btn" id="rest-go" disabled title="Un repos long est requis après 3 repos courts">Repos long requis</button>'
+        : '<button class="btn" id="rest-go">Appliquer le repos</button>'}
     </div>`;
 
   $$('[data-rmove]', sheet).forEach(cb => cb.addEventListener('change', () => {
@@ -1593,6 +1654,10 @@ function openRestModal(c, mode, onDone) {
 
   $('#rest-cancel', sheet).addEventListener('click', () => back.remove());
   $('#rest-go', sheet).addEventListener('click', () => {
+    if (!isLong && (c.shortRestsSinceLong || 0) >= 3) {
+      toast('Trois repos courts consécutifs : prenez un repos long avant de continuer (SRD 2.0).');
+      return;
+    }
     const logs = [];
     const effHopeMax = Math.max(0, 6 - (c.scars || 0));
     const d4Roll = () => (1 + Math.floor(Math.random() * 4)) + tier;
@@ -1639,6 +1704,12 @@ function openRestModal(c, mode, onDone) {
         if (!k.startsWith('long:')) delete c.cardUses[k];
       }
     }
+    /* SRD 2.0 : le MJ gagne 1d4 Peur sur un repos court, 1d4 + nombre de PJ sur un repos long. */
+    const fearRoll = 1 + Math.floor(Math.random() * 4);
+    const pcCount = Math.max(1, (getState().characters || []).length);
+    const fearGain = isLong ? fearRoll + pcCount : fearRoll;
+    setState(s => { s.fear = Math.min(30, (s.fear || 0) + fearGain); });
+    logs.push(`+${fearGain} Peur (MJ)`);
     saveChar(c);
     back.remove();
     toast(`${isLong ? 'Repos long' : 'Repos court'} appliqué${logs.length ? ' : ' + logs.join(' · ') : ''}.`);
@@ -1705,18 +1776,19 @@ function weaponPicker(c, ctx, onDone) {
 
   let tierFilter = null;
   let query = '';
+  const tierMax = tierOf(c.level);
+  const pickSub = ctx.subclasses?.find(s => s.id === c.subclassId);
+  const hasSpellcast = !!pickSub?.spellcastTrait;
   sheet.innerHTML = `
     <h3>Ajouter une arme (${ctx.weapons.length})</h3>
+    <div class="ms-meta">Palier ${tierMax} maximum · ${hasSpellcast ? 'armes magiques autorisées (Incantation)' : 'armes magiques indisponibles (aucun trait d’Incantation)'}</div>
     <div class="search-bar">
       <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
       <input type="text" id="wp-q" placeholder="Rechercher (nom, trait, feature…)" autocomplete="off">
     </div>
     <div class="filter-row" id="wp-tiers" style="margin:.45rem 0">
       <button class="filter-chip active" data-wtier="">Tous</button>
-      <button class="filter-chip" data-wtier="1">Palier 1</button>
-      <button class="filter-chip" data-wtier="2">Palier 2</button>
-      <button class="filter-chip" data-wtier="3">Palier 3</button>
-      <button class="filter-chip" data-wtier="4">Palier 4</button>
+      ${[1, 2, 3, 4].map(n => `<button class="filter-chip" data-wtier="${n}" ${n > tierMax ? 'disabled style="opacity:.4;cursor:not-allowed" title="Palier supérieur à votre niveau"' : ''}>Palier ${n}</button>`).join('')}
     </div>
     <div id="wp-list" class="wp-list"></div>
     <div style="margin-top:.8rem;display:flex;gap:.5rem;justify-content:flex-end">
@@ -1727,6 +1799,8 @@ function weaponPicker(c, ctx, onDone) {
   const draw = () => {
     const q = query.toLowerCase();
     const hits = ctx.weapons
+      .filter(w => w.tier <= tierMax)
+      .filter(w => hasSpellcast || w.dmgType !== 'mag')
       .filter(w => (!tierFilter || w.tier === tierFilter))
       .filter(w => !q || (w.fr + ' ' + w.en + ' ' + (w.desc || '')).toLowerCase().includes(q))
       .sort((a, b) => a.tier - b.tier || a.fr.localeCompare(b.fr, 'fr'))
@@ -1785,18 +1859,17 @@ function armorPicker(c, ctx, onDone) {
 
   let tierFilter = null;
   let query = '';
+  const tierMax = tierOf(c.level);
   sheet.innerHTML = `
     <h3>Choisir une armure (${ctx.armors.length})</h3>
+    <div class="ms-meta">Palier ${tierMax} maximum (votre niveau)</div>
     <div class="search-bar">
       <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
       <input type="text" id="ap-q" placeholder="Rechercher (nom, feature…)" autocomplete="off">
     </div>
     <div class="filter-row" id="ap-tiers" style="margin:.45rem 0">
       <button class="filter-chip active" data-atier="">Tous</button>
-      <button class="filter-chip" data-atier="1">Palier 1</button>
-      <button class="filter-chip" data-atier="2">Palier 2</button>
-      <button class="filter-chip" data-atier="3">Palier 3</button>
-      <button class="filter-chip" data-atier="4">Palier 4</button>
+      ${[1, 2, 3, 4].map(n => `<button class="filter-chip" data-atier="${n}" ${n > tierMax ? 'disabled style="opacity:.4;cursor:not-allowed" title="Palier supérieur à votre niveau"' : ''}>Palier ${n}</button>`).join('')}
     </div>
     <div id="ap-list" class="wp-list"></div>
     <div style="margin-top:.8rem;display:flex;gap:.5rem;justify-content:flex-end">
@@ -1807,6 +1880,7 @@ function armorPicker(c, ctx, onDone) {
   const draw = () => {
     const q = query.toLowerCase();
     const hits = ctx.armors
+      .filter(a => a.tier <= tierMax)
       .filter(a => (!tierFilter || a.tier === tierFilter))
       .filter(a => !q || (a.fr + ' ' + (a.en || '') + ' ' + (a.desc || '')).toLowerCase().includes(q))
       .sort((a, b) => a.tier - b.tier || a.fr.localeCompare(b.fr, 'fr'))
@@ -1815,7 +1889,7 @@ function armorPicker(c, ctx, onDone) {
       <button class="inv-sug" data-apick="${a.id}">
         <span class="is-body">
           <span class="is-name">${esc(a.fr)} <span class="tag" style="margin-left:4px">P${a.tier}</span>${a.campaign ? ` <span class="tag">${esc(CAMPAIGN_LABELS[a.campaign] || a.campaign)}</span>` : ''}</span>
-          <span class="is-sub">Score ${a.armorScore} · Seuils ${a.major}/${a.severe}${a.heavy ? ' · Lourd' : ''}</span>
+          <span class="is-sub">Valeur ${a.armorScore} · Seuils ${a.major}/${a.severe}${a.heavy ? ' · Lourd' : ''}</span>
           ${a.desc ? `<span class="is-sub" style="color:var(--text-faint);margin-top:2px">${esc(a.desc)}</span>` : ''}
         </span>
         <span class="is-add">＋</span>

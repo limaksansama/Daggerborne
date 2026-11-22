@@ -2,6 +2,7 @@
 import { $, $$, el, esc, go, T, data, toast, uid, newCharacter, saveChar, getState, setState } from '../core.js';
 
 import { t } from '../i18n.js';
+import { openCodexDetail } from './compendium.js';
 /* fonction (et non constante) : les titres doivent suivre la langue courante */
 const STEPS = () => [
   { id: 'class', title: 'Classe' },
@@ -16,6 +17,46 @@ const STEPS = () => [
 ];
 
 const MODS = [2, 1, 1, 0, 0, -1];
+const WIZ_GLYPHS = { class: '⚔', subclass: '✧', ancestry: '✦', community: '⌂' };
+
+function wizEmblem({ icons = [], monogram = '', glyph = '✦' }) {
+  if (icons.length) {
+    return `<span class="cc-emblem cc-emblem-icons">${icons.map(src => `<img src="${esc(src)}" alt="">`).join('')}</span>`;
+  }
+  return `<span class="cc-emblem cc-emblem-letter"><b>${esc(monogram)}</b><span>${esc(glyph)}</span></span>`;
+}
+
+/* Carte de sélection de l'assistant : même silhouette que le compendium,
+   avec la fiche complète accessible sous la carte. */
+function wizChoice({ kind, kicker, name, sub = '', info = '', fan = false, foot = 'SRD 2.0', icons = [], monogram = '', glyph = WIZ_GLYPHS[kind] || '✦', selected = false, onClick, detail }) {
+  const emblem = wizEmblem({ icons, monogram, glyph });
+  const ribbon = icons.length
+    ? `<span class="ct-ribbon-icons">${icons.map(src => `<img src="${esc(src)}" alt="">`).join('')}</span>`
+    : esc(glyph);
+  const wrap = el(`<div class="choice-wrap">
+    <button class="choice codex-tile codex-choice ${selected ? 'selected' : ''}" data-kind="${kind}">
+      <span class="ct-art">
+        <span class="ct-halo" aria-hidden="true"></span>
+        ${emblem}
+        <span class="ct-ribbon">${ribbon}</span>
+        <span class="ct-plate">
+          <span class="ct-kicker">${esc(kicker)}</span>
+          <span class="ct-name">${esc(name)}</span>
+        </span>
+      </span>
+      <span class="ct-content">
+        <span class="ct-sub">${esc(sub)}</span>
+        ${info ? `<span class="ct-info">${esc(info)}</span>` : ''}
+        ${fan ? '<span class="ct-fan">H&amp;F</span>' : ''}
+        <span class="ct-foot">${esc(foot)}</span>
+      </span>
+    </button>
+    ${detail ? `<button type="button" class="choice-info">ⓘ ${esc(t('createFullSheet'))}</button>` : ''}
+  </div>`);
+  wrap.querySelector('.codex-choice').addEventListener('click', onClick);
+  if (detail) wrap.querySelector('.choice-info').addEventListener('click', detail);
+  return wrap;
+}
 
 let wiz = null;
 
@@ -125,29 +166,24 @@ async function stepClass(body) {
   const domains = await data('domains');
   const sorted = [...classes].sort((a, b) => a.fr.localeCompare(b.fr, 'fr'));
   body.innerHTML = `<p class="page-sub" style="margin-bottom:.8rem">${t('createClassHint')}</p>
-  <div class="choice-grid" id="grid"></div>`;
+  <div class="choice-grid codex-choice-grid" id="grid"></div>`;
   const grid = $('#grid', body);
   for (const c of sorted) {
     const domNames = c.domains.map(d => domains[d].fr).join(' · ');
-    const btn = el(`<button class="choice ${wiz.classId === c.id ? 'selected' : ''}" data-id="${c.id}">
-      <div class="ch-head">
-        <span class="ch-name">${esc(c.fr)}</span>
-        ${c.fan ? '<span class="tag fan">' + t('sheetHopeFear') + '</span>' : ''}
-      </div>
-      <div class="ch-sub">${domNames}</div>
-      <div class="ch-stats">
-        <span class="stat-chip">PV <b>${c.hp}</b></span>
-        <span class="stat-chip">Évasion <b>${c.evasion}</b></span>
-      </div>
-      <div class="ch-desc">${esc(c.desc)}</div>
-      <div class="ch-desc"><b style="color:var(--golden)">✦ ${esc(c.hopeAbility)} :</b> ${esc(c.hopeDesc)}</div>
-    </button>`);
-    btn.addEventListener('click', () => {
-      /* re-clic sur la même classe : garde la sélection (pas de toggle-off piégeux) */
-      if (wiz.classId !== c.id) { wiz.classId = c.id; wiz.subclassId = null; wiz.cardIds = []; }
-      draw(getMain());
-    });
-    grid.appendChild(btn);
+    grid.appendChild(wizChoice({
+      kind: 'class', kicker: 'Classe', name: c.fr,
+      icons: c.domains.map(d => `assets/icons/domain-card/${d}.png`), glyph: '⚔',
+      sub: `${domNames} · PV ${c.hp} · Évasion ${c.evasion}`,
+      info: c.desc, fan: c.fan,
+      foot: `${c.features.length} ${t('sheetFeatures').toLowerCase()}`,
+      selected: wiz.classId === c.id,
+      onClick: () => {
+        /* re-clic sur la même classe : garde la sélection (pas de toggle-off piégeux) */
+        if (wiz.classId !== c.id) { wiz.classId = c.id; wiz.subclassId = null; wiz.cardIds = []; }
+        draw(getMain());
+      },
+      detail: () => openCodexDetail(c, 'class'),
+    }));
   }
 }
 
@@ -158,28 +194,27 @@ async function stepSubclass(body) {
   const subs = subclasses.filter(s => s.classId === wiz.classId).sort((a, b) => a.fr.localeCompare(b.fr, 'fr'));
   body.innerHTML = `
     <p class="page-sub" style="margin-bottom:.8rem">Classe : <b style="color:var(--golden)">${esc(cl.fr)}</b> — choisissez la voie qui façonne vos aptitudes.</p>
-    <div class="choice-grid" id="grid"></div>`;
+    <div class="choice-grid codex-choice-grid" id="grid"></div>`;
   const grid = $('#grid', body);
   for (const s of subs) {
-    const btn = el(`<button class="choice ${wiz.subclassId === s.id ? 'selected' : ''}" data-id="${s.id}">
-      <div class="ch-head">
-        <span class="ch-name">${esc(s.fr)}</span>
-        ${s.spellcastTrait ? `<span class="stat-chip">Incantation : <b>${T.traits[s.spellcastTrait] || '—'}</b></span>` : ''}
-      </div>
-      <div class="ch-desc">${esc(s.desc)}</div>
-      ${s.features.length ? `<div class="ch-desc" style="font-size:.78rem"><b style="color:var(--golden)">Aptitudes de base :</b> ${s.features.map(f => esc(f.name)).join(' · ')}</div>` : ''}
-    </button>`);
-    btn.addEventListener('click', () => {
-      wiz.subclassId = s.id; /* re-clic : conserve la sélection */
-      if (!s.spellcastTrait) {
-        const pw = weapons.find(w => w.id === wiz.primaryWeaponId);
-        const sw = weapons.find(w => w.id === wiz.secondaryWeaponId);
-        if (pw?.dmgType === 'mag') wiz.primaryWeaponId = null;
-        if (sw?.dmgType === 'mag') wiz.secondaryWeaponId = null;
-      }
-      draw(getMain());
-    });
-    grid.appendChild(btn);
+    grid.appendChild(wizChoice({
+      kind: 'subclass', kicker: t('sheetSubclass'), name: s.fr,
+      monogram: s.fr.slice(0, 1), glyph: '✧',
+      sub: s.spellcastTrait ? `Incantation : ${T.traits[s.spellcastTrait] || '—'}` : '',
+      info: s.desc,
+      foot: `${s.features.length} ${t('sheetFeatures').toLowerCase()}`,
+      selected: wiz.subclassId === s.id,
+      onClick: () => {
+        wiz.subclassId = s.id; /* re-clic : conserve la sélection */
+        if (!s.spellcastTrait) {
+          const pw = weapons.find(w => w.id === wiz.primaryWeaponId);
+          const sw = weapons.find(w => w.id === wiz.secondaryWeaponId);
+          if (pw?.dmgType === 'mag') wiz.primaryWeaponId = null;
+          if (sw?.dmgType === 'mag') wiz.secondaryWeaponId = null;
+        }
+        draw(getMain());
+      },
+    }));
   }
 }
 
@@ -222,7 +257,7 @@ async function stepAncestry(body) {
       <button class="btn small ${wiz.mixedFirstFrom === 2 ? '' : 'ghost'}" data-mix-ord="2">1re apt. de ${esc(a2.fr)} (${esc(a2.abilities[0]?.fr || '')}) + 2e apt. de ${esc(a1.fr)} (${esc(a1.abilities[1]?.fr || '')})</button>
     </div>` : '<p class="dh-help" style="margin-top:.5rem">Sélectionnez deux ascendances ci-dessus ou cliquez dans la grille ci-dessous.</p>'}
   </div>` : ''}
-  <div class="choice-grid" id="grid"></div>`;
+  <div class="choice-grid codex-choice-grid" id="grid"></div>`;
 
   $('#anc-mixed', body).addEventListener('change', (e) => {
     wiz.mixedAncestry = e.target.checked;
@@ -248,30 +283,32 @@ async function stepAncestry(body) {
   const grid = $('#grid', body);
   for (const a of sorted) {
     const isSel = wiz.ancestryId === a.id || (wiz.mixedAncestry && wiz.ancestry2Id === a.id);
-    const badge = wiz.mixedAncestry
-      ? (wiz.ancestryId === a.id ? '<span class="tag">Lignée 1</span>' : wiz.ancestry2Id === a.id ? '<span class="tag">Lignée 2</span>' : '')
-      : '';
-    const btn = el(`<button class="choice ${isSel ? 'selected' : ''}" data-id="${a.id}">
-      <div class="ch-head"><span class="ch-name">${esc(a.fr)}</span>${badge}${a.fan ? '<span class="tag fan">Hope & Fear</span>' : ''}</div>
-      <div class="ch-desc">${esc(a.desc)}</div>
-      ${a.abilities.map((ab, idx) => `<div class="ch-desc" style="font-size:.78rem"><b style="color:var(--golden)">${idx + 1}. ${esc(ab.fr)}.</b> ${esc(ab.desc)}</div>`).join('')}
-    </button>`);
-    btn.addEventListener('click', () => {
-      if (!wiz.mixedAncestry) {
-        wiz.ancestryId = a.id;
-      } else if (!wiz.ancestryId) {
-        wiz.ancestryId = a.id;
-      } else if (wiz.ancestryId === a.id) {
-        /* re-clic sur Lignée 1 : désélectionne si Lignée 2 est libre, sinon conserve */
-        if (wiz.ancestry2Id) { wiz.ancestryId = wiz.ancestry2Id; wiz.ancestry2Id = null; }
-      } else if (wiz.ancestry2Id === a.id) {
-        wiz.ancestry2Id = null;
-      } else {
-        wiz.ancestry2Id = a.id;
-      }
-      draw(getMain());
-    });
-    grid.appendChild(btn);
+    const line = wiz.mixedAncestry && wiz.ancestryId === a.id ? ' · Lignée 1'
+      : wiz.mixedAncestry && wiz.ancestry2Id === a.id ? ' · Lignée 2' : '';
+    grid.appendChild(wizChoice({
+      kind: 'ancestry', kicker: `Ascendance${line}`, name: a.fr,
+      monogram: a.fr.slice(0, 1), glyph: '✦',
+      sub: a.abilities.map(x => x.fr).join(' · '),
+      info: a.desc, fan: a.fan,
+      foot: `${a.abilities.length} ${t('cmpAbilities').toLowerCase()}`,
+      selected: isSel,
+      onClick: () => {
+        if (!wiz.mixedAncestry) {
+          wiz.ancestryId = a.id;
+        } else if (!wiz.ancestryId) {
+          wiz.ancestryId = a.id;
+        } else if (wiz.ancestryId === a.id) {
+          /* re-clic sur Lignée 1 : désélectionne si Lignée 2 est libre, sinon conserve */
+          if (wiz.ancestry2Id) { wiz.ancestryId = wiz.ancestry2Id; wiz.ancestry2Id = null; }
+        } else if (wiz.ancestry2Id === a.id) {
+          wiz.ancestry2Id = null;
+        } else {
+          wiz.ancestry2Id = a.id;
+        }
+        draw(getMain());
+      },
+      detail: () => openCodexDetail(a, 'ancestry'),
+    }));
   }
 }
 
@@ -280,19 +317,21 @@ async function stepCommunity(body) {
   const communities = await data('communities');
   const sorted = [...communities].sort((a, b) => a.fr.localeCompare(b.fr, 'fr'));
   body.innerHTML = `<p class="page-sub" style="margin-bottom:.8rem">La communauté représente la culture dans laquelle votre personnage a grandi : elle accorde une aptitude.</p>
-  <div class="choice-grid" id="grid"></div>`;
+  <div class="choice-grid codex-choice-grid" id="grid"></div>`;
   const grid = $('#grid', body);
   for (const c of sorted) {
-    const btn = el(`<button class="choice ${wiz.communityId === c.id ? 'selected' : ''}" data-id="${c.id}">
-      <div class="ch-head"><span class="ch-name">${esc(c.fr)}</span>${c.fan ? '<span class="tag fan">Hope & Fear</span>' : ''}</div>
-      <div class="ch-desc">${esc(c.desc)}</div>
-      ${c.ability ? `<div class="ch-desc" style="font-size:.78rem"><b style="color:var(--golden)">${esc(c.ability.fr)}.</b> ${esc(c.ability.desc)}</div>` : ''}
-    </button>`);
-    btn.addEventListener('click', () => {
-      wiz.communityId = c.id; /* re-clic : conserve la sélection */
-      draw(getMain());
-    });
-    grid.appendChild(btn);
+    grid.appendChild(wizChoice({
+      kind: 'community', kicker: 'Communauté', name: c.fr,
+      monogram: c.fr.slice(0, 1), glyph: '⌂',
+      sub: c.ability ? c.ability.fr : '',
+      info: c.desc, fan: c.fan, foot: 'SRD 2.0',
+      selected: wiz.communityId === c.id,
+      onClick: () => {
+        wiz.communityId = c.id; /* re-clic : conserve la sélection */
+        draw(getMain());
+      },
+      detail: () => openCodexDetail(c, 'community'),
+    }));
   }
 }
 
@@ -389,11 +428,11 @@ async function stepEquipment(body) {
     <div class="choice-grid" id="pgrid">
       <button class="choice ${wiz.startingPotion !== 'stamina' ? 'selected' : ''}" data-pot="health">
         <div class="ch-head"><span class="ch-name">🧪 Potion de santé mineure</span></div>
-        <div class="ch-desc">Consommable — Régénérez 1d4 PV.</div>
+        <div class="ch-desc">Consommable — Effacez 1d4 PV.</div>
       </button>
       <button class="choice ${wiz.startingPotion === 'stamina' ? 'selected' : ''}" data-pot="stamina">
         <div class="ch-head"><span class="ch-name">🧪 Potion de résilience mineure</span></div>
-        <div class="ch-desc">Consommable — Régénérez 1d4 Stress.</div>
+        <div class="ch-desc">Consommable — Effacez 1d4 Stress.</div>
       </button>
     </div>`;
 
@@ -697,15 +736,15 @@ async function finish(main) {
       ? { compendiumId: armor.id, name: armor.fr, baseScore: armor.armorScore, baseMajor: armor.major, baseSevere: armor.severe, feature: armor.desc || '' }
       : { compendiumId: null, name: '', baseScore: 0, baseMajor: 0, baseSevere: 0, feature: '' },
     domainCards: wiz.cardIds.map((id, i) => ({ cardId: id, inHand: i < 5 })),
-    goldTrack: { handfuls: 2, bags: 0, chests: 0 },
+    goldTrack: { handfuls: 1, bags: 0, chests: 0 },
     journal: [],
     inventory: [
       { name: 'Torche', qty: 1, type: 'loot', desc: "Torche d'aventure classique permettant d'éclairer les lieux sombres.", itemId: 'z3qzQoThgcZafEZr' },
       { name: 'Corde (15 m)', qty: 1, type: 'loot', desc: '15 mètres de corde robuste, utile pour escalader une paroi ou descendre une falaise en rappel.', itemId: 'ocBTBdfvjTqIehtf' },
       { name: 'Fournitures de base', qty: 1, type: 'loot', desc: 'Nécessaire de voyage standard : couverture, boîte à amadou, rations, outre et matériel courant.', itemId: 'jga6tUNjZjTpK6td' },
       wiz.startingPotion === 'stamina'
-        ? { name: 'Potion de résilience mineure', qty: 1, type: 'consumable', desc: 'Régénérez 1d4 Stress.', itemId: 'b6vGSPFWOlzZZDLO' }
-        : { name: 'Potion de santé mineure', qty: 1, type: 'consumable', desc: 'Régénérez 1d4 PV.', itemId: 'tPfKtKRRjv8qdSqy' },
+        ? { name: 'Potion de résilience mineure', qty: 1, type: 'consumable', desc: 'Effacez 1d4 Stress.', itemId: 'b6vGSPFWOlzZZDLO' }
+        : { name: 'Potion de santé mineure', qty: 1, type: 'consumable', desc: 'Effacez 1d4 PV.', itemId: 'tPfKtKRRjv8qdSqy' },
     ],
     backgroundAnswers: { ...wiz.answers },
     className: cl.fr, hopeAbility: { name: cl.hopeAbility, desc: cl.hopeDesc },

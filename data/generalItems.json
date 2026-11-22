@@ -8,7 +8,7 @@
     "descEn": "You can attach this charm to a weapon with a Melee range. Three times per rest, you can activate the charm and attack a target within Close range.",
     "img": "icons/equipment/neck/amulet-carved-stone-spiral-blue.webp",
     "fan": false,
-    "descFr": "Vous pouvez attacher ce charme à une arme avec une portée Mêlée. Trois fois par repos, vous pouvez activer le charme et attaquer une cible à portée Rapprochée."
+    "descFr": "Vous pouvez attacher ce charme à une arme avec une portée Mêlée. Trois fois par repos, vous pouvez activer le charme et attaquer une cible à portée Proche."
   },
   {
     "id": "MeEg57T6MKpw3sme",
@@ -19,7 +19,7 @@
     "descEn": "You can light this magic torch at will. The flame's light fills a much larger space than it should, enough to illuminate a cave bright as day.",
     "img": "icons/sundries/lights/torch-brown-lit.webp",
     "fan": false,
-    "descFr": "Vous pouvez allumer cette torche magique à volonté. La lumière de la flampe remplit un espace beaucoup plus grand qu'elle ne le devrait, suffisamment pour éclairer une caverne comme en plein jour."
+    "descFr": "Vous pouvez allumer cette torche magique à volonté. La lumière de la flamme remplit un espace beaucoup plus grand qu'elle ne le devrait, suffisamment pour éclairer une caverne comme en plein jour."
   },
   {
     "id": "4STt98biZwjFoKOe",
@@ -41,29 +41,29 @@
     "descEn": "Position this prism in a location of your choosing and activate it. All allies within Close range of it gain a +1 bonus to their Spellcast Rolls. While activated, the prism can't be moved. Once the prism is deactivated, it can't be activated again until your next long rest.",
     "img": "icons/commodities/gems/gem-faceted-trillion-blue.webp",
     "fan": false,
-    "descFr": "Placez ce prisme à l'emplacement de votre choix et activez-le. Tous les alliés à portée Rapprochée de celui-ci obtiennent un bonus de +1 à leurs Jets de Sortilège. Lorsqu'il est activé, le prisme ne peut pas être déplacé. Une fois le prisme désactivé, il ne peut plus être activé jusqu'à votre prochain long repos."
+    "descFr": "Placez ce prisme à l'emplacement de votre choix et activez-le. Tous les alliés à portée Proche de celui-ci obtiennent un bonus de +1 à leurs Jets de Sortilège. Lorsqu'il est activé, le prisme ne peut pas être déplacé. Une fois le prisme désactivé, il ne peut plus être activé jusqu'à votre prochain repos long."
   },
   {
     "id": "vK6bKyQTT3m8WvMh",
     "en": "Attune Relic",
-    "fr": "Relique de grande foulée",
+    "fr": "Relique d'harmonie",
     "type": "loot",
     "rarity": null,
     "descEn": "You gain a +1 bonus to your Instinct. You can only carry one relic.",
     "img": "icons/commodities/treasure/token-runed-spiral-grey.webp",
     "fan": false,
-    "descFr": "Vous obtenez un bonus de +1 à votre Agilité. Vous ne pouvez porter qu'une seule relique."
+    "descFr": "Vous obtenez un bonus de +1 à votre Instinct. Vous ne pouvez porter qu'une seule relique."
   },
   {
     "id": "J8pp36Kta0WZ5n72",
     "en": "Augur's Relic",
-    "fr": "Relique d'harmonie",
+    "fr": "Relique d'augure",
     "type": "loot",
     "rarity": null,
     "descEn": "Once per long rest, you can activate your Hope feature without spending Hope. You can carry only one relic.",
     "img": "icons/commodities/treasure/puzzle-triangle-gold.webp",
     "fan": false,
-    "descFr": "Une fois par repos, vous pouvez dépenser un Espoir pour utiliser l'Expérience d'un allié comme si elle était la vôtre. Vous ne pouvez porter qu'une seule relique."
+    "descFr": "Une fois par repos long, vous pouvez activer votre aptitude d'Espoir sans dépenser d'Espoir. Vous ne pouvez porter qu'une seule relique."
   },
   {
     "id": "v758j4FwNVAurhYK",
@@ -74,7 +74,7 @@
     "descEn": "You can convince this small bag of sand to be much heavier or lighter with a successful [[/dr trait=\"presence\" difficulty=\"10\"]] . Additionally, on a successful [[/dr trait=\"finesse\" difficulty=\"10\"]] , you can blow a bit of sand into a target's face to make them temporarily Vulnerable.",
     "img": "icons/containers/bags/pouch-cloth-tan.webp",
     "fan": false,
-    "descFr": "Vous pouvez convaincre ce petit sac de sable d'être beaucoup plus lourd ou plus léger avec un [[/dr trait=\"presence\" difficulty=\"10\"]] réussi. De plus, avec un [[/dr trait=\"finesse\" difficulty=\"10\"]] réussi, vous pouvez souffler un peu de sable dans le visage d'une cible pour la rendre temporairement Vulnérable."
+    "descFr": "Vous pouvez convaincre ce petit sac de sable d'être beaucoup plus lourd ou plus léger avec un jet de Présence (10) réussi. De plus, avec un jet de Finesse (10) réussi, vous pouvez souffler un peu de sable dans le visage d'une cible pour la rendre temporairement Vulnérable."
   },
   {
     "id": "nQ0dhnzdqm8pz9Fp",
@@ -151,7 +151,7 @@
     "descEn": "This snuffbox is filled with combustible powder.",
     "img": "icons/containers/boxes/crate-tech-red.webp",
     "fan": true,
-    "descFr": "Ce tabatière est remplie d'une poudre combustible."
+    "descFr": "Cette tabatière est remplie d'une poudre combustible."
   },
   {
     "id": "bZyT7Qw7iafswlTY",
@@ -162,7 +162,7 @@
     "descEn": "Once per long rest, you can open this small box and roll a [[/r d12]]. On a result of 1–6, it's empty. On a result of 7–10, it contains one random common consumable. On a result of 11–12, it contains two random common consumables.",
     "img": "icons/containers/boxes/crate-heavy-yellow.webp",
     "fan": false,
-    "descFr": "Une fois par long repos, vous pouvez ouvrir cette petite boîte et lancer un [[/r d12]]. Sur un résultat de 1 à 6, elle est vide. Sur un résultat de 7 à 10, elle contient un consommable courant au hasard. Sur un résultat de 11 à 12, elle contient deux consommables courants au hasard."
+    "descFr": "Une fois par repos long, vous pouvez ouvrir cette petite boîte et lancer un d12. Sur un résultat de 1 à 6, elle est vide. Sur un résultat de 7 à 10, elle contient un consommable courant au hasard. Sur un résultat de 11 à 12, elle contient deux consommables courants au hasard."
   },
   {
     "id": "hNCCPH0wV2GLFKT6",
@@ -173,7 +173,7 @@
     "descEn": "On a successful weapon attack, you can knock your target back up to Close range from their location.",
     "img": "icons/commodities/treasure/brooch-jewel-gold-blue.webp",
     "fan": true,
-    "descFr": "Lors d'une attaque à l'arme réussie, vous pouvez repousser votre cible jusqu'à portée Rapprochée de sa position."
+    "descFr": "Lors d'une attaque à l'arme réussie, vous pouvez repousser votre cible jusqu'à portée Proche de sa position."
   },
   {
     "id": "tgFFMxpuRSiRrrEB",
@@ -184,18 +184,18 @@
     "descEn": "When you would mark your last Stress, roll a [[/r d6]]. On a result of 5 or higher, don't mark it.",
     "img": "icons/equipment/neck/amulet-round-blue.webp",
     "fan": false,
-    "descFr": "Lorsque vous devriez marquer votre dernier Stress, lancez un [[/r d6]]. Sur un résultat de 5 ou plus, ne le marquez pas."
+    "descFr": "Lorsque vous devriez marquer votre dernier Stress, lancez un d6. Sur un résultat de 5 ou plus, ne le marquez pas."
   },
   {
     "id": "MHtVtO1J2ikzvRgZ",
     "en": "Caltrops",
-    "fr": "Caltrops",
+    "fr": "Chausse-trappes",
     "type": "loot",
     "rarity": null,
     "descEn": "You can spread these caltrops in a Very Close area around you. A creature hastening through that area must mark a Stress.",
     "img": "icons/containers/bags/coinpouch-simple-tan.webp",
     "fan": true,
-    "descFr": "Vous pouvez répandre ces caltrops dans une zone Très rapprochée autour de vous. Une créature qui se dépêche dans cette zone doit marquer un Stress."
+    "descFr": "Vous pouvez répandre ces chausse-trappes dans une zone Très proche autour de vous. Une créature qui se dépêche dans cette zone doit marquer un Stress."
   },
   {
     "id": "gsUDP90d4SRtLEUn",
@@ -266,13 +266,13 @@
   {
     "id": "AHqRDhPuWAdecutZ",
     "en": "Communion Relic",
-    "fr": "Relique d'harmonie",
+    "fr": "Relique de communion",
     "type": "loot",
     "rarity": null,
     "descEn": "Once per rest, you can spend a Hope to use an ally's Experience as if it were your own. You can carry only one relic.",
     "img": "icons/commodities/treasure/token-engraved-spiral-grey.webp",
     "fan": false,
-    "descFr": "Une fois par repos, vous pouvez dépenser un Espoir pour utiliser l'Expérience d'un allié comme si elle était la vôtre."
+    "descFr": "Une fois par repos, vous pouvez dépenser un Espoir pour utiliser l'Expérience d'un allié comme si c'était la vôtre. Vous ne pouvez porter qu'une seule relique."
   },
   {
     "id": "V25uXkAQvK3hUta4",
@@ -305,7 +305,7 @@
     "descEn": "This tiny sprite sits in the curve of your ear canal and whispers helpful advice during combat. Once per short rest, you can gain advantage on an attack roll.",
     "img": "icons/magic/light/orbs-smoke-pink.webp",
     "fan": false,
-    "descFr": "Ce lutin minuscule se niche dans le conduit de votre oreille et chuchote des conseils utiles au combat. Une fois par court repos, vous pouvez obtenir un avantage sur un jet d'attaque."
+    "descFr": "Ce lutin minuscule se niche dans le conduit de votre oreille et chuchote des conseils utiles au combat. Une fois par repos court, vous pouvez obtenir un avantage sur un jet d'attaque."
   },
   {
     "id": "2kv7bVMaveULmJIE",
@@ -349,7 +349,7 @@
     "descEn": "Once per rest, [[/r 1d2]]{flip a coin.} On heads, you gain a +1 bonus to attack rolls until your next successful attack. On tails, you gain +1 to your Evasion until an attack fails against you.",
     "img": "icons/commodities/currency/coin-engraved-waves-copper.webp",
     "fan": true,
-    "descFr": "Une fois par repos, [[/r 1d2]]{lancez une pièce.} Pile, vous obtenez un bonus de +1 aux jets d'attaque jusqu'à votre prochaine attaque réussie. Face, vous obtenez +1 à votre Évasion jusqu'à ce qu'une attaque rate contre vous."
+    "descFr": "Une fois par repos, lancez une pièce. Pile, vous obtenez un bonus de +1 aux jets d'attaque jusqu'à votre prochaine attaque réussie. Face, vous obtenez +1 à votre Évasion jusqu'à ce qu'une attaque rate contre vous."
   },
   {
     "id": "PkmTZXRMZL022O75",
@@ -360,7 +360,7 @@
     "descEn": "Once per long rest, you can activate this amulet to become Hidden until you move. While Hidden in this way, you remain unseen even if an adversary moves to where they would normally see you.",
     "img": "icons/equipment/neck/pendant-rough-silver-purple.webp",
     "fan": false,
-    "descFr": "Une fois par long repos, vous pouvez activer cette amulette pour devenir Caché jusqu'à ce que vous vous déplaciez. Tant que vous êtes Caché de cette manière, vous restez invisible même si un adversaire se déplace à un endroit où il vous verrait normalement."
+    "descFr": "Une fois par repos long, vous pouvez activer cette amulette pour devenir Caché jusqu'à ce que vous vous déplaciez. Tant que vous êtes Caché de cette manière, vous restez invisible même si un adversaire se déplace à un endroit où il vous verrait normalement."
   },
   {
     "id": "Zt9K4eHv2etzau6v",
@@ -415,7 +415,7 @@
     "descEn": "Once per long rest, you can command this fist-sized silver orb to capture an omnidirectional image of its surroundings on its surface. This image lasts until your next long rest.",
     "img": "icons/commodities/gems/pearl-swirl-blue.webp",
     "fan": true,
-    "descFr": "Une fois par long repos, vous pouvez commander à cette sphère d'argent de la taille d'un poing de capturer une image omnidirectionnelle de son environnement sur sa surface. Cette image dure jusqu'à votre prochain long repos."
+    "descFr": "Une fois par repos long, vous pouvez commander à cette sphère d'argent de la taille d'un poing de capturer une image omnidirectionnelle de son environnement sur sa surface. Cette image dure jusqu'à votre prochain repos long."
   },
   {
     "id": "X6RMkIt89wf7qX2E",
@@ -426,7 +426,7 @@
     "descEn": "You can pour out the strange liquid contents of this jar to instantly produce fire. The contents regenerate when you take a long rest.",
     "img": "icons/containers/kitchenware/jug-wrapped-red.webp",
     "fan": false,
-    "descFr": "Vous pouvez verser le liquide étrange contenu dans ce pot pour produire instantanément du feu. Le contenu se régénère lorsque vous effectuez un long repos."
+    "descFr": "Vous pouvez verser le liquide étrange contenu dans ce pot pour produire instantanément du feu. Le contenu se régénère lorsque vous effectuez un repos long."
   },
   {
     "id": "9VKYSBQxN9XFWlAm",
@@ -437,7 +437,7 @@
     "descEn": "While you carry this pendant, your weapons with a Melee range that deal physical damage have a gossamer sheen and can attack targets within Very Close range.",
     "img": "icons/equipment/neck/choker-rough-green.webp",
     "fan": false,
-    "descFr": "Tant que vous portez ce pendentif, vos armes de portée Mêlée infligeant des dégâts physiques ont un éclat de soie et peuvent attaquer des cibles à portée Très rapprochée."
+    "descFr": "Tant que vous portez ce pendentif, vos armes de portée Mêlée infligeant des dégâts physiques ont un éclat de soie et peuvent attaquer des cibles à portée Très proche."
   },
   {
     "id": "ABuNwIdACvsxSyNP",
@@ -459,7 +459,7 @@
     "descEn": "Once per rest, you can produce [[/r 2d20]] harmless, cat-sized fur creatures of indeterminate origin and species from this bag.",
     "img": "icons/containers/bags/pouch-leather-pink.webp",
     "fan": true,
-    "descFr": "Une fois par repos, vous pouvez produire [[/r 2d20]] des créatures de fourrure inoffensives, de la taille d'un chat, d'origine et d'espèces indéterminées, à partir de ce sac."
+    "descFr": "Une fois par repos, vous pouvez produire 2d20 créatures de fourrure inoffensives, de la taille d'un chat, d'origine et d'espèces indéterminées, à partir de ce sac."
   },
   {
     "id": "CyefGILogUehSTe0",
@@ -646,7 +646,7 @@
     "descEn": "When you critically succeed on an attack, all allies within Close range gain a Hope.",
     "img": "icons/equipment/head/helm-barbute-brass-steel.webp",
     "fan": true,
-    "descFr": "Lorsque vous obtenez un succès critique sur une attaque, tous les alliés à portée Rapprochée gagnent un Espoir."
+    "descFr": "Lorsque vous obtenez un succès critique sur une attaque, tous les alliés à portée Proche gagnent un Espoir."
   },
   {
     "id": "9zgvj1CQaOmvdodC",
@@ -690,7 +690,7 @@
     "descEn": "During a long rest, if you have 6 Hope, you can spend a Hope to imbue this locket with your bountiful resolve. When you have 0 Hope, you can use the locket to immediately gain a Hope. The locket must be re-imbued before it can be used this way again.",
     "img": "icons/equipment/neck/amulet-round-engraved-spiral-gold.webp",
     "fan": false,
-    "descFr": "Lors d'un long repos, si vous avez 6 Espoir, vous pouvez dépenser un Espoir pour imprégner ce médaillon de votre volonté abondante. Lorsque vous avez 0 Espoir, vous pouvez utiliser le médaillon pour immédiatement obtenir un Espoir. Le médaillon doit être ré-imprégné avant de pouvoir être utilisé à nouveau de cette manière."
+    "descFr": "Lors d'un repos long, si vous avez 6 Espoir, vous pouvez dépenser un Espoir pour imprégner ce médaillon de votre volonté abondante. Lorsque vous avez 0 Espoir, vous pouvez utiliser le médaillon pour immédiatement obtenir un Espoir. Le médaillon doit être ré-imprégné avant de pouvoir être utilisé à nouveau de cette manière."
   },
   {
     "id": "Iedjw1LVWEozVh0J",
@@ -723,7 +723,7 @@
     "descEn": "Once per long rest, you can spend a Hope to tell the pendant a creature's name. The pendant gently pulls you toward that creature's current location until your next long rest.",
     "img": "icons/equipment/neck/necklace-simple-engraved-stone.webp",
     "fan": true,
-    "descFr": "Une fois par long repos, vous pouvez dépenser un Espoir pour dire à ce pendentif le nom d'une créature. Le pendentif vous attire doucement vers l'emplacement actuel de cette créature jusqu'à votre prochain long repos."
+    "descFr": "Une fois par repos long, vous pouvez dépenser un Espoir pour dire à ce pendentif le nom d'une créature. Le pendentif vous attire doucement vers l'emplacement actuel de cette créature jusqu'à votre prochain repos long."
   },
   {
     "id": "oB9zqrcM1jCKBK6U",
@@ -745,7 +745,7 @@
     "descEn": "Once per long rest, you can use this net to scoop one live fish out of any amount of water, no matter how unlikely it is for that water to have fish in it.",
     "img": "icons/tools/fishing/net-gold.webp",
     "fan": true,
-    "descFr": "Une fois par long repos, vous pouvez utiliser ce filet pour attraper un poisson vivant dans n'importe quelle quantité d'eau, aussi improbable soit-il qu'il y ait des poissons."
+    "descFr": "Une fois par repos long, vous pouvez utiliser ce filet pour attraper un poisson vivant dans n'importe quelle quantité d'eau, aussi improbable soit-il qu'il y ait des poissons."
   },
   {
     "id": "2gaZtAAs0KRtAE7c",
@@ -756,7 +756,7 @@
     "descEn": "On a successful weapon attack, you can knock your target back up to Close range from their location.",
     "img": "icons/equipment/wrist/bracer-reinforced.webp",
     "fan": true,
-    "descFr": "En cas d'attaque à l'arme réussie, vous pouvez projeter votre cible en arrière jusqu'à une distance de portée Rapprochée de sa position."
+    "descFr": "En cas d'attaque à l'arme réussie, vous pouvez projeter votre cible en arrière jusqu'à une distance de portée Proche de sa position."
   },
   {
     "id": "NgvmrJYKpA2PrRSo",
@@ -844,7 +844,7 @@
     "descEn": "As a downtime move, you can use the bone of a creature to craft a Minor Stamina Potion.",
     "img": "icons/sundries/scrolls/scroll-bound-green.webp",
     "fan": false,
-    "descFr": "En tant que mouvement de temps mort, vous pouvez utiliser l'os d'une créature pour fabriquer une potion de résistance mineure."
+    "descFr": "En tant que mouvement de temps mort, vous pouvez utiliser l'os d'une créature pour fabriquer une potion de résilience mineure."
   },
   {
     "id": "KzRYiDcJeVHPXf8d",
@@ -899,7 +899,7 @@
     "descEn": "As a downtime move, you can meditate on an ideal or principle you hold dear and focus your will into this chain. Once per long rest, you can spend a Hope to roll a d20 as your Hope Die for rolls that directly align with that principle.",
     "img": "icons/equipment/neck/choker-chain-thin-gold.webp",
     "fan": false,
-    "descFr": "En tant que mouvement de temps mort, vous pouvez méditer sur un idéal ou un principe qui vous est cher et concentrer votre volonté dans cette chaîne. Une fois par long repos, vous pouvez dépenser un Espoir pour lancer un d20 comme votre Dé d'Espoir pour les jets qui s'alignent directement avec ce principe."
+    "descFr": "En tant que mouvement de temps mort, vous pouvez méditer sur un idéal ou un principe qui vous est cher et concentrer votre volonté dans cette chaîne. Une fois par repos long, vous pouvez dépenser un Espoir pour lancer un d20 comme votre Dé d'Espoir pour les jets qui s'alignent directement avec ce principe."
   },
   {
     "id": "ERL0eMaAW1Akx6Nn",
@@ -910,7 +910,7 @@
     "descEn": "When the GM spends a Fear, roll a d4. Once per scene on a result of 4, you clear a Stress.",
     "img": "icons/commodities/treasure/crown-gold-laurel-wreath.webp",
     "fan": true,
-    "descFr": "Lorsque le GM dépense une Peur, lancez un d4. Une fois par scène sur un résultat de 4, vous effacez un Stress."
+    "descFr": "Lorsque le MJ dépense une Peur, lancez un d4. Une fois par scène sur un résultat de 4, vous effacez un Stress."
   },
   {
     "id": "QNtzJSVENww63THa",
@@ -932,7 +932,7 @@
     "descEn": "Three times per rest when you succeed on an attack with one of these arrows, you can add your Proficiency to the damage roll.",
     "img": "icons/weapons/ammunition/arrow-broadhead-glowing-orange.webp",
     "fan": false,
-    "descFr": "Trois fois par repos, lorsque vous réussissez une attaque avec l'une de ces flèches, vous pouvez ajouter votre Compétence au jet de dégâts."
+    "descFr": "Trois fois par repos, lorsque vous réussissez une attaque avec l'une de ces flèches, vous pouvez ajouter votre Maîtrise au jet de dégâts."
   },
   {
     "id": "v4PIoCCEjeE3acys",
@@ -987,7 +987,7 @@
     "descEn": "If an adversary attacks you within Melee range, they must succeed on a Reaction Roll (12) or mark a Hit Point.",
     "img": "icons/commodities/cloth/ribbon-bow-purple.webp",
     "fan": true,
-    "descFr": "Si un adversaire vous attaque à portée de Mêlée, il doit réussir un jet de Réaction (12) ou marquer un PV."
+    "descFr": "Si un adversaire vous attaque à portée Mêlée, il doit réussir un jet de Réaction (12) ou marquer un PV."
   },
   {
     "id": "PAZL4sEq7UB5sLsA",
@@ -1020,7 +1020,7 @@
     "descEn": "Once per long rest, you can activate this ring after a successful attack against you to halve the damage.",
     "img": "icons/equipment/finger/ring-shield-silver.webp",
     "fan": false,
-    "descFr": "Une fois par long repos, vous pouvez activer cet anneau après une attaque réussie contre vous pour réduire de moitié les dégâts."
+    "descFr": "Une fois par repos long, vous pouvez activer cet anneau après une attaque réussie contre vous pour réduire de moitié les dégâts."
   },
   {
     "id": "K1ysGnTpNyxPu5Au",
@@ -1042,7 +1042,7 @@
     "descEn": "Once per session, when the GM spends a Fear, you can spend 4 Hope to cancel the effects of that spent Fear.",
     "img": "icons/equipment/finger/ring-faceted-gold-teal.webp",
     "fan": false,
-    "descFr": "Une fois par session, lorsque le GM dépense une Peur, vous pouvez dépenser 4 Espoir pour annuler les effets de cette Peur dépensée."
+    "descFr": "Une fois par session, lorsque le MJ dépense une Peur, vous pouvez dépenser 4 Espoir pour annuler les effets de cette Peur dépensée."
   },
   {
     "id": "GK0z0U4xxxOgQPC3",
@@ -1050,7 +1050,7 @@
     "fr": "Anneaux d'alliance",
     "type": "loot",
     "rarity": null,
-    "descFr": "Deux créatures peuvent porter cette paire d'anneaux en or rose. Une fois par session, vous pouvez initier un Jet d'Équipe avec celui qui porte l'autre anneau sans dépenser d'Espoir ou sans compter contre votre limite de session pour les Jets d'Équipe.",
+    "descFr": "Deux créatures peuvent porter cette paire d'anneaux en or rose. Une fois par session, vous pouvez initier un Jet d'Équipe avec celui qui porte l'autre anneau sans dépenser d'Espoir et sans compter contre votre limite de session pour les Jets d'Équipe.",
     "descEn": "Two creatures can wear this pair of rose gold rings. Once per session, you can initiate a Tag Team Roll with whoever is wearing the other ring without spending Hope or counting against your session limit for Tag Team Rolls.",
     "img": "icons/equipment/finger/ring-cabochon-silver-red.webp",
     "fan": true
@@ -1097,7 +1097,7 @@
     "descEn": "Once per long rest, you can spend 2 Hope to recall a domain card from your vault instead of paying its Recall Cost.",
     "img": "icons/commodities/gems/gem-rough-navette-purple-pink.webp",
     "fan": false,
-    "descFr": "Une fois par long repos, vous pouvez dépenser 2 Espoir pour rappeler une carte de domaine de votre caveau au lieu de payer son Prix de rappel."
+    "descFr": "Une fois par repos long, vous pouvez dépenser 2 Espoir pour rappeler une carte de domaine de votre caveau au lieu de payer son Prix de rappel."
   },
   {
     "id": "xwZiqqwNYUJMiWjZ",
@@ -1105,7 +1105,7 @@
     "fr": "Couteau pliant de Silee",
     "type": "loot",
     "rarity": null,
-    "descFr": "Ce lame de 3 pouces a un tranchant qui coupe facilement tout sauf le manche dans lequel elle est rangée.",
+    "descFr": "Cette lame de 3 pouces a un tranchant qui coupe facilement tout sauf le manche dans lequel elle est rangée.",
     "descEn": "This 3-inch blade has an edge that easily cuts through anything except the handle it's stored in.",
     "img": "icons/weapons/daggers/knife-engraved-black.webp",
     "fan": true
@@ -1138,7 +1138,7 @@
     "fr": "Diadèmes d’âmes jumelles",
     "type": "loot",
     "rarity": null,
-    "descFr": "Deux créatures peuvent porter ce paire de diadèmes. Vous pouvez dépenser un Espoir pour échanger de place avec celle qui porte l'autre diadème.",
+    "descFr": "Deux créatures peuvent porter cette paire de diadèmes. Vous pouvez dépenser un Espoir pour échanger de place avec celle qui porte l'autre diadème.",
     "descEn": "Two creatures can wear this pair of circlets. You can spend a Hope to switch places with whoever is wearing the other circlet.",
     "img": "icons/commodities/treasure/trinket-wing-white.webp",
     "fan": true
@@ -1163,7 +1163,7 @@
     "descEn": "You gain a +1 bonus to your Agility. You can only carry one relic.",
     "img": "icons/commodities/treasure/token-runed-ing-brown.webp",
     "fan": false,
-    "descFr": "Vous gagnez un bonus de +1 à votre Agilité. Vous ne pouvez porter qu'une seule relique à la fois."
+    "descFr": "Vous obtenez un bonus de +1 à votre Agilité. Vous ne pouvez porter qu'une seule relique."
   },
   {
     "id": "nnj12RiFanq7s5zv",
@@ -1226,7 +1226,7 @@
     "fr": "Cloche du voyageur",
     "type": "loot",
     "rarity": null,
-    "descFr": "Une fois par long repos, vous pouvez sonner cette cloche pour ouvrir magiquement le chemin le plus sûr à travers un terrain difficile pendant 1 heure.",
+    "descFr": "Une fois par repos long, vous pouvez sonner cette cloche pour ouvrir magiquement le chemin le plus sûr à travers un terrain difficile pendant 1 heure.",
     "descEn": "Once per long rest, you can ring this bell to magically open the shortest safe path through rough terrain for 1 hour.",
     "img": "icons/tools/instruments/bell-brass-brown.webp",
     "fan": true
@@ -1237,7 +1237,7 @@
     "fr": "Broche de l’égide à deux visages",
     "type": "loot",
     "rarity": null,
-    "descFr": "Une fois par repos, [[/r 1d2]]{lancez une pièce}. Pile, vous devenez immunisé contre les prochains dégâts physiques que vous subissez. Face, vous devenez immunisé contre les prochains dégâts magiques que vous subissez.",
+    "descFr": "Une fois par repos, lancez une pièce. Pile, vous devenez immunisé contre les prochains dégâts physiques que vous subissez. Face, vous devenez immunisé contre les prochains dégâts magiques que vous subissez.",
     "descEn": "Once per rest, [[/r 1d2]]{flip a coin}. On heads, you become immune to the next physical damage you take. On tails, you become immune to the next magic damage you take.",
     "img": "icons/commodities/currency/coin-engraved-moon-silver.webp",
     "fan": true
@@ -1262,7 +1262,7 @@
     "descEn": "As a downtime move, you can mark a Stress to craft a Vial of Darksmoke.",
     "img": "icons/sundries/scrolls/scroll-bound-black-brown.webp",
     "fan": false,
-    "descFr": "En tant qu'action de temps mort, vous pouvez marquer un Stress pour fabriquer une Fiole de Sombrefumée."
+    "descFr": "En tant que mouvement de temps mort, vous pouvez marquer un Stress pour fabriquer une Fiole de Sombrefumée."
   },
   {
     "id": "C2lZrVCqXZ09t7U5",
@@ -1347,7 +1347,7 @@
     "fr": "Éclat d’arcticite",
     "type": "consumable",
     "rarity": null,
-    "descFr": "Choisissez un point à portée Éloignée. Toutes les cibles à portée Rapprochée de ce point doivent réussir un jet de Réaction (16) ou subir 3d6 dégâts magiques et devenir temporairement Entravées par la glace.",
+    "descFr": "Choisissez un point à portée Éloignée. Toutes les cibles à portée Proche de ce point doivent réussir un jet de Réaction (16) ou subir 3d6 dégâts magiques et devenir temporairement Entravées par la glace.",
     "descEn": "Choose a point within Far range. All targets within Close range of that point must succeed on a Reaction Roll (16) or take 3d6 magic damage and become temporarily Restrained by ice.",
     "img": "icons/commodities/gems/gem-faceted-cushion-teal-black.webp",
     "fan": true
@@ -1380,7 +1380,7 @@
     "fr": "Breuvage du berserker",
     "type": "consumable",
     "rarity": null,
-    "descFr": "Lorsque vous buvez ce drame de liquide, vous gagnez un bonus à votre Force et un pénalité à votre Finesse et Savoir égal à votre Instinct (minimum 1). Cet effet dure jusqu'à ce que vous effectuiez un mouvement de mort ou jusqu'à votre prochain repos.",
+    "descFr": "Lorsque vous buvez cette mesure de liquide, vous gagnez un bonus à votre Force et une pénalité à votre Finesse et à votre Savoir égale à votre Instinct (minimum 1). Cet effet dure jusqu'à ce que vous effectuiez un mouvement de mort ou jusqu'à votre prochain repos.",
     "descEn": "When you drink this dram of liquid, you gain a bonus to your Strength and a penalty to your Finesse and Knowledge equal to your Instinct (minimum 1). This effect lasts until you make a death move or until your next rest.",
     "img": "icons/consumables/potions/bottle-corked-red.webp",
     "fan": true
@@ -1394,7 +1394,7 @@
     "descEn": "You can activate this orb to create a flash of bright light. All targets within Close range become Vulnerable until they mark HP. @Template[type:emanation|range:c]",
     "img": "icons/magic/light/explosion-star-large-blue-yellow.webp",
     "fan": false,
-    "descFr": "Vous pouvez activer cette orbe pour créer un éclair de lumière vive. Toutes les cibles à portée Rapprochée deviennent Vulnérables jusqu'à ce qu'elles marquent des PV. @Template[type:emanation|range:c]"
+    "descFr": "Vous pouvez activer cet orbe pour créer un éclair de lumière vive. Toutes les cibles à portée Proche deviennent Vulnérables jusqu'à ce qu'elles marquent des PV."
   },
   {
     "id": "pDGzmczoTlKGmKgd",
@@ -1405,7 +1405,7 @@
     "descEn": "You can drink this blood to disappear from where you are and immediately reappear at a point you can see within Very Far range.",
     "img": "icons/consumables/potions/potion-tube-corked-bat-gold-red.webp",
     "fan": false,
-    "descFr": "Vous pouvez boire ce sang pour disparaître de votre position et réapparaître instantanément à un point de votre choix à portée Très Éloignée."
+    "descFr": "Vous pouvez boire ce sang pour disparaître de votre position et réapparaître instantanément à un point de votre choix à portée Très éloignée."
   },
   {
     "id": "FOPQNqXbiVO0ilYL",
@@ -1438,7 +1438,7 @@
     "descEn": "Thick vines grow from your location to a point of your choice within Far range, allowing you to climb up or across them. The vines dissipate on your next short rest.",
     "img": "icons/consumables/plants/leaf-old-dried-curled-green.webp",
     "fan": false,
-    "descFr": "De grosses vignes poussent de votre emplacement jusqu'à un point de votre choix à portée Éloignée, vous permettant de grimper dessus ou de traverser. Les vignes disparaissent à votre prochain court repos."
+    "descFr": "De grosses vignes poussent de votre emplacement jusqu'à un point de votre choix à portée Éloignée, vous permettant de grimper dessus ou de traverser. Les vignes disparaissent à votre prochain repos court."
   },
   {
     "id": "8xFCYnLWg6N4kPLC",
@@ -1457,7 +1457,7 @@
     "fr": "Concoction cacophonique",
     "type": "consumable",
     "rarity": null,
-    "descFr": "Lorsque vous buvez cette potion, tout ce que vous dites ou faites dans l'heure qui suit devient impossible à rapporter pour un témoin. Toutes leurs tentatives pour communiquer ce qu'ils ont vu, entendu ou perçu aboutissent à un charabia ou un incohérent.",
+    "descFr": "Lorsque vous buvez cette potion, tout ce que vous dites ou faites dans l'heure qui suit devient impossible à rapporter pour un témoin. Toutes leurs tentatives pour communiquer ce qu'ils ont vu, entendu ou perçu aboutissent à un charabia incohérent.",
     "descEn": "When you drink this potion, anything you say or do in the next hour becomes impossible for a witness to recount. Any attempts they make to communicate what they saw, heard, or otherwise sensed comes out garbled or nonsensical.",
     "img": "icons/consumables/potions/bottle-bulb-corked-purple.webp",
     "fan": true
@@ -1504,7 +1504,7 @@
     "descEn": "Mark a Stress to create a void that extends up to Far range. No magic can be cast inside the void, and creatures within the void are immune to magic damage.",
     "img": "icons/magic/unholy/orb-glowing-purple.webp",
     "fan": false,
-    "descFr": "Marquez un Stress pour créer un vide qui s'étend jusqu'à portée Éloigée. Aucun sort ne peut être lancé à l'intérieur du vide, et les créatures à l'intérieur du vide sont immunisées contre les dégâts magiques."
+    "descFr": "Marquez un Stress pour créer un vide qui s'étend jusqu'à portée Éloignée. Aucun sort ne peut être lancé à l'intérieur du vide, et les créatures à l'intérieur du vide sont immunisées contre les dégâts magiques."
   },
   {
     "id": "1D81W1ECLzGHHyAv",
@@ -1512,7 +1512,7 @@
     "fr": "Bouteille de brouillard ciscan",
     "type": "consumable",
     "rarity": null,
-    "descFr": "Vous pouvez briser cette jarre pour remplir la zone à portée Rapprochée d'un brouillard magique. Une créature qui entre dans le brouillard efface un Stress et devient Caché.",
+    "descFr": "Vous pouvez briser cette jarre pour remplir la zone à portée Proche d'un brouillard magique. Une créature qui entre dans le brouillard efface un Stress et devient Caché.",
     "descEn": "You can break this jar to fill the area within Close range with magical mist. A creature who enters the mist clears a Stress and becomes Hidden.",
     "img": "icons/consumables/potions/bottle-corked-empty.webp",
     "fan": true
@@ -1523,7 +1523,7 @@
     "fr": "Thé de patte de coq",
     "type": "consumable",
     "rarity": null,
-    "descFr": "Vous pouvez boire ce thé pour rafraîchir vos traits comme si vous aviez effectué un long repos.",
+    "descFr": "Vous pouvez boire ce thé pour rafraîchir vos traits comme si vous aviez effectué un repos long.",
     "descEn": "You can drink this tea to refresh your features as if you had taken a long rest.",
     "img": "icons/consumables/drinks/coffee.webp",
     "fan": true
@@ -1556,7 +1556,7 @@
     "fr": "Bézoard de l’échanson",
     "type": "consumable",
     "rarity": null,
-    "descFr": "Vous pouvez avaler ce bézoard pour devenir immunisé contre les poisons jusqu'à votre prochain long repos.",
+    "descFr": "Vous pouvez avaler ce bézoard pour devenir immunisé contre les poisons jusqu'à votre prochain repos long.",
     "descEn": "You can swallow this bezoar to become immune to poisons until your next long rest.",
     "img": "icons/commodities/materials/slime-thick-orange.webp",
     "fan": true
@@ -1570,7 +1570,7 @@
     "descEn": "After you drink this tea, you instantly kill your target when you critically succeed on an attack. If you don't critically succeed on an attack before your next long rest, you die.",
     "img": "icons/consumables/drinks/wine-amphora-clay-gray.webp",
     "fan": false,
-    "descFr": "Après avoir bu ce thé, vous tuez instantanément votre cible lorsque vous réussissez un critique avec une attaque. Si vous ne réussissez pas de critique avec une attaque avant votre prochain long repos, vous mourez."
+    "descFr": "Après avoir bu ce thé, vous tuez instantanément votre cible lorsque vous réussissez un critique avec une attaque. Si vous ne réussissez pas de critique avec une attaque avant votre prochain repos long, vous mourez."
   },
   {
     "id": "OGnTVWBqgNJDrOeK",
@@ -1578,7 +1578,7 @@
     "fr": "Poudre du voyant de mort",
     "type": "consumable",
     "rarity": null,
-    "descFr": "Vous pouvez saupoudrer cette poudre sur un récemment décédé pour faire apparaître un spectral de sa dernière minute de vie.",
+    "descFr": "Vous pouvez saupoudrer cette poudre sur une créature récemment morte pour faire apparaître un spectre de sa dernière minute de vie.",
     "descEn": "You can sprinkle this powder over a recently deceased corpse to conjure a spectral reprise of their final minute of life.",
     "img": "icons/commodities/materials/bowl-powder-teal.webp",
     "fan": true
@@ -1614,7 +1614,7 @@
     "descEn": "You can drink this tea to unleash a fiery breath attack. Make an Instinct Roll against all adversaries in front of you within Close range. Targets you succeed against take d20 physical damage using your Proficiency.",
     "img": "icons/consumables/drinks/tea-jug-gourd-brown.webp",
     "fan": false,
-    "descFr": "Vous pouvez boire ce thé pour lancer une attaque de souffle enflammé. Effectuez un jet d'Instinct contre tous les adversaires devant vous à portée Rapprochée. Les cibles contre lesquelles vous réussissez subissent d20 dégâts physiques en utilisant votre Maîtrise."
+    "descFr": "Vous pouvez boire ce thé pour lancer une attaque de souffle enflammé. Effectuez un jet d'Instinct contre tous les adversaires devant vous à portée Proche. Les cibles contre lesquelles vous réussissez subissent d20 dégâts physiques en utilisant votre Maîtrise."
   },
   {
     "id": "7r21aeT3LT8wQypK",
@@ -1647,7 +1647,7 @@
     "descEn": "Choose a point within Far range. All targets within Close range of that point must succeed on a Reaction Roll (16) or take 3d6 magic damage and become temporarily Ablaze. While Ablaze, a creature must roll a d4 whenever they make an action roll. On a result of 1, they mark a Hit Point. On a result of 4, they clear the Ablaze condition.",
     "img": "icons/commodities/gems/gem-rough-cushion-red-white.webp",
     "fan": false,
-    "descFr": "Choisissez un point à portée Éloignée. Toutes les cibles à portée Rapprochée de ce point doivent réussir un jet de Réaction (16) ou subir 3d6 dégâts magiques et devenir temporairement Enflammées. Tant qu'elles sont Enflammées, une créature doit lancer un d4 à chaque jet d'action. Sur un résultat de 1, elle marque un PV. Sur un résultat de 4, elle efface la condition Enflammé."
+    "descFr": "Choisissez un point à portée Éloignée. Toutes les cibles à portée Proche de ce point doivent réussir un jet de Réaction (16) ou subir 3d6 dégâts magiques et devenir temporairement Enflammées. Tant qu'elles sont Enflammées, une créature doit lancer un d4 à chaque jet d'action. Sur un résultat de 1, elle marque un PV. Sur un résultat de 4, elle efface la condition Enflammé."
   },
   {
     "id": "aWHSO2AqDufi7nL4",
@@ -1688,7 +1688,7 @@
     "fr": "Potion du pas de plume",
     "type": "consumable",
     "rarity": null,
-    "descFr": "Vous pouvez boire cette potion pour faire pousser de petites ailes à vos chevilles qui vous donnent un bonus à votre Esquive égal à votre rang jusqu'à votre prochain repos.",
+    "descFr": "Vous pouvez boire cette potion pour faire pousser de petites ailes à vos chevilles qui vous donnent un bonus à votre Évasion égal à votre rang jusqu'à votre prochain repos.",
     "descEn": "You can drink this potion to sprout small wings from your ankles that give you a bonus to your Evasion equal to your tier until your next rest.",
     "img": "icons/consumables/potions/potion-flask-corked-tied-necklace-teal.webp",
     "fan": true
@@ -1699,7 +1699,7 @@
     "fr": "Sérum formoïde",
     "type": "consumable",
     "rarity": null,
-    "descFr": "Vous pouvez boire cette potion pour devenir un essaim de 16 millions de fourmis jusqu'à la fin de la scène. Vous conservez et avez accès à tout votre équipement, butin et aptitudes.",
+    "descFr": "Vous pouvez boire cette potion pour devenir un essaim de 16 millions de fourmis jusqu'à la fin de la scène. Vous conservez l'accès à tout votre équipement, butin et aptitudes.",
     "descEn": "You can drink this potion to become a swarm of 16 million ants until the end of the scene. You keep and have access to all equipment, loot, and features.",
     "img": "icons/consumables/potions/bottle-bulb-empty-glass.webp",
     "fan": true
@@ -1713,7 +1713,7 @@
     "descEn": "Choose a point within Far range. All targets within Close range of that point must succeed on a Reaction Roll (16) or take 3d6 magic damage and mark 1d4 Stress as lightning crackles through the area.",
     "img": "icons/commodities/gems/gem-rough-cushion-purple.webp",
     "fan": false,
-    "descFr": "Choisissez un point à portée Éloignée. Toutes les cibles à portée Rapprochée de ce point doivent réussir un jet de Réaction (16) ou subir 3d6 dégâts magiques et marquer 1d4 Stress tandis que des éclairs parcourent la zone."
+    "descFr": "Choisissez un point à portée Éloignée. Toutes les cibles à portée Proche de ce point doivent réussir un jet de Réaction (16) ou subir 3d6 dégâts magiques et marquer 1d4 Stress tandis que des éclairs parcourent la zone."
   },
   {
     "id": "sgqL3qFiArgCR8oI",
@@ -1721,7 +1721,7 @@
     "fr": "Sophisme du parieur",
     "type": "consumable",
     "rarity": null,
-    "descFr": "Vous pouvez dépenser un nombre poignées d'or en les plaçant dans ce pot en céramique à fentes, en forme de cochon. Lorsque vous lancez le pot à un point à portée Éloignée, il explose et inflige 1d20 dégâts magiques pour chaque poignée d'or dépensée à toutes les créatures à portée Rapprochée de ce point. Tout l'or contenu dans le pot est détruit.",
+    "descFr": "Vous pouvez dépenser un certain nombre de poignées d'or en les plaçant dans ce pot en céramique à fentes, en forme de cochon. Lorsque vous lancez le pot à un point à portée Éloignée, il explose et inflige 1d20 dégâts magiques pour chaque poignée d'or dépensée à toutes les créatures à portée Proche de ce point. Tout l'or contenu dans le pot est détruit.",
     "descEn": "You can spend any number of handfuls of gold by placing them into this slotted ceramic jar shaped like a pig. When you throw the jar at a point within Far range, it explodes and deals 1d20 magic damage for each handful of gold spent to all creatures within Close range of that point. All gold within the jar is destroyed.",
     "img": "icons/sundries/misc/piggybank.webp",
     "fan": true
@@ -1743,7 +1743,7 @@
     "fr": "Champignon lumenmousse",
     "type": "consumable",
     "rarity": null,
-    "descFr": "Vous pouvez briser ce champignon en morceaux, ce qui le fait briller d'un bleu vif jusqu'à votre prochain long repos.",
+    "descFr": "Vous pouvez briser ce champignon en morceaux, ce qui le fait briller d'un bleu vif jusqu'à votre prochain repos long.",
     "descEn": "You can break this mushroom into pieces, causing it to glow bright blue until your next long rest.",
     "img": "icons/consumables/mushrooms/umbontae-green.webp",
     "fan": true
@@ -1776,7 +1776,7 @@
     "fr": "Bombe à gravité",
     "type": "consumable",
     "rarity": null,
-    "descFr": "Vous pouvez lancer cette mécanique de la taille d'une pêche à un point à portée Éloignée. Elle implose et attire toutes les créatures et objets à portée Rapprochée de ce point en portée Mêlée avec elle.",
+    "descFr": "Vous pouvez lancer cette mécanique de la taille d'une pêche à un point à portée Éloignée. Elle implose et attire toutes les créatures et objets à portée Proche de ce point en portée Mêlée avec elle.",
     "descEn": "You can throw this peach-sized mechanical orb at a point within Far range. It implodes and pulls all creatures and objects within Close range of that point into Melee range with it.",
     "img": "icons/commodities/metal/plate-mount-round-copper.webp",
     "fan": true
@@ -1787,7 +1787,7 @@
     "fr": "Huile de vase verte",
     "type": "consumable",
     "rarity": null,
-    "descFr": "Vous pouvez enduire votre arme de cette huile. La prochaine attaque réussie avec cette arme inflige 1d8 dégâts magiques supplémentaires et Corrode temporairement la cible. Tant qu'elle est Corrodée, la cible subit une pénalité de -2 à ses seuils de dégâts.",
+    "descFr": "Vous pouvez enduire votre arme de cette huile. La prochaine attaque réussie avec cette arme inflige 1d8 dégâts magiques supplémentaires et corrode temporairement la cible. Tant qu'elle est Corrodée, la cible subit une pénalité de -2 à ses seuils de dégâts.",
     "descEn": "You can coat your weapon in this oil. The next successful attack you make with this weapon deals an extra 1d8 magic damage and temporarily Corrodes the target. While Corroded, the target gains a -2 penalty to their damage thresholds.",
     "img": "icons/commodities/materials/glass-orb-marble-green.webp",
     "fan": true
@@ -1823,7 +1823,7 @@
     "descEn": "Clear 1d4+1 HP.",
     "img": "icons/consumables/potions/bottle-corked-red.webp",
     "fan": false,
-    "descFr": "Restaurez 1d4+1 PV."
+    "descFr": "Effacez 1d4+1 PV."
   },
   {
     "id": "VSwa1LpQ9PjZKsWF",
@@ -1845,7 +1845,7 @@
     "descEn": "When you use this flare, allies within Close range roll a d6 when they spend a Hope. On a result of 6, they gain the effect of that Hope without spending it. The flare lasts until the end of the scene. @Template[type:emanation|range:c]",
     "img": "icons/commodities/tech/smoke-bomb-purple.webp",
     "fan": false,
-    "descFr": "Lorsque vous utilisez ce signal, les alliés à portée Rapprochée lancent un d6 lorsqu'ils dépensent un Espoir. Sur un résultat de 6, ils obtiennent l'effet de cet Espoir sans le dépenser. Le signal dure jusqu'à la fin de la scène. @Template[type:emanation|range:c]"
+    "descFr": "Lorsque vous utilisez ce signal, les alliés à portée Proche lancent un d6 lorsqu'ils dépensent un Espoir. Sur un résultat de 6, ils obtiennent l'effet de cet Espoir sans le dépenser. Le signal dure jusqu'à la fin de la scène."
   },
   {
     "id": "nQTo6mNoPTEVBtkm",
@@ -1875,7 +1875,7 @@
     "fr": "Camp instantané",
     "type": "consumable",
     "rarity": null,
-    "descFr": "Vous pouvez déplier cette petite mécanique en une tente de camping assez grande pour loguer six personnes en toute sécurité. La tente s'effondre à la fin de votre prochain long repos.",
+    "descFr": "Vous pouvez déplier cette petite mécanique en une tente de camping assez grande pour loger six personnes en toute sécurité. La tente s'effondre à la fin de votre prochain repos long.",
     "descEn": "You can unfold this small mechanical box into a camping tent large enough to safely house six people. The tent collapses at the end of your next long rest.",
     "img": "icons/containers/boxes/crate-tech-silver-tan.webp",
     "fan": true
@@ -1911,7 +1911,7 @@
     "descEn": "You can open this jar to release a deafening echo of voices for a number of minutes equal to your Instinct. Creatures within Far range unprepared for the sound take 6d8 magic damage. @Template[type:emanation|range:f]",
     "img": "icons/containers/kitchenware/jug-wrapped-red.webp",
     "fan": false,
-    "descFr": "Vous pouvez ouvrir ce pot pour libérer un écho assourdissant de voix pendant un nombre de minutes égal à votre Instinct. Les créatures à portée Éloignée non préparées au son subissent 6d8 dégâts magiques. @Template[type:emanation|range:f]"
+    "descFr": "Vous pouvez ouvrir ce pot pour libérer un écho assourdissant de voix pendant un nombre de minutes égal à votre Instinct. Les créatures à portée Éloignée non préparées au son subissent 6d8 dégâts magiques."
   },
   {
     "id": "c2putn9apuurJhWX",
@@ -2043,7 +2043,7 @@
     "descEn": "Clear 1d4+2 HP.",
     "img": "icons/consumables/potions/bottle-round-label-cork-red.webp",
     "fan": false,
-    "descFr": "Régénérez 1d4+2 PV."
+    "descFr": "Effacez 1d4+2 PV."
   },
   {
     "id": "I4cQ03xbxnc81EGa",
@@ -2054,7 +2054,7 @@
     "descEn": "Clear 1d4+2 Stress.",
     "img": "icons/consumables/potions/bottle-round-label-cork-green.webp",
     "fan": false,
-    "descFr": "Régénérez 1d4+2 Stress."
+    "descFr": "Effacez 1d4+2 Stress."
   },
   {
     "id": "yK6eEDUrsPbZA8G0",
@@ -2084,7 +2084,7 @@
     "fr": "Tonique du mesmer",
     "type": "consumable",
     "rarity": null,
-    "descFr": "Lorsque vous buvez ce tonique, la seule chose que vous pouvez entendre jusqu'à votre prochain repos sont les pensées de surface des créatures à portée Très rapprochée.",
+    "descFr": "Lorsque vous buvez ce tonique, la seule chose que vous pouvez entendre jusqu'à votre prochain repos sont les pensées de surface des créatures à portée Très proche.",
     "descEn": "When you drink this tonic, the only thing you can hear until your next rest are the surface thoughts of creatures within Very Close range.",
     "img": "icons/consumables/potions/bottle-conical-bubbling-blue.webp",
     "fan": true
@@ -2109,7 +2109,7 @@
     "descEn": "Clear 1d4 HP.",
     "img": "icons/consumables/potions/potion-tube-corked-red.webp",
     "fan": false,
-    "descFr": "Régénérez 1d4 PV."
+    "descFr": "Effacez 1d4 PV."
   },
   {
     "id": "b6vGSPFWOlzZZDLO",
@@ -2120,7 +2120,7 @@
     "descEn": "Clear 1d4 Stress.",
     "img": "icons/consumables/potions/potion-tube-corked-green.webp",
     "fan": false,
-    "descFr": "Régénérez 1d4 Stress."
+    "descFr": "Effacez 1d4 Stress."
   },
   {
     "id": "UFQVwgYOUZ88UxcH",
@@ -2139,7 +2139,7 @@
     "fr": "Potion mnémonique",
     "type": "consumable",
     "rarity": null,
-    "descFr": "Vous pouvez boire cette potion pour Utiliser une Expérience sans dépenser d'Espoir.",
+    "descFr": "Vous pouvez boire cette potion pour utiliser une Expérience sans dépenser d'Espoir.",
     "descEn": "You can drink this potion to Utilize an Experience without spending a Hope.",
     "img": "icons/consumables/potions/bottle-corked-empty.webp",
     "fan": true
@@ -2153,7 +2153,7 @@
     "descEn": "You can shatter this orb to make the area within Very Far range appear as though it's moonlit nighttime for the next 24 hours.",
     "img": "icons/tools/laboratory/alembic-glass-ball-blue.webp",
     "fan": false,
-    "descFr": "Vous pouvez briser cette orbe pour que la zone à portée Très éloignée paraisse illuminée par la lune pendant les 24 prochaines heures."
+    "descFr": "Vous pouvez briser cet orbe pour que la zone à portée Très éloignée paraisse illuminée par la lune pendant les 24 prochaines heures."
   },
   {
     "id": "f1NHVSIHJJCIOaBl",
@@ -2205,7 +2205,7 @@
     "fr": "Poussière de la sorcière de la nuit",
     "type": "consumable",
     "rarity": null,
-    "descFr": "Vous pouvez souffler cette poudre au visage d'un adversaire pour l'empêcher de réduire son Stress jusqu'à votre prochain long repos.",
+    "descFr": "Vous pouvez souffler cette poudre au visage d'un adversaire pour l'empêcher de réduire son Stress jusqu'à votre prochain repos long.",
     "descEn": "You can blow this dust in an adversary's face to prevent them from clearing Stress until your next long rest.",
     "img": "icons/commodities/materials/bowl-powder-grey.webp",
     "fan": true
@@ -2260,7 +2260,7 @@
     "fr": "Herbe à pipe",
     "type": "consumable",
     "rarity": null,
-    "descFr": "Lorsque vous choisissez le mouvement de temps mort Réduire le Stress pendant un court repos, vous pouvez fumer cette feuille non intoxicante pour réduire un Stress supplémentaire. Tout autre PJ ayant choisi le mouvement de temps mort Réduire le Stress bénéficie également de cet avantage.",
+    "descFr": "Lorsque vous choisissez le mouvement de temps mort Réduire le Stress pendant un repos court, vous pouvez fumer cette feuille non intoxicante pour réduire un Stress supplémentaire. Tout autre PJ ayant choisi le mouvement de temps mort Réduire le Stress bénéficie également de cet avantage.",
     "descEn": "When you choose the Clear Stress downtime move during a short rest, you can smoke this non-intoxicating leaf to clear an additional Stress. Any other PCs who chose the Clear Stress downtime move also gain this benefit.",
     "img": "icons/consumables/plants/leaf-dried-eaten-green.webp",
     "fan": true
@@ -2296,7 +2296,7 @@
     "descEn": "You can place this shroud over the corpse of a recently deceased creature. The creature's spirit enters the shroud and becomes your spectral assistant until the next sunrise, when they pass through the veil of death and take the shroud with them.",
     "img": "icons/commodities/cloth/cloth-patterned-teal.webp",
     "fan": false,
-    "descFr": "Vous pouvez poser ce suaire sur le cadavre d'une créature récemment décédée. L'esprit de la créité entre dans le suaire et devient votre assistant spectral jusqu'au prochain lever de soleil, moment où il franchit le voile de la mort et emporte le suaire avec lui."
+    "descFr": "Vous pouvez poser ce suaire sur le cadavre d'une créature récemment décédée. L'esprit de la créature entre dans le suaire et devient votre assistant spectral jusqu'au prochain lever de soleil, moment où il franchit le voile de la mort et emporte le suaire avec lui."
   },
   {
     "id": "L5gCE0cJ8Pmyqp7E",
@@ -2373,7 +2373,7 @@
     "descEn": "You can drink this potion to halve your size until you choose to drop this form or your next rest. While in this form, you have a +2 bonus to Agility and a -1 penalty to your Proficiency.",
     "img": "icons/consumables/potions/flask-decorated-label-pink.webp",
     "fan": false,
-    "descFr": "Vous pouvez boire cette potion pour réduire de moitié votre taille jusqu'à ce que vous choisissiez d'abandonner cette forme ou jusqu'à votre prochain repos. Dans cette forme, vous bénéficiez d'un bonus de +2 à l'Agilité et d'une pénalité de -1 à votre Compétence."
+    "descFr": "Vous pouvez boire cette potion pour réduire de moitié votre taille jusqu'à ce que vous choisissiez d'abandonner cette forme ou jusqu'à votre prochain repos. Dans cette forme, vous bénéficiez d'un bonus de +2 à l'Agilité et d'une pénalité de -1 à votre Maîtrise."
   },
   {
     "id": "0jQGjzdnAlkOu9hb",
@@ -2425,7 +2425,7 @@
     "fr": "Graine d’épine cassante",
     "type": "consumable",
     "rarity": null,
-    "descFr": "Vous pouvez lancer cette graine à un point que vous pouvez voir. Elle explose en une丛林 de vignes de liaison qui entrave temporairement toutes les créatures à portée Rapprochée de ce point.",
+    "descFr": "Vous pouvez lancer cette graine à un point que vous pouvez voir. Elle explose en un enchevêtrement de vignes de liaison qui entrave temporairement toutes les créatures à portée Proche de ce point.",
     "descEn": "You can throw this seed at a point you can see. It explodes into a tangle of binding vines that temporarily Restrains all creatures within Close range of that point.",
     "img": "icons/consumables/plants/thorned-curled-vine-green.webp",
     "fan": true
@@ -2483,7 +2483,7 @@
     "descEn": "You can use this stardrop to summon a hailstorm of comets that deals 8d20 physical damage to all targets within Very Far range.",
     "img": "icons/magic/light/projectiles-star-purple.webp",
     "fan": false,
-    "descFr": "Vous pouvez utiliser cette goutte d'étoile pour invoquer une pluie de comets infligeant 8d20 dégâts physiques à toutes les cibles dans la portée Très Éloignée."
+    "descFr": "Vous pouvez utiliser cette goutte d'étoile pour invoquer une pluie de comètes infligeant 8d20 dégâts physiques à toutes les cibles dans la portée Très éloignée."
   },
   {
     "id": "JjMeRG3aAH3steY2",
@@ -2527,7 +2527,7 @@
     "descEn": "Consume this sap to roll a [[/r d6]]. On a result of 5–6, clear 2 HP. On a result of 2–4, clear 3 Stress. On a result of 1, see through the veil of death and return changed, gaining one scar.",
     "img": "icons/consumables/drinks/wine-amphora-clay-pink.webp",
     "fan": false,
-    "descFr": "Consommez cette sève pour effectuer un jet [[/r d6]]. Sur un résultat de 5–6, vous effacez 2 PV. Sur un résultat de 2–4, vous effacez 3 Stress. Sur un résultat de 1, vous percez le voile de la mort et revenez transformé, gagnant une cicatrice."
+    "descFr": "Consommez cette sève pour effectuer un jet de d6. Sur un résultat de 5–6, vous effacez 2 PV. Sur un résultat de 2–4, vous effacez 3 Stress. Sur un résultat de 1, vous percez le voile de la mort et revenez transformé, gagnant une cicatrice."
   },
   {
     "id": "cdb3AMaxRazFahUL",
@@ -2538,7 +2538,7 @@
     "descEn": "You can shatter this orb to make the area within Very Far range appear as though it's sunlit daytime for the next 24 hours.",
     "img": "icons/commodities/gems/pearl-fire.webp",
     "fan": false,
-    "descFr": "Vous pouvez briser cette orbe pour que la zone dans la portée Très Éloignée semble être en plein jour pour les 24 prochaines heures."
+    "descFr": "Vous pouvez briser cet orbe pour que la zone dans la portée Très éloignée semble être en plein jour pour les 24 prochaines heures."
   },
   {
     "id": "GrDrRqWgv7gvl9vn",
@@ -2557,7 +2557,7 @@
     "fr": "Larmes du héros immortel",
     "type": "consumable",
     "rarity": null,
-    "descFr": "Lorsque vous buvez cette potion, la mort ne peut vous atteindre jusqu'à votre prochain long repos. Lorsque vous marquez votre dernier PV, au lieu d'effectuer un mouvement de mort, vous effectuez un dernier jet d'action avant de sombrer dans un sommeil sans rêves jusqu'à ce qu'un allié choisisse le mouvement de temps mort Soigner les blessures pour effacer vos PV.",
+    "descFr": "Lorsque vous buvez cette potion, la mort ne peut vous atteindre jusqu'à votre prochain repos long. Lorsque vous marquez votre dernier PV, au lieu d'effectuer un mouvement de mort, vous effectuez un dernier jet d'action avant de sombrer dans un sommeil sans rêves jusqu'à ce qu'un allié choisisse le mouvement de temps mort Soigner les blessures pour effacer vos PV.",
     "descEn": "When you drink this potion, death can't touch you until your next long rest. When you would mark your last Hit Point, instead of making a death move, you make one final action roll before falling into a dreamless slumber until an ally chooses the Tend to Wounds downtime move to clear your Hit Points.",
     "img": "icons/consumables/potions/flask-corked-blue.webp",
     "fan": true
@@ -2593,7 +2593,7 @@
     "descEn": "You can use this ice shard to instantly freeze an area of water up to Close range.",
     "img": "icons/commodities/gems/gem-faceted-oval-blue.webp",
     "fan": false,
-    "descFr": "Vous pouvez utiliser ce fragment de glace pour geler instantanément une zone d'eau jusqu'à la portée Rapprochée."
+    "descFr": "Vous pouvez utiliser ce fragment de glace pour geler instantanément une zone d'eau jusqu'à la portée Proche."
   },
   {
     "id": "Nwv5ydGf0MWnzq1n",
@@ -2634,7 +2634,7 @@
     "fr": "Bougie de protection",
     "type": "consumable",
     "rarity": null,
-    "descFr": "Vous pouvez allumer cette bougie pour remplir une zone dans la portée Rapprochée d'un halo de lumière. Une créature à l'extérieur du halo ne peut pas y entrer si elle a de mauvaises intentions envers une créature à l'intérieur. La bougie brûle pendant une heure.",
+    "descFr": "Vous pouvez allumer cette bougie pour remplir une zone dans la portée Proche d'un halo de lumière. Une créature à l'extérieur du halo ne peut pas y entrer si elle a de mauvaises intentions envers une créature à l'intérieur. La bougie brûle pendant une heure.",
     "descEn": "You can light this candle to fill an area within Close range with a halo of light. A creature outside the halo can't enter it if they have ill intent toward a creature within it. The candle burns for an hour.",
     "img": "icons/sundries/lights/candle-lit-yellow.webp",
     "fan": true
@@ -2670,7 +2670,7 @@
     "campaign": "western",
     "fan": false,
     "descEn": "You can light this dynamite and toss it within Close range. All creatures within Very Close range of where the dynamite lands must make a Reaction Roll (14). Targets who fail take 1d20+5 physical damage. Targets who succeed must mark a Stress. Dynamite deals double damage to inanimate objects or structures.",
-    "descFr": "Vous pouvez allumer cette dynamite et la lancer à portée Courte. Toutes les créatures à portée Très courte du point d'impact font un jet de Réaction (14) : en cas d'échec, elles subissent 1d20+5 dégâts physiques ; en cas de réussite, elles marquent 1 Stress. Inflige le double des dégâts aux objets inanimés et structures.",
+    "descFr": "Vous pouvez allumer cette dynamite et la lancer à portée Proche. Toutes les créatures à portée Très proche du point d'impact font un jet de Réaction (14) : en cas d'échec, elles subissent 1d20+5 dégâts physiques ; en cas de réussite, elles marquent 1 Stress. Inflige le double des dégâts aux objets inanimés et structures.",
     "img": "icons/weapons/thrown/bomb-fuse-lit.webp"
   },
   {

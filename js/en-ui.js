@@ -158,6 +158,9 @@ export const EN_UI = {
   'Sac': 'Bag', 'Sacs': 'Bags', 'Poignées': 'Handfuls',
   'Potion de santé mineure': 'Minor Health Potion',
   'Potion de résilience mineure': 'Minor Stamina Potion',
+  'Effacez 1d4 PV.': 'Clear 1d4 HP.', 'Effacez 1d4 Stress.': 'Clear 1d4 Stress.',
+  'Consommable — Effacez 1d4 PV.': 'Consumable — clear 1d4 HP.',
+  'Consommable — Effacez 1d4 Stress.': 'Consumable — clear 1d4 Stress.',
   'Régénérez 1d4 PV.': 'Clear 1d4 HP.', 'Régénérez 1d4 Stress.': 'Clear 1d4 Stress.',
   'Consommable — Régénérez 1d4 PV.': 'Consumable — clear 1d4 HP.',
   'Consommable — Régénérez 1d4 Stress.': 'Consumable — clear 1d4 Stress.',
@@ -600,7 +603,7 @@ export const EN_UI = {
   'Se préparer (gagnez 1 Espoir, ou 2 si vous vous préparez avec un ou plusieurs membres du groupe)':
     'Prepare (gain 1 Hope, or 2 if you prepare with one or more party members)',
   'Conséquence : le MJ gagne 1d4 Peur.': 'Consequence: the GM gains 1d4 Fear.',
-  'À la fin d\'un repos court, les features à usage limité par repos se rechargent et les effets « jusqu\'à votre prochain repos » expirent.':
+  'À la fin d\'un repos court, les aptitudes à usage limité par repos se rechargent et les effets « jusqu\'à votre prochain repos » expirent.':
     'At the end of a short rest, features limited to once per rest recharge and effects lasting “until your next rest” expire.',
   'Soigner toutes les blessures (effacez tous vos PV ou ceux d\'un allié)': 'Treat all wounds (clear all your HP or an ally’s)',
   'Effacer tout le Stress': 'Clear all Stress',
@@ -624,7 +627,7 @@ export const EN_UI = {
     'When an adversary marks their last HP, they are defeated: describe how they leave the scene. When all adversaries are defeated or can no longer harm the party, the fight ends and the PCs can rest.',
   'À partir du niveau 5, vous pouvez choisir le multiclassage comme option de montée de niveau. Il coûte deux emplacements de montée de niveau (les deux de ce palier).':
     'From level 5, you can choose multiclassing as a level-up option. It costs two level-up slots (both for that tier).',
-  'Choisissez une classe supplémentaire et gagnez sa feature de classe': 'Choose an additional class and gain its class feature',
+  'Choisissez une classe supplémentaire et gagnez son aptitude de classe': 'Choose an additional class and gain its class feature',
   'Choisissez un de ses domaines (vous y avez désormais accès)': 'Choose one of its domains (you now have access to it)',
   'Prenez la carte de Fondation d\'une de ses sous-classes': 'Take the Foundation card of one of its subclasses',
   'Si vos cartes de Fondation indiquent des traits d\'Incantation différents, choisissez lequel appliquer lors de vos jets d\'Incantation':
@@ -653,7 +656,7 @@ export const EN_UI = {
     'Made to resist or dodge a danger. Identical to an action roll, but generates no Hope or Fear, does not trigger a GM move, and cannot receive “Help an Ally”. A critical success cancels all negative effects.',
   'Résistance : divisez les dégâts du type concerné par 2 (arrondi à l\'inférieur) avant de comparer aux seuils et avant d\'appliquer l\'armure. Immunité : ignore totalement les dégâts de ce type. Dégâts directs : impossibles à réduire en marquant des Emplacements d\'armure.':
     'Resistance: halve damage of that type (rounded down) before comparing to thresholds and applying armor. Immunity: completely ignore damage of that type. Direct damage: cannot be reduced by marking Armor Slots.',
-  'Chute de portée Très Courte → 1d10+3 dégâts physiques ; Courte → 1d20+5 ; Lointaine / Très Lointaine → 1d100+15 (ou mort à la discrétion du MJ). Collision à grande vitesse → 1d20+5 dégâts physiques directs.':
+  'Chute à portée Très proche → 1d10+3 dégâts physiques ; à portée Rapprochée → 1d20+5 ; à portée Éloignée / Très éloignée → 1d100+15 (ou mort à la discrétion du MJ). Collision à grande vitesse → 1d20+5 dégâts physiques directs.':
     'Fall from Very Close range → 1d10+3 physical damage; Close → 1d20+5; Far / Very Far → 1d100+15 (or death at the GM’s discretion). High-speed collision → 1d20+5 direct physical damage.',
   'Attaquer sous l\'eau subit un désavantage par défaut. Une créature incapable de respirer sous l\'eau suit un compte à rebours standard (3) qui avance à chaque action (et +1 sur échec ou Peur) ; une fois à terme, elle marque 1 Stress à chaque action.':
     'Attacking underwater has disadvantage by default. A creature unable to breathe underwater follows a standard countdown (3) that advances on each action (and +1 on a failure or Fear); once it triggers, they mark 1 Stress per action.',
@@ -732,7 +735,7 @@ export const EN_UI = {
   'Tout risquer échoué (Peur': 'Risk it all failed (Fear',
   '— choisissez la voie qui façonne vos aptitudes.': '— choose the path that shapes your features.',
   '. Comparez les dégâts reçus aux seuils.': '. Compare incoming damage to the thresholds.',
-  'Déplacez gratuitement des cartes de domaine entre votre kit et votre réserve, puis choisissez deux fois un mouvement de temps mort (le même deux fois si vous voulez) :':
+  'Déplacez gratuitement des cartes de domaine entre votre kit et votre réserve, puis choisissez deux fois une action de temps mort (la même deux fois si vous voulez) :':
     'Freely move domain cards between your loadout and your vault, then choose two downtime moves (the same one twice if you like):',
   'Déplacez gratuitement des cartes de domaine, puis choisissez deux fois :':
     'Freely move domain cards, then choose twice:',
@@ -794,8 +797,9 @@ export const EN_UI = {
   'Rechercher un adversaire…': 'Search adversaries…',
   'Rechercher un environnement…': 'Search environments…',
   'Adversaires potentiels :': 'Potential adversaries:',
-  "Features de l'environnement": 'Environment features',
-  'Features de l’environnement': 'Environment features',
+  "Aptitudes de l'environnement": 'Environment features',
+  'Bloc de statistiques & aptitudes': 'Statblock & features',
+  'Aptitudes de l’environnement': 'Environment features',
   /* Sheet / rest / dice / creation leftovers */
   'Total :': 'Total:',
   'Appliquer le repos': 'Apply rest',

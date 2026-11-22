@@ -565,6 +565,13 @@ test('all views render cleanly with real SRD data and expose no formatting artif
   assert.ok(!main.innerHTML.includes('++'), 'Compendium adversary rendered "++"');
   assert.ok(!main.innerHTML.includes('+null'), 'Compendium adversary rendered "+null"');
 
+  /* Compendium transformations: must not shadow the translation function */
+  const transTab = main.querySelector('[data-tab="transformations"]');
+  assert.ok(transTab, 'Compendium transformations tab present');
+  transTab.click();
+  await new Promise(r => setTimeout(r, 20));
+  assert.ok(main.innerHTML.includes('transformation(s)'), 'Compendium transformations list should render');
+
   /* GM bestiary sign check & encounter tab */
   await views.gm.render(main, null);
   const gmBestiary = main.querySelector('[data-gmtab="bestiary"]');
