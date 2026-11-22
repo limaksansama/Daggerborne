@@ -1,9 +1,9 @@
 /* Service worker — cache-first PWA for Daggerborne */
-const VERSION = 'daggerborne-v41';
+const VERSION = 'daggerborne-v44';
 const CORE = [
   './', './index.html', './manifest.webmanifest',
   './css/app.css', './css/sheet2.css', './css/dice-box.css', './js/app.js', './js/core.js',
-  './js/dice3d.js', './js/fab.js', './js/gmRules.js', './js/rules.js',
+  './js/dice3d.js', './js/fab.js', './js/gmRules.js', './js/rules.js', './js/en-ui.js', './js/i18n-dom.js',
   './js/vendor/dice-box.es.min.js', './js/vendor/world.offscreen.min.js',
   './js/vendor/world.onscreen.min.js', './js/vendor/world.none.min.js',
   './js/views/home.js', './js/views/chars.js', './js/views/create.js', './js/views/sheet.js',
@@ -13,6 +13,10 @@ const CORE = [
   './data/communities.json', './data/domainCards.json', './data/weapons.json', './data/armors.json',
   './data/adversaries.json', './data/generalItems.json', './data/environments.json', './data/transformations.json',
   './data/beastforms.json',
+  './data/en/domains.json', './data/en/classes.json', './data/en/subclasses.json', './data/en/ancestries.json',
+  './data/en/communities.json', './data/en/domainCards.json', './data/en/weapons.json', './data/en/armors.json',
+  './data/en/adversaries.json', './data/en/generalItems.json', './data/en/environments.json', './data/en/transformations.json',
+  './data/en/beastforms.json', './js/i18n.js',
   './assets/fonts/Cinzel-VariableFont_wght.ttf', './assets/fonts/cinzel-decorative-bold-latin.woff2',
   './assets/fonts/overpass-regular-latin.woff2', './assets/fonts/overpass-regular-latin-ext.woff2',
   './assets/fonts/overpass-italic-latin.woff2',
