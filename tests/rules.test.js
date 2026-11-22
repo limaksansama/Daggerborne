@@ -279,3 +279,47 @@ test('Every local asset listed in sw.js exists on disk', () => {
     assert.ok(fs.existsSync(path.join(ROOT, clean)), `Missing sw.js precache file: ${clean}`);
   }
 });
+
+/* ---- armorThresholdBonus : features d'armure SRD 2.0 accordant des bonus de seuils ---- */
+import { armorThresholdBonus } from '../js/rules.js';
+
+test('armorThresholdBonus: Enchantée (Mage Robes) = trait d\'Incantation', () => {
+  const r = armorThresholdBonus({ feature: 'Enchantée : Bonus aux seuils de dégâts égal à votre trait d\'Incantation.', spellcastValue: 2, tier: 1, armorMax: 0, armorUsed: 0 });
+  assert.equal(r.bonus, 2);
+  assert.deepEqual(r.parts, ['Incantation']);
+});
+
+test('armorThresholdBonus: Enchanted (EN) détection bilingue', () => {
+  const r = armorThresholdBonus({ feature: 'Enchanted: Gain a bonus to your damage thresholds equal to your Spellcast trait.', spellcastValue: 3, tier: 1 });
+  assert.equal(r.bonus, 3);
+});
+
+test('armorThresholdBonus: Éclatante (Coffinwood) = emplacements libres', () => {
+  const r = armorThresholdBonus({ feature: 'Éclatante : Bonus aux seuils de dégâts égal à vos emplacements d\'armure non cochés.', armorMax: 3, armorUsed: 1 });
+  assert.equal(r.bonus, 2);
+  // tous cochés → 0
+  const r2 = armorThresholdBonus({ feature: 'Éclatante : ...', armorMax: 3, armorUsed: 3 });
+  assert.equal(r2.bonus, 0);
+});
+
+test('armorThresholdBonus: Splintering (EN) = unused armor slots', () => {
+  const r = armorThresholdBonus({ feature: 'Splintering: Gain a bonus to your damage thresholds equal to your unmarked Armor Slots.', armorMax: 4, armorUsed: 0 });
+  assert.equal(r.bonus, 4);
+});
+
+test('armorThresholdBonus: Harmonisée (Rune-Forged) = palier', () => {
+  const r = armorThresholdBonus({ feature: 'Harmonisée :Votre maximum ... bonus aux seuils de dégâts égal à votre palier.', tier: 3 });
+  assert.equal(r.bonus, 3);
+});
+
+test('armorThresholdBonus: Renforcée (Irontree) = +2 seulement au dernier emplacement coché', () => {
+  const f = 'Renforcée : Lorsque vous cochez votre dernier emplacement d\'armure, augmentez vos seuils de dégâts de +2.';
+  assert.equal(armorThresholdBonus({ feature: f, armorMax: 3, armorUsed: 2 }).bonus, 0);
+  assert.equal(armorThresholdBonus({ feature: f, armorMax: 3, armorUsed: 3 }).bonus, 2);
+});
+
+test('armorThresholdBonus: armure sans feature de seuils → 0', () => {
+  const r = armorThresholdBonus({ feature: 'Protégée : Réduisez les dégâts magiques subis de votre Score d\'armure.', spellcastValue: 5, tier: 4, armorMax: 6, armorUsed: 0 });
+  assert.equal(r.bonus, 0);
+  assert.deepEqual(r.parts, []);
+});

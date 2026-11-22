@@ -4,6 +4,7 @@
 import { $, $$, el, esc, getState, toast } from './core.js';
 import { rollDuality, rollDice, isRolling } from './dice3d.js';
 
+import { t, getLang } from './i18n.js';
 /* icônes SVG : d12 stylisé (pentagone) + horloge */
 const D12 = (fill, stroke) => `<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
   <polygon points="12,1.8 21,8.3 17.6,18.6 6.4,18.6 3,8.3" fill="${fill}" stroke="${stroke}" stroke-width="1.2"/>
@@ -28,7 +29,7 @@ export function initFab() {
       <div class="d3d-menu" id="d3d-menu">
         <button class="d3d-quick" id="d3d-quick">
           ${D12('#f59e0b', 'rgba(255,255,255,.5)')}${D12('#2e1065', 'rgba(255,255,255,.5)')}
-          <span>2d12 Dualité</span>
+          <span>${t('fab2d12')}</span>
         </button>
         <div class="d3d-dice-row">
           ${DICE.map(d => `<button class="d3d-dbtn" data-d3d-die="${d}" title="Ajouter un d${d}">${D12_SM('#312e81', d)}<span>d${d}</span><span class="cnt"></span></button>`).join('')}
@@ -77,7 +78,7 @@ export function initFab() {
   });
   $$('[data-d3d-die]', root).forEach(b => b.addEventListener('click', () => {
     const total = Object.values(sel).reduce((a, b) => a + b, 0);
-    if (total >= 12) { toast('Maximum 12 dés 3D à la fois.'); return; }
+    if (total >= 12) { toast(t('fabMax12')); return; }
     const d = +b.dataset.d3dDie;
     sel[d] = (sel[d] || 0) + 1;
     refreshSel();
@@ -96,7 +97,7 @@ export function initFab() {
     if (wasOpen) return;
     const rolls = getState().rolls.slice(0, 25);
     hist.innerHTML = rolls.length ? rolls.map(r => {
-      const time = new Date(r.t).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+      const time = new Date(r.t).toLocaleTimeString(getLang() === 'en' ? 'en-US' : 'fr-FR', { hour: '2-digit', minute: '2-digit' });
       if (r.hope != null) {
         const w = r.result === 'crit' ? '★ Critique' : r.result === 'hope' ? 'E' : 'P';
         return `<div class="d3d-hist-item">${time} · <span class="h">${r.hope}</span>/<span class="f">${r.fear}</span>${r.mod ? ` ${r.mod >= 0 ? '+' : ''}${r.mod}` : ''} = <b>${r.total}</b> ${w} · ${esc(r.label || '')}</div>`;

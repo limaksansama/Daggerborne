@@ -4,9 +4,10 @@
    Thème sombre conservé, mobile = onglets Combat / Stats / Équipement / Plus. */
 import { $, $$, el, esc, go, T, data, toast, getChar, saveChar, getState, setState, uid, exportJsonFile, importCharacterFromText } from '../core.js';
 import { rollDuality, rollDice, rollAttack, rollDamage, rollCustomDamage, isRolling } from '../dice3d.js';
-import { computeDamageApplication, calcDamageSpec, tierOf, nextDieStep } from '../rules.js';
+import { computeDamageApplication, calcDamageSpec, tierOf, nextDieStep, armorThresholdBonus } from '../rules.js';
 import { openLevelUp } from './levelup.js';
 
+import { t, getLang } from '../i18n.js';
 const TRAIT_KEYS = ['agility', 'strength', 'finesse', 'instinct', 'presence', 'knowledge'];
 const DICE = ['d4', 'd6', 'd8', 'd10', 'd12', 'd20'];
 const CONDITIONS = ['Vulnérable', 'Entravé', 'Caché', 'Empoisonné'];
@@ -54,7 +55,7 @@ function migrate(c, weapons, armors, subclasses, classes) {
   const subMatch = subclasses?.find(s => s.id === c.subclassId);
   if ((c.subclassId === BEASTBOUND_SUBCLASS_ID || subMatch?.en === 'Beastbound') && !c.companion) {
     c.companion = {
-      name: 'Compagnon animal', species: 'Louveteau / Faucon / Lynx…', evasion: 10,
+      name: t('sheetCompanion'), species: 'Louveteau / Faucon / Lynx…', evasion: 10,
       dice: 'd6', range: 'Mêlée', dmgType: 'phy', attackName: 'Attaque coordonnée',
       stress: { max: 3, current: 0 },
       experiences: [{ name: 'Pistage', mod: 2 }, { name: 'Protection', mod: 2 }],
@@ -140,10 +141,33 @@ function migrate(c, weapons, armors, subclasses, classes) {
   if (dirty) saveChar(c);
 }
 
-const thresholds = (c) => ({
-  major: (c.armorCard.baseMajor || 0) + c.level + (c.thresholds.bonus || 0),
-  severe: (c.armorCard.baseSevere || 0) + c.level + (c.thresholds.bonus || 0),
-});
+/* Seuils de dégâts = base d'armure + niveau + bonus manuel (aptitudes)
+   + bonus automatique de la feature d'armure (Enchantée, Éclatante, Harmonisée, Renforcée).
+   ctx fournit les dépendances dynamiques : trait d'Incantation, palier, emplacements. */
+function armorBonus(c, ctx) {
+  const sub = ctx?.subclasses?.find(s => s.id === c.subclassId);
+  const scTrait = sub?.spellcastTrait || null;
+  const spellcastValue = scTrait ? (c.traits[scTrait] || 0) : 0;
+  const armMax = Math.max(0, Math.min(12, c.armorCard.baseScore || 0));
+  return armorThresholdBonus({
+    feature: c.armorCard.feature || '',
+    spellcastValue,
+    tier: tierOf(c.level),
+    armorMax: armMax,
+    armorUsed: c.armorSlots.used || 0,
+  });
+}
+
+function thresholds(c, ctx) {
+  const ab = armorBonus(c, ctx);
+  const b = (c.thresholds.bonus || 0) + ab.bonus;
+  return {
+    major: (c.armorCard.baseMajor || 0) + c.level + b,
+    severe: (c.armorCard.baseSevere || 0) + c.level + b,
+    autoBonus: ab.bonus,
+    autoParts: ab.parts,
+  };
+}
 const signed = (n) => (n >= 0 ? `+${n}` : `${n}`);
 const syncMaxes = (c) => {
   c.hp.max = c.hp.active + c.hp.unlocked;
@@ -205,7 +229,7 @@ export async function render(main, params) {
   const effTrait = (k) => (c.traits[k] || 0) + traitBonusOf(k);
   const armMax = Math.max(0, Math.min(12, c.armorCard.baseScore || 0));
   const effHopeMax = Math.max(0, 6 - (c.scars || 0));
-  const thr = thresholds(c);
+  const thr = thresholds(c, { subclasses });
   const gt = c.goldTrack;
   const goldTotal = gt.handfuls + gt.bags * 10 + gt.chests * 100;
 
@@ -240,10 +264,10 @@ export async function render(main, params) {
       </div>
       <div class="dh-idfields">
         <label class="dh-idf w2"><span>Nom</span><input data-f="name" value="${esc(c.name)}" placeholder="Nom du personnage"></label>
-        <label class="dh-idf"><span>Pronoms</span><input data-f="pronouns" value="${esc(c.pronouns)}" placeholder="iel · elle · il"></label>
-        <label class="dh-idf w2"><span>Héritage</span><input data-f="heritage" value="${esc(c.heritage)}" placeholder="Ascendance / peuple"></label>
-        <label class="dh-idf"><span>Sous-classe</span><input data-f="subclassText" value="${esc(c.subclassText)}" placeholder="${esc(sub?.fr || 'Sous-classe')}"></label>
-        <label class="dh-idf w2"><span>Transformation (optionnelle)</span><input data-f="transformation" value="${esc(c.transformation || '')}" placeholder="Aucune · ex. Loup-garou, Vampire…" list="transf-list"></label>
+        <label class="dh-idf"><span>${t('createPronouns')}</span><input data-f="pronouns" value="${esc(c.pronouns)}" placeholder="iel · elle · il"></label>
+        <label class="dh-idf w2"><span>${t('sheetHeritage')}</span><input data-f="heritage" value="${esc(c.heritage)}" placeholder="Ascendance / peuple"></label>
+        <label class="dh-idf"><span>${t('sheetSubclass')}</span><input data-f="subclassText" value="${esc(c.subclassText)}" placeholder="${esc(sub?.fr || 'Sous-classe')}"></label>
+        <label class="dh-idf w2"><span>${t('sheetTransformationOpt')}</span><input data-f="transformation" value="${esc(c.transformation || '')}" placeholder="Aucune · ex. Loup-garou, Vampire…" list="transf-list"></label>
         <datalist id="transf-list">${transformations.map(t => `<option value="${esc(t.fr)}">`).join('')}</datalist>
       </div>
       <div class="dh-level" title="Niveau ${c.level} — les seuils de dégâts l'utilisent">
@@ -251,7 +275,7 @@ export async function render(main, params) {
         <span class="dh-lv-shield">
           <svg viewBox="0 0 64 74" preserveAspectRatio="none" aria-hidden="true"><polygon points="1,1 63,1 63,50 32,73 1,50"/></svg>
           <span class="dh-lv-num">${c.level}</span>
-          <span class="dh-lv-lbl">Niveau</span>
+          <span class="dh-lv-lbl">${t('sheetLevel')}</span>
         </span>
         <span class="dh-lv-btns">
           <button data-lvl="-1" title="Baisser le niveau (ajustement manuel)">−</button>
@@ -286,7 +310,7 @@ export async function render(main, params) {
         </div>
         <div class="dh-shield arm" title="Score d'armure + emplacements">
           <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polygon points="1,1 99,1 99,72 50,99 1,72"/></svg>
-          <span class="dh-sh-lbl">Armure</span>
+          <span class="dh-sh-lbl">${t('createArmor')}</span>
           <input type="number" class="dh-sh-val" data-f="armorScore" value="${c.armorCard.baseScore}" min="0" max="12">
         </div>
         <div class="dh-aspots" title="Emplacements d'armure actifs (${armMax}/12) — cliquez pour marquer les dégâts absorbés">
@@ -317,15 +341,15 @@ export async function render(main, params) {
 
         <!-- DÉGÂTS & SANTÉ -->
         <section class="dh-panel s-combat">
-          <div class="dh-banner"><i></i><span>Dégâts &amp; Santé</span><i></i></div>
+          <div class="dh-banner"><i></i><span>${t('sheetDamageHealth')}</span><i></i></div>
           <div class="dh-thrrow">
-            <div class="dh-thrbar minor"><span>Dégâts mineurs</span><em>Cochez 1 PV</em></div>
+            <div class="dh-thrbar minor"><span>${t('sheetMinorDmg')}</span><em>Cochez 1 PV</em></div>
             <button class="dh-thrval" data-thr="1" title="Modifier les seuils">${thr.major}</button>
-            <div class="dh-thrbar major"><span>Dégâts majeurs</span><em>Cochez 2 PV</em></div>
+            <div class="dh-thrbar major"><span>${t('sheetMajorDmg')}</span><em>Cochez 2 PV</em></div>
             <button class="dh-thrval" data-thr="2" title="Modifier les seuils">${thr.severe}</button>
-            <div class="dh-thrbar severe"><span>Dégâts graves</span><em>Cochez 3 PV</em></div>
+            <div class="dh-thrbar severe"><span>${t('sheetSevereDmg')}</span><em>Cochez 3 PV</em></div>
           </div>
-          <p class="dh-help">Seuils = base d'armure ${c.armorCard.baseMajor}/${c.armorCard.baseSevere} + Niveau ${c.level}${c.thresholds.bonus ? ` ${signed(c.thresholds.bonus)} (aptitudes)` : ''}. Comparez les dégâts reçus aux seuils.</p>
+          <p class="dh-help">Seuils = base d'armure ${c.armorCard.baseMajor}/${c.armorCard.baseSevere} + Niveau ${c.level}${c.thresholds.bonus ? ` ${signed(c.thresholds.bonus)} (aptitudes)` : ''}${thr.autoBonus ? ` ${signed(thr.autoBonus)} (${thr.autoParts.join(' + ')})` : ''}. Comparez les dégâts reçus aux seuils.</p>
 
           <div class="dh-gauge">
             <div class="dh-g-head"><span class="dh-g-lbl">PV</span>
@@ -367,11 +391,11 @@ export async function render(main, params) {
             </div>
           </div>
           <div class="dh-dmg-bar">
-            <button class="btn small" id="btn-take-dmg" title="Calculer et appliquer des dégâts selon vos seuils et votre armure">💥 Encaisser des dégâts</button>
+            <button class="btn small" id="btn-take-dmg" title="Calculer et appliquer des dégâts selon vos seuils et votre armure">${t('sheetTakeDamageBtn')}</button>
             <button class="btn ${c.hp.current === 0 ? 'danger' : 'ghost'} small" id="btn-death-move" title="Mouvement de mort (SRD 2.0)">💀 Mouvement de mort${c.hp.current === 0 ? ' !' : ''}</button>
           </div>
           <div class="dh-conds">
-            <span class="dh-cond-lbl">États</span>
+            <span class="dh-cond-lbl">${t('sheetStates')}</span>
             ${CONDITIONS.map(cond => `<button class="dh-cond ${c.conditions?.includes(cond) ? 'on' : ''}" data-cond="${esc(cond)}">${esc(cond)}</button>`).join('')}
           </div>
         </section>
@@ -393,14 +417,14 @@ export async function render(main, params) {
               return `<button class="dh-diamond ${on ? 'on' : ''}${scarred ? ' scarred' : ''}" data-hoped="${i}" ${scarred ? 'aria-disabled="true" title="Emplacement condamné par une cicatrice"' : ''}></button>`;
             }).join('')}
           </div>
-          <p class="dh-help">Dépensez un Espoir pour utiliser une Expérience ou aider un allié.</p>
-          <label class="dh-fl dh-fl-hope"><span>Feature d'Espoir</span>
+          <p class="dh-help">${t('sheetHopeHint')}</p>
+          <label class="dh-fl dh-fl-hope"><span>${t('sheetHopeFeature')}</span>
             <textarea data-f="hopeFeature" rows="4" placeholder="Feature d'Espoir de votre classe…">${esc(c.hopeFeature)}</textarea></label>
         </section>
 
         <!-- EXPÉRIENCES -->
         <section class="dh-panel s-stats">
-          <div class="dh-banner"><i></i><span>Expériences</span><i></i></div>
+          <div class="dh-banner"><i></i><span>${t('sheetExperiences')}</span><i></i></div>
           ${c.experiences.map((e, i) => `
           <div class="dh-exprow">
             <input class="dh-exp-name" data-ef="${i}:name" value="${esc(e.name)}" placeholder="Expérience ${i + 1}…">
@@ -415,12 +439,12 @@ export async function render(main, params) {
           <div class="dh-gold">
             <div class="dh-goldgrp">
               <div class="dh-gpips" title="Poignées — cliquez la ${gt.handfuls}e pastille pour ajuster">${Array.from({ length: 10 }, (_, i) => `<button class="gpip g1 ${i < gt.handfuls ? 'on' : ''}" data-goldpip="handfuls:${i}"></button>`).join('')}</div>
-              <div class="dh-gold-lbl"><span>Poignées</span><b class="dh-gold-n">${gt.handfuls}/10</b>
+              <div class="dh-gold-lbl"><span>${t('sheetHandfuls')}</span><b class="dh-gold-n">${gt.handfuls}/10</b>
                 <span class="dh-gold-btns"><button data-goldbtn="handfuls:-1" title="−1 poignée">−</button><button data-goldbtn="handfuls:1" title="+1 poignée">+</button></span></div>
             </div>
             <div class="dh-goldgrp">
               <div class="dh-gpips" title="Sacs — 1 sac = 10 poignées">${Array.from({ length: 10 }, (_, i) => `<button class="gpip g2 ${i < gt.bags ? 'on' : ''}" data-goldpip="bags:${i}"></button>`).join('')}</div>
-              <div class="dh-gold-lbl"><span>Sacs</span><b class="dh-gold-n">${gt.bags}/10</b>
+              <div class="dh-gold-lbl"><span>${t('sheetBags')}</span><b class="dh-gold-n">${gt.bags}/10</b>
                 <span class="dh-gold-btns"><button data-goldbtn="bags:-1" title="−1 sac">−</button><button data-goldbtn="bags:1" title="+1 sac">+</button></span></div>
             </div>
             <div class="dh-goldgrp chest">
@@ -437,7 +461,7 @@ export async function render(main, params) {
 
         <!-- APTITUDE DE CLASSE -->
         <section class="dh-panel s-stats">
-          <div class="dh-banner"><i></i><span>Aptitude de classe</span><i></i></div>
+          <div class="dh-banner"><i></i><span>${t('sheetClassAbility')}</span><i></i></div>
           <div class="dh-cf">
             <textarea data-f="classFeature" rows="6" placeholder="Capacités de classe, features de sous-classe…">${esc(c.classFeature)}</textarea>
           </div>
@@ -454,10 +478,10 @@ export async function render(main, params) {
           <!-- ===== ACTIONS & ATTAQUES : tableau tactique rapide (style D&D Beyond) ===== -->
           <div class="dha-block" id="dh-actions">
             <div class="dha-head">
-              <span class="dha-t">Actions &amp; Attaques</span>
+              <span class="dha-t">${t('sheetActions')}</span>
               <span class="dha-toggles">
-                <button class="dha-tbtn ${ui.atkAdv ? 'on' : ''}" id="dha-adv" title="Appliquer Avantage (+1d6) aux attaques rapides">▲ Avantage</button>
-                <button class="dha-tbtn ${ui.atkDis ? 'on' : ''}" id="dha-dis" title="Appliquer Désavantage (−1d6) aux attaques rapides">▼ Désavantage</button>
+                <button class="dha-tbtn ${ui.atkAdv ? 'on' : ''}" id="dha-adv" title="Appliquer Avantage (+1d6) aux attaques rapides">${t('sheetAdv')}</button>
+                <button class="dha-tbtn ${ui.atkDis ? 'on' : ''}" id="dha-dis" title="Appliquer Désavantage (−1d6) aux attaques rapides">${t('sheetDisadv')}</button>
                 <button class="dha-tbtn crit ${ui.atkCrit ? 'on' : ''}" id="dha-crit" title="Dégâts critiques : max des dés (Maîtrise × faces) + jet normal + bonus fixe">💥 Critique</button>
               </span>
             </div>
@@ -488,22 +512,22 @@ export async function render(main, params) {
                 <span class="dha-icon" title="${w.dmgType === 'mag' ? 'Magique' : 'Physique'}">${w.dmgType === 'mag' ? '✦' : '⚔'}</span>
                 <span class="dha-name">
                   <b>${esc(w.name || 'Arme')}</b>
-                  <small>${T.traits[w.trait] || ''} · ${w.hands === 'two' ? '2 mains' : '1 main'} · ${esc(w.range || '')}</small>
+                  <small>${T.traits[w.trait] || ''} · ${w.hands === 'two' ? t('sheet2Hands') : t('sheet1Hand')} · ${esc(w.range || '')}</small>
                 </span>
                 <span class="dha-range">${esc(w.range || '—')}</span>
                 <button class="dha-btn atk" data-dha-atk="${w.uid}" title="Jet de Dualité + ${T.traits[w.trait] || ''}">${mod >= 0 ? '+' + mod : mod}</button>
                 <button class="dha-btn dmg" data-dha-dmg="${w.uid}" title="${ui.atkCrit ? `Dégâts critiques : ${spec.critMax} + ${spec.normalNotation}` : `Dégâts : ${spec.qty} × ${w.dice}${spec.flatBonus ? ' ' + fmtBonus(spec.flatBonus) : ''}`}">${dmgLabel}</button>
               </div>`;
-            }).join('') || (!activeBf ? '<div class="dh-help">Équipez une arme pour voir vos attaques rapides.</div>' : '')}
+            }).join('') || (!activeBf ? '<div class="dh-help">' + t('sheetEquipHint') + '</div>' : '')}
             ${c.companion ? (() => {
               const compSpec = calcDamageSpec(c.proficiency, c.companion.dice || 'd6', 0, { crit: ui.atkCrit });
               const compLabel = ui.atkCrit ? `💥 ${compSpec.critMax}+${compSpec.normalNotation}` : compSpec.normalNotation;
               return `
             <div class="dha-row">
-              <span class="dha-icon" title="Compagnon animal">🐺</span>
+              <span class="dha-icon" title="${t('sheetCompanion')}">🐺</span>
               <span class="dha-name">
                 <b>${esc(c.companion.name || 'Compagnon')}</b>
-                <small>${esc(c.companion.attackName || 'Attaque')} · ${esc(c.companion.range || 'Mêlée')} · Éva ${c.companion.evasion || 10}</small>
+                <small>${esc(c.companion.attackName || t('sheetAttack'))} · ${esc(c.companion.range || 'Mêlée')} · Éva ${c.companion.evasion || 10}</small>
               </span>
               <span class="dha-range">${esc(c.companion.range || 'Mêlée')}</span>
               <button class="dha-btn atk" data-comp-atk title="Jet d'attaque du compagnon (Instinct)">${signed(effTrait('instinct'))}</button>
@@ -513,7 +537,7 @@ export async function render(main, params) {
           </div>
 
           <div class="dh-prof" title="Maîtrise — nombre de dés de dégâts lancés">
-            <span class="dh-g-lbl">Maîtrise</span>
+            <span class="dh-g-lbl">${t('sheetProficiency')}</span>
             <span class="dh-prof-pips">
               ${Array.from({ length: 6 }, (_, i) => `<button class="dh-profpip ${i < c.proficiency ? 'on' : ''}" data-prof="${i}"></button>`).join('')}
             </span>
@@ -527,27 +551,27 @@ export async function render(main, params) {
 
         <!-- ARMURE ACTIVE -->
         <section class="dh-panel s-equip">
-          <div class="dh-banner"><i></i><span>Armure active</span><i></i></div>
+          <div class="dh-banner"><i></i><span>${t('sheetActiveArmor')}</span><i></i></div>
           <div class="dh-wgrid armor">
             <label class="dh-fl w2"><span>Nom</span><input data-af="name" value="${esc(c.armorCard.name)}" placeholder="Ex. : Cotte de mailles"></label>
-            <label class="dh-fl"><span>Score de base</span><input type="number" data-af="baseScore" value="${c.armorCard.baseScore}" min="0" max="12"></label>
-            <label class="dh-fl"><span>Seuil majeur de base</span><input type="number" data-af="baseMajor" value="${c.armorCard.baseMajor}" min="0" max="40"></label>
-            <label class="dh-fl"><span>Seuil grave de base</span><input type="number" data-af="baseSevere" value="${c.armorCard.baseSevere}" min="0" max="60"></label>
+            <label class="dh-fl"><span>${t('sheetBaseScore')}</span><input type="number" data-af="baseScore" value="${c.armorCard.baseScore}" min="0" max="12"></label>
+            <label class="dh-fl"><span>${t('sheetBaseMajor')}</span><input type="number" data-af="baseMajor" value="${c.armorCard.baseMajor}" min="0" max="40"></label>
+            <label class="dh-fl"><span>${t('sheetBaseSevere')}</span><input type="number" data-af="baseSevere" value="${c.armorCard.baseSevere}" min="0" max="60"></label>
           </div>
-          <p class="dh-help">Ces valeurs alimentent le score d'armure en haut et les seuils de la colonne gauche (base + niveau).</p>
-          <label class="dh-fl"><span>Feature</span><input data-af="feature" value="${esc(c.armorCard.feature)}" placeholder="Feature d'armure…"></label>
-          <button class="dh-wadd" data-aadd>＋ Ajouter une armure</button>
+          <p class="dh-help">${t('sheetArmorFeedHint')}</p>
+          <label class="dh-fl"><span>${t('sheetFeature')}</span><input data-af="feature" value="${esc(c.armorCard.feature)}" placeholder="Feature d'armure…"></label>
+          <button class="dh-wadd" data-aadd>${t('sheetAddArmor')}</button>
         </section>
 
         <!-- INVENTAIRE -->
         <section class="dh-panel s-equip">
-          <div class="dh-banner"><i></i><span>Inventaire</span><i></i></div>
+          <div class="dh-banner"><i></i><span>${t('sheetInventory')}</span><i></i></div>
           <div class="dh-inv-tools">
             <div class="search-bar">
               <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
               <input type="text" id="inv-q" placeholder="Rechercher un objet à ajouter…" autocomplete="off">
             </div>
-            <button class="btn ghost small dh-inv-catbtn" id="inv-catalog" title="Parcourir le catalogue complet d'objets, armes et armures">📦 Catalogue</button>
+            <button class="btn ghost small dh-inv-catbtn" id="inv-catalog" title="Parcourir le catalogue complet d'objets, armes et armures">${t('sheetCatalog')}</button>
           </div>
           <div id="inv-suggest"></div>
           <div id="inv-list">
@@ -563,7 +587,7 @@ export async function render(main, params) {
                   ${desc ? `<span class="ii-desc" title="${esc(desc)}">${esc(desc)}</span>` : ''}
                   <span class="ii-sub">Score ${armorDef.armorScore} · Seuils ${armorDef.major}/${armorDef.severe}${armorDef.heavy ? ' · Lourd' : ''}</span>
                   <div class="ii-actions">
-                    <button class="btn small ${equipped ? 'ghost' : ''}" data-inv-eq-armor="${armorDef.id}">${equipped ? 'Ranger' : 'Équiper'}</button>
+                    <button class="btn small ${equipped ? 'ghost' : ''}" data-inv-eq-armor="${armorDef.id}">${equipped ? 'Ranger' : t('sheetEquip')}</button>
                     <div class="ii-qty">
                       <button class="qbtn" data-qty="${i}:-1">−</button>
                       <span class="qval">${it.qty ?? 1}</span>
@@ -586,7 +610,7 @@ export async function render(main, params) {
                   <div class="ii-actions">
                     ${owned
                       ? `<button class="btn small ghost" data-inv-eq-weapon="${weaponDef.id}" data-owned-uid="${owned.uid}">${equipped ? 'Ranger' : 'Équiper'}</button>`
-                      : `<button class="btn small" data-inv-eq-weapon="${weaponDef.id}">Équiper</button>`}
+                      : `<button class="btn small" data-inv-eq-weapon="${weaponDef.id}">${t('sheetEquip')}</button>`}
                     <div class="ii-qty">
                       <button class="qbtn" data-qty="${i}:-1">−</button>
                       <span class="qval">${it.qty ?? 1}</span>
@@ -606,7 +630,7 @@ export async function render(main, params) {
                 ? itemDef.descFr
                 : (it.desc || itemDef?.descFr || itemDef?.descEn || '');
               return `<div class="inv-item">
-              <span class="ii-name" title="${esc(fullDesc)}">${esc(it.name)}${isConsumable ? ' <span class="tag" style="margin-left:4px">Consommable</span>' : ''}</span>
+              <span class="ii-name" title="${esc(fullDesc)}">${esc(it.name)}${isConsumable ? ' <span class="tag" style="margin-left:4px">' + t('sheetConsumable') + '</span>' : ''}</span>
               ${fullDesc ? `<span class="ii-desc" title="${esc(fullDesc)}">${esc(fullDesc)}</span>` : ''}
               <div class="ii-actions">
                 ${isConsumable ? `<button class="btn small ghost" data-use-inv="${i}" title="Consommer 1 exemplaire">🧪 Utiliser</button>` : ''}
@@ -620,7 +644,7 @@ export async function render(main, params) {
                 </button>
               </div>
             </div>`;
-            }).join('') || '<div class="dh-help">Inventaire vide — ajoutez des objets via la recherche ou le catalogue.</div>'}
+            }).join('') || '<div class="dh-help">' + t('sheetInvEmpty') + '</div>'}
           </div>
           <div class="dh-invadd">
             <input type="text" id="inv-new" placeholder="Ajouter un objet perso…">
@@ -651,7 +675,7 @@ export async function render(main, params) {
   else if (ui.more === 'background') tabBackground(body, c, { main });
   else if (ui.more === 'journal') tabJournal(body, c, { main });
 
-  bindAll(main, c, { main, params, weapons, armors, generalItems, thr, activeBf, traitBonusOf, effTrait, armMax, effHopeMax });
+  bindAll(main, c, { main, params, weapons, armors, generalItems, thr, activeBf, traitBonusOf, effTrait, armMax, effHopeMax, subclasses });
 
   /* B15 : restitue le focus et le scroll après re-render */
   if (focusSel) {
@@ -673,12 +697,12 @@ function weaponCardHTML(w, i, c) {
   <div class="dh-wcard ${w.state === 'inventory' ? 'inv' : ''}">
     <div class="dh-wtop">
       <span class="dh-wswitch">
-        <button class="ws ${w.state === 'active' ? 'on' : ''}" data-wstate="${i}:active" title="Arme portée / en main">⚔ Portée</button>
-        <button class="ws ${w.state === 'inventory' ? 'on' : ''}" data-wstate="${i}:inventory" title="Arme rangée dans le sac">🎒 Sac</button>
+        <button class="ws ${w.state === 'active' ? 'on' : ''}" data-wstate="${i}:active" title="Arme portée / en main">${t('sheetRangeIcon')}</button>
+        <button class="ws ${w.state === 'inventory' ? 'on' : ''}" data-wstate="${i}:inventory" title="Arme rangée dans le sac">${t('sheetBag')}</button>
       </span>
       <span class="dh-whands" title="Nombre de mains">
-        <button class="wh ${w.hands === 'one' ? 'on' : ''}" data-whands="${i}:one">1 main</button>
-        <button class="wh ${w.hands === 'two' ? 'on' : ''}" data-whands="${i}:two">2 mains</button>
+        <button class="wh ${w.hands === 'one' ? 'on' : ''}" data-whands="${i}:one">${t('sheet1Hand')}</button>
+        <button class="wh ${w.hands === 'two' ? 'on' : ''}" data-whands="${i}:two">${t('sheet2Hands')}</button>
       </span>
       <span class="dh-wrole">
         <label title="Arme principale (exclusif avec S sur la même arme)"><input type="checkbox" data-wrole="${i}:primary" ${w.primary ? 'checked' : ''} ${w.secondary ? 'disabled' : ''}>P</label>
@@ -690,10 +714,10 @@ function weaponCardHTML(w, i, c) {
     </div>
     <div class="dh-wgrid">
       <label class="dh-fl w2"><span>Nom</span><input data-wf="${i}:name" value="${esc(w.name)}" placeholder="Nom de l'arme"></label>
-      <label class="dh-fl"><span>Trait</span>
+      <label class="dh-fl"><span>${t('sheetTrait')}</span>
         <select data-wf="${i}:trait">${TRAIT_KEYS.map(k => `<option value="${k}" ${w.trait === k ? 'selected' : ''}>${T.traits[k]}</option>`).join('')}</select></label>
-      <label class="dh-fl"><span>Portée</span><input data-wf="${i}:range" value="${esc(w.range)}" placeholder="Mêlée · Distance…"></label>
-      <label class="dh-fl"><span>Dé &amp; Bonus</span>
+      <label class="dh-fl"><span>${t('sheetRange')}</span><input data-wf="${i}:range" value="${esc(w.range)}" placeholder="Mêlée · Distance…"></label>
+      <label class="dh-fl"><span>${t('sheetDiceBonus')}</span>
         <div class="dh-wdice-row">
           <select data-wf="${i}:dice">${DICE.map(d => `<option ${w.dice === d ? 'selected' : ''}>${d}</option>`).join('')}</select>
           <input type="number" data-wf="${i}:dmgBonus" value="${parseInt(w.dmgBonus, 10) || 0}" min="-10" max="30" title="Bonus fixe de dégâts (+N)">
@@ -701,15 +725,15 @@ function weaponCardHTML(w, i, c) {
       </label>
       <label class="dh-fl"><span>Type</span>
         <select data-wf="${i}:dmgType">
-          <option value="phy" ${w.dmgType === 'phy' ? 'selected' : ''}>Physique</option>
-          <option value="mag" ${w.dmgType === 'mag' ? 'selected' : ''}>Magique</option>
+          <option value="phy" ${w.dmgType === 'phy' ? 'selected' : ''}>${t('sheetPhysical')}</option>
+          <option value="mag" ${w.dmgType === 'mag' ? 'selected' : ''}>${t('sheetMagic')}</option>
         </select></label>
       ${(() => {
         const wSpec = calcDamageSpec(c.proficiency, w.dice, w.dmgBonus, { crit: ui.atkCrit });
         return `<button class="btn small dh-wdmg" data-wroll="${i}" title="${ui.atkCrit ? `Dégâts critiques : ${wSpec.critMax} + ${wSpec.normalNotation}` : `Lancer les dégâts : ${wSpec.qty} × ${w.dice}${wSpec.flatBonus ? ' ' + fmtBonus(wSpec.flatBonus) : ''}`}">${ui.atkCrit ? `💥 ${wSpec.critMax}+${wSpec.normalNotation}` : `🎲 ${wSpec.normalNotation}`}</button>`;
       })()}
     </div>
-    <label class="dh-fl"><span>Feature</span><input data-wf="${i}:feature" value="${esc(w.feature)}" placeholder="Feature d'arme…"></label>
+    <label class="dh-fl"><span>${t('sheetFeature')}</span><input data-wf="${i}:feature" value="${esc(w.feature)}" placeholder="Feature d'arme…"></label>
   </div>`;
 }
 
@@ -885,7 +909,7 @@ function bindAll(root, c, ctx) {
   }));
 
   /* --- seuils : modal --- */
-  $$('[data-thr]', root).forEach(b => b.addEventListener('click', () => editThresholds(c, () => render(main, params))));
+  $$('[data-thr]', root).forEach(b => b.addEventListener('click', () => editThresholds(c, ctx, () => render(main, params))));
 
   /* --- expériences --- */
   $$('[data-ef]', root).forEach(inp => inp.addEventListener('change', () => {
@@ -1263,7 +1287,7 @@ function bindAll(root, c, ctx) {
     e.target.value = '';
   });
   $('#btn-delete', root).addEventListener('click', () => {
-    if (!confirm(`Supprimer définitivement « ${c.name} » ?`)) return;
+    if (!confirm(t('sheetDeleteConfirm', { name: c.name }))) return;
     setState(s => { s.characters = s.characters.filter(x => x.id !== c.id); });
     go('chars');
   });
@@ -1281,7 +1305,7 @@ function openRoller(c, preset = {}, ctx = null) {
   const traitVal = (k) => (ctx?.effTrait ? ctx.effTrait(k) : (c.traits[k] || 0));
   box.innerHTML = `
     <h3>Jet d'action — ${esc(c.name || 'Personnage')}</h3>
-    <div class="ms-meta">Dés de Dualité : 1d12 Espoir + 1d12 Peur + modificateurs.</div>
+    <div class="ms-meta">${t('sheetDualityHint')}</div>
     <div class="dhr-dice">
       <div class="dhr-die hope"><span class="l">Espoir d12</span><span class="v" id="dhr-h">—</span></div>
       <span class="dhr-vs">+</span>
@@ -1289,23 +1313,23 @@ function openRoller(c, preset = {}, ctx = null) {
     </div>
     <div class="dhr-mods">
       <select id="dhr-trait">
-        <option value="">— Trait —</option>
+        <option value="">${t('sheetPickTrait')}</option>
         ${TRAIT_KEYS.map(k => `<option value="${k}" ${preset.trait === k ? 'selected' : ''}>${T.traits[k]} ${signed(traitVal(k))}</option>`).join('')}
       </select>
       <select id="dhr-exp">
-        <option value="">— Expérience —</option>
+        <option value="">${t('sheetPickExp')}</option>
         ${expList.map(x => `<option value="${x.i}" ${preset.expIdx === x.i ? 'selected' : ''}>✦ ${esc(x.e.name)} (${signed(x.e.mod)})</option>`).join('')}
       </select>
     </div>
     <label class="dhr-hopespend"><input type="checkbox" id="dhr-spend" checked> Dépenser 1 Espoir pour l'Expérience</label>
     <div class="dhr-toggles">
-      <button class="btn ghost small" id="dhr-adv">▲ Avantage (d6)</button>
-      <button class="btn ghost small" id="dhr-dis">▼ Désavantage (d6)</button>
+      <button class="btn ghost small" id="dhr-adv">${t('sheetAdv6')}</button>
+      <button class="btn ghost small" id="dhr-dis">${t('sheetDisadv6')}</button>
     </div>
     <div class="dhr-result" id="dhr-res"></div>
     <div class="dhr-btns">
       <button class="btn ghost" id="dhr-close">Fermer</button>
-      <button class="btn" id="dhr-go">✦ Lancer les dés</button>
+      <button class="btn" id="dhr-go">${t('sheetRollDice')}</button>
     </div>`;
 
   let adv = false, dis = false;
@@ -1363,10 +1387,10 @@ function openDamageModal(c, thr, activeBf, onDone) {
   const massiveRule = !!getState().settings?.massiveDamageRule;
 
   sheet.innerHTML = `
-    <h3>Encaisser des dégâts</h3>
+    <h3>${t('sheetTakeDamage')}</h3>
     <div class="ms-meta">Seuils actuels : Majeurs ≥ <b>${thr.major}</b> · Graves ≥ <b>${thr.severe}</b>${massiveRule ? ` · Massifs ≥ <b>${thr.severe * 2}</b>` : ''}</div>
     <div class="field" style="margin:.7rem 0">
-      <label>Dégâts bruts reçus</label>
+      <label>${t('sheetRawDamage')}</label>
       <input type="number" id="dmg-amt" min="0" max="999" value="10" style="font-size:1.1rem;font-weight:800">
     </div>
     <label class="dhr-hopespend" style="margin:.4rem 0">
@@ -1375,7 +1399,7 @@ function openDamageModal(c, thr, activeBf, onDone) {
     </label>
     <label class="dhr-hopespend" style="margin:.4rem 0">
       <input type="checkbox" id="dmg-direct">
-      Dégâts directs (ignore l'armure)
+      ${t('sheetDirectDamage')}
     </label>
     <div class="panel" id="dmg-preview" style="margin:.75rem 0;padding:.65rem"></div>
     <div style="display:flex;gap:.5rem;justify-content:flex-end">
@@ -1400,7 +1424,7 @@ function openDamageModal(c, thr, activeBf, onDone) {
       <div style="font-size:.98rem;font-weight:800;color:var(--golden);margin-top:.2rem">
         Effet : −${res.hpMarked} PV (${c.hp.current} → ${newHp}/${c.hp.max})${res.armorSpent ? ' · −1 Armure' : ''}
       </div>
-      ${newHp === 0 && res.hpMarked > 0 ? '<div style="font-size:.76rem;color:#ffb4b4;margin-top:.25rem">⚠ Tombe à 0 PV → déclenche un Mouvement de mort !</div>' : ''}`;
+      ${newHp === 0 && res.hpMarked > 0 ? '<div style="font-size:.76rem;color:#ffb4b4;margin-top:.25rem">' + t('sheetFallsTo0') + '</div>' : ''}`;
     return res;
   };
 
@@ -1436,12 +1460,12 @@ function openDeathMoveModal(c, onDone) {
 
   sheet.innerHTML = `
     <h3>💀 Mouvement de mort — ${esc(c.name || 'Personnage')}</h3>
-    <div class="ms-meta">À 0 PV, choisissez l'une des trois issues (SRD 2.0) :</div>
+    <div class="ms-meta">${t('sheetDeathChoices')}</div>
     <div style="display:flex;flex-direction:column;gap:.55rem;margin:.8rem 0">
       <button class="inv-sug" id="dm-avoid" style="text-align:left">
         <span class="is-type">🛡️</span>
         <span class="is-body">
-          <span class="is-name">Éviter la mort</span>
+          <span class="is-name">${t('sheetAvoidDeath')}</span>
           <span class="is-sub">Vous sombrez dans l'inconscience. Lancez le dé d'Espoir (1d12) : si résultat ≤ Niveau (${c.level}), vous gagnez 1 Cicatrice (losange d'Espoir condamné).</span>
         </span>
       </button>
@@ -1455,7 +1479,7 @@ function openDeathMoveModal(c, onDone) {
       <button class="inv-sug" id="dm-blaze" style="text-align:left">
         <span class="is-type">🔥</span>
         <span class="is-body">
-          <span class="is-name">Baroud d'honneur</span>
+          <span class="is-name">${t('sheetLastStand')}</span>
           <span class="is-sub">Une ultime action héroïque devient automatiquement un Succès Critique, puis votre personnage franchit le voile de la mort.</span>
         </span>
       </button>
@@ -1494,9 +1518,10 @@ function openDeathMoveModal(c, onDone) {
       saveChar(c);
       toast(`Tout risquer — Succès Critique (double ${r.hope}) ! Tous les PV (${c.hp.max}) et le Stress sont restaurés !`);
     } else if (r.hope > r.fear) {
-      c.hp.current = Math.min(c.hp.max, Math.max(1, r.hope));
+      /* SRD : effacez un total de PV et/ou Stress égal à la valeur du dé d'Espoir. */
+      c.hp.current = Math.min(c.hp.max, c.hp.current + r.hope);
       saveChar(c);
-      toast(`Tout risquer réussi (${r.hope} vs ${r.fear}) — PV restaurés jusqu'à ${c.hp.current}/${c.hp.max} !`);
+      toast(`Tout risquer réussi (${r.hope} vs ${r.fear}) — ${r.hope} PV effacé(s) → ${c.hp.current}/${c.hp.max} !`);
     } else {
       toast(`Tout risquer échoué (Peur ${r.fear} > Espoir ${r.hope}) — Le personnage succombe.`);
     }
@@ -1622,29 +1647,29 @@ function openRestModal(c, mode, onDone) {
 }
 
 /* ============ MODAL : seuils (bonus d'aptitudes) ============ */
-function editThresholds(c, onDone) {
+function editThresholds(c, ctx, onDone) {
   const back = el(`<div class="modal-back"></div>`);
   const sheet = el(`<div class="modal-sheet"></div>`);
   back.appendChild(sheet);
   document.body.appendChild(back);
   back.addEventListener('click', (e) => { if (e.target === back) back.remove(); });
 
-  const t = thresholds(c);
+  const th = thresholds(c, ctx);
   sheet.innerHTML = `
-    <h3>Seuils de dégâts</h3>
-    <div class="ms-meta">Règle (livre p. 98) — comparez les dégâts reçus à vos seuils :</div>
+    <h3>${t('sheetThresholds')}</h3>
+    <div class="ms-meta">${t('sheetRuleThresholds')}</div>
     <div class="ms-body">
       <p>
-        <b style="color:#9fe0b0">Dégâts Mineurs</b> : &lt; seuil Majeur → <b>1 PV</b><br>
-        <b style="color:#ff9d6f">Dégâts Majeurs</b> : ≥ seuil Majeur (et &lt; Grave) → <b>2 PV</b><br>
-        <b style="color:#ff6b6b">Dégâts Graves</b> : ≥ seuil Grave → <b>3 PV</b>
+        <b style="color:#9fe0b0">${t('sheetDmgMinor')}</b> : &lt; seuil Majeur → <b>1 PV</b><br>
+        <b style="color:#ff9d6f">${t('sheetDmgMajor')}</b> : ≥ seuil Majeur (et &lt; Grave) → <b>2 PV</b><br>
+        <b style="color:#ff6b6b">${t('sheetDmgSevere')}</b> : ≥ seuil Grave → <b>3 PV</b>
       </p>
-      <p class="dh-help">Seuils = base de votre armure (${c.armorCard.baseMajor}/${c.armorCard.baseSevere}, modifiable dans « Armure active ») + Niveau ${c.level} + bonus d'aptitudes.</p>
+      <p class="dh-help">Seuils = base de votre armure (${c.armorCard.baseMajor}/${c.armorCard.baseSevere}, modifiable dans « Armure active ») + Niveau ${c.level} + bonus d'aptitudes${th.autoBonus ? ` + ${signed(t.autoBonus)} (feature d'armure : ${th.autoParts.join(' + ')})` : ''}.</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin:.8rem 0">
-        <div class="field" style="margin:0"><label>Seuil Majeur (calculé)</label>
-          <div class="dh-thr-live" id="lv-major">${t.major}</div></div>
-        <div class="field" style="margin:0"><label>Seuil Grave (calculé)</label>
-          <div class="dh-thr-live" id="lv-severe">${t.severe}</div></div>
+        <div class="field" style="margin:0"><label>${t('sheetMajorThreshCalc')}</label>
+          <div class="dh-thr-live" id="lv-major">${th.major}</div></div>
+        <div class="field" style="margin:0"><label>${t('sheetSevereThreshCalc')}</label>
+          <div class="dh-thr-live" id="lv-severe">${th.severe}</div></div>
       </div>
       <div class="field" style="margin:0"><label>Bonus d'aptitudes (ex. Peau épaisse +2)</label>
         <input type="number" id="thr-bonus" min="-9" max="20" value="${c.thresholds.bonus || 0}"></div>
@@ -1656,8 +1681,9 @@ function editThresholds(c, onDone) {
 
   $('#thr-bonus', sheet).addEventListener('input', () => {
     const b = parseInt($('#thr-bonus', sheet).value, 10) || 0;
-    $('#lv-major', sheet).textContent = (c.armorCard.baseMajor || 0) + c.level + b;
-    $('#lv-severe', sheet).textContent = (c.armorCard.baseSevere || 0) + c.level + b;
+    const ab = armorBonus(c, ctx);
+    $('#lv-major', sheet).textContent = (c.armorCard.baseMajor || 0) + c.level + b + ab.bonus;
+    $('#lv-severe', sheet).textContent = (c.armorCard.baseSevere || 0) + c.level + b + ab.bonus;
   });
   $('#thr-cancel', sheet).addEventListener('click', () => back.remove());
   $('#thr-save', sheet).addEventListener('click', () => {
@@ -1695,7 +1721,7 @@ function weaponPicker(c, ctx, onDone) {
     <div id="wp-list" class="wp-list"></div>
     <div style="margin-top:.8rem;display:flex;gap:.5rem;justify-content:flex-end">
       <button class="btn ghost" id="wp-cancel">Annuler</button>
-      <button class="btn" id="wp-custom">✎ Arme personnalisée</button>
+      <button class="btn" id="wp-custom">${t('sheetCustomWeapon')}</button>
     </div>`;
 
   const draw = () => {
@@ -1713,7 +1739,7 @@ function weaponPicker(c, ctx, onDone) {
           ${w.desc ? `<span class="is-sub" style="color:var(--text-faint);margin-top:2px">${esc(w.desc)}</span>` : ''}
         </span>
         <span class="is-add">＋</span>
-      </button>`).join('') || '<div class="dh-help">Aucune arme trouvée.</div>';
+      </button>`).join('') || '<div class="dh-help">' + t('sheetNoWeapon') + '</div>';
     $$('[data-pickid]', sheet).forEach(b => b.addEventListener('click', () => {
       const w = ctx.weapons.find(x => x.id === b.dataset.pickid);
       c.weapons.push({
@@ -1775,7 +1801,7 @@ function armorPicker(c, ctx, onDone) {
     <div id="ap-list" class="wp-list"></div>
     <div style="margin-top:.8rem;display:flex;gap:.5rem;justify-content:flex-end">
       <button class="btn ghost" id="ap-cancel">Annuler</button>
-      <button class="btn" id="ap-custom">✎ Armure personnalisée</button>
+      <button class="btn" id="ap-custom">${t('sheetCustomArmor')}</button>
     </div>`;
 
   const draw = () => {
@@ -1793,7 +1819,7 @@ function armorPicker(c, ctx, onDone) {
           ${a.desc ? `<span class="is-sub" style="color:var(--text-faint);margin-top:2px">${esc(a.desc)}</span>` : ''}
         </span>
         <span class="is-add">＋</span>
-      </button>`).join('') || '<div class="dh-help">Aucune armure trouvée.</div>';
+      </button>`).join('') || '<div class="dh-help">' + t('sheetNoArmor') + '</div>';
     $$('[data-apick]', sheet).forEach(b => b.addEventListener('click', () => {
       const a = ctx.armors.find(x => x.id === b.dataset.apick);
       if (!a) return;
@@ -1873,7 +1899,7 @@ function openInventoryCatalog(c, ctx, onDone) {
     <div class="filter-row" id="cat-tabs" style="margin:.45rem 0">
       <button class="filter-chip active" data-cat="all">Tous</button>
       <button class="filter-chip" data-cat="loot">🎁 Butin</button>
-      <button class="filter-chip" data-cat="consumable">🧪 Consommables</button>
+      <button class="filter-chip" data-cat="consumable">${t('sheetConsumables')}</button>
       <button class="filter-chip" data-cat="weapon">⚔ Armes</button>
       <button class="filter-chip" data-cat="armor">🛡 Armures</button>
     </div>
@@ -1902,7 +1928,7 @@ function openInventoryCatalog(c, ctx, onDone) {
           ${e.desc ? `<span class="is-sub" style="color:var(--text-faint);margin-top:2px">${esc(e.desc)}</span>` : ''}
         </span>
         <span class="is-add">＋</span>
-      </button>`).join('') || '<div class="dh-help">Aucun élément trouvé.</div>';
+      </button>`).join('') || '<div class="dh-help">' + t('sheetNoResult') + '</div>';
 
     $$('[data-cat-add]', sheet).forEach(b => b.addEventListener('click', () => {
       const entry = allEntries.find(x => x.id === b.dataset.catAdd);
@@ -1937,14 +1963,14 @@ async function tabCards(body, c, ctx) {
   const inVault = c.domainCards.filter(x => !x.inHand);
   body.innerHTML = `
     <div class="panel">
-      <div class="p-head"><span class="rb-lbl">Cartes de domaine</span>
+      <div class="p-head"><span class="rb-lbl">${t('sheetDomainCards')}</span>
         <span class="tag">${inHand.length}/5 en main · ${c.domainCards.length} au total</span></div>
       <div id="cards-list"></div>
     </div>
     <div class="panel" style="margin-top:.9rem">
-      <div class="p-head"><span class="rb-lbl">🗄️ Caveau</span>
+      <div class="p-head"><span class="rb-lbl">${t('sheetVaultBtn')}</span>
         <span class="tag">${inVault.length} rangée(s)</span></div>
-      <div class="rl-sub" style="padding:.15rem 0 .4rem">Cartes hors de la main. Le rappel en main coûte son prix en Espoir (↻).</div>
+      <div class="rl-sub" style="padding:.15rem 0 .4rem">${t('sheetVaultHint')}</div>
       <div id="vault-list"></div>
     </div>`;
   const cardsList = $('#cards-list', body);
@@ -1964,7 +1990,7 @@ async function tabCards(body, c, ctx) {
       if (cost.hope) actions.push(`<button class="btn ghost small" data-fx-hope="${cost.hope}">Activer (${cost.hope === 1 ? '1 Espoir' : `${cost.hope} Espoirs`})</button>`);
       if (cost.stress) actions.push(`<button class="btn ghost small" data-fx-stress="${cost.stress}">Marquer ${cost.stress === 1 ? '1 Stress' : `${cost.stress} Stress`}</button>`);
       if (cost.dice) actions.push(`<button class="btn ghost small" data-fx-dice="${cost.dice}" data-fx-name="${esc(card.fr)}" title="Lancer ${cost.dice}">🎲 ${cost.dice}</button>`);
-      actions.push(`<button class="btn ghost small" data-toggle-hand="${dc.cardId}">↧ Ranger au caveau</button>`);
+      actions.push(`<button class="btn ghost small" data-toggle-hand="${dc.cardId}">${t('sheetToVault')}</button>`);
     }
     actions.push(`<button class="btn ghost small" data-remove-card="${dc.cardId}">Retirer</button>`);
     const metaCtrls = `<span class="dc-meta-ctrls">
@@ -1989,13 +2015,13 @@ async function tabCards(body, c, ctx) {
     const card = cards.find(x => x.id === dc.cardId);
     if (card) cardsList.appendChild(el(cardHTML(card, dc, false)));
   }
-  if (!inHand.length) cardsList.innerHTML = '<div class="empty"><div class="e-title">Main vide</div><div class="e-sub">Ajoutez des cartes de domaine depuis le compendium.</div></div>';
+  if (!inHand.length) cardsList.innerHTML = '<div class="empty"><div class="e-title">' + t('sheetHandEmpty') + '</div><div class="e-sub">' + t('sheetAddCardEmpty') + '</div></div>';
 
   for (const dc of inVault) {
     const card = cards.find(x => x.id === dc.cardId);
     if (card) vaultList.appendChild(el(cardHTML(card, dc, true)));
   }
-  if (!inVault.length) vaultList.innerHTML = '<div class="rl-sub" style="padding:.3rem 0">Aucune carte au caveau. Rangez une carte depuis la main ci-dessus.</div>';
+  if (!inVault.length) vaultList.innerHTML = '<div class="rl-sub" style="padding:.3rem 0">' + t('sheetVaultEmpty') + '</div>';
 
   const update = () => { saveChar(c); render(main, params); };
   $$('[data-use-key]', body).forEach(b => b.addEventListener('click', () => {
@@ -2124,7 +2150,7 @@ function featureCardHTML(f, source, rank, c) {
 function featureSection(title, count, html) {
   return `<div class="panel">
     <div class="p-head"><span class="rb-lbl">${title}</span><span class="tag">${count}</span></div>
-    ${html || '<div class="rl-sub" style="padding:.4rem 0">Aucune aptitude.</div>'}
+    ${html || '<div class="rl-sub" style="padding:.4rem 0">' + t('sheetNoAbility') + '</div>'}
   </div>`;
 }
 
@@ -2135,8 +2161,8 @@ function tabFeatures(body, c, ctx) {
   const hopeFeat = hopeName ? [{ name: `✦ ${hopeName}`, desc: hopeDesc }] : [];
   const classFeats = cl?.features || [];
   const sec1 = [...hopeFeat, ...classFeats];
-  const RANKS = ['Fondation', 'Spécialisation', 'Spécialisation', 'Maîtrise', 'Maîtrise', 'Maîtrise'];
-  const subFeats = (sub?.features || []).map((f, i) => ({ ...f, __rank: RANKS[i] || 'Maîtrise' }));
+  const RANKS = ['Fondation', 'Spécialisation', 'Spécialisation', t('sheetProficiency'), t('sheetProficiency'), t('sheetProficiency')];
+  const subFeats = (sub?.features || []).map((f, i) => ({ ...f, __rank: RANKS[i] || t('sheetProficiency') }));
   const ancFeats = c.ancestry?.abilities || [];
   const comFeat = c.community?.ability ? [c.community.ability] : [];
 
@@ -2169,17 +2195,17 @@ function tabFeatures(body, c, ctx) {
     : `P${b.tier} · ${esc(b.fr)} (${T.traits[b.trait] || b.trait} +${b.traitBonus}, Éva +${b.evasionBonus})`;
   const bfSection = isDruid ? `
     <div class="panel">
-      <div class="p-head"><span class="rb-lbl">🐾 Forme bestiale</span><span class="tag">${activeBf ? `Active : ${esc(activeBf.fr)}` : `Palier ≤ ${maxTier}`}</span></div>
+      <div class="p-head"><span class="rb-lbl">${t('sheetBeastformLbl')}</span><span class="tag">${activeBf ? `Active : ${esc(activeBf.fr)}` : `Palier ≤ ${maxTier}`}</span></div>
       ${activeBf ? `
         <div class="dh-bf-banner">
           <span><b>${esc(activeBf.fr)}</b> (${esc(activeBf.examples)}) — ${T.traits[activeBf.trait] || activeBf.trait} +${activeBf.traitBonus}, Évasion +${activeBf.evasionBonus}, Dégâts ${activeBf.dmgDice}${fmtBonus(activeBf.dmgBonus)} (${esc(activeBf.range)})${activeBf.advantages?.length ? ` · Avantages : ${esc(activeBf.advantages.join(', '))}` : ''}</span>
           <button class="btn ghost small" id="bf-exit">Quitter la forme</button>
         </div>
         ${(activeBf.features || []).map(f => featureCardHTML(f, 'Forme bestiale', null, c)).join('')}
-      ` : '<div class="rl-sub" style="margin-bottom:.45rem">Choisissez une Forme bestiale pour appliquer ses bonus temporaires de Trait, d’Évasion et d’attaque naturelle.</div>'}
+      ` : '<div class="rl-sub" style="margin-bottom:.45rem">' + t('sheetBeastformHint') + '</div>'}
       <div style="display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.55rem;align-items:center">
         <select id="bf-pick" style="flex:1;min-width:190px;background:var(--panel-3);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:.4rem .5rem;font-size:.8rem">
-          <option value="">— Choisir une Forme bestiale —</option>
+          <option value="">${t('sheetPickBeastform')}</option>
           ${availBf.map(b => `<option value="${b.id}" ${c.beastform?.id === b.id ? 'selected' : ''}>${bfOptLabel(b)}</option>`).join('')}
         </select>
         <select id="bf-base" style="flex:1;min-width:190px;background:var(--panel-3);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:.4rem .5rem;font-size:.8rem;display:${isVarPicked ? '' : 'none'}">
@@ -2187,27 +2213,27 @@ function tabFeatures(body, c, ctx) {
           ${baseCandidates(pickedMeta?.tier >= 4 ? 2 : 1).map(b => `<option value="${b.id}" ${c.beastform?.baseId === b.id ? 'selected' : ''}>P${b.tier} · ${esc(b.fr)} (${T.traits[b.trait]} +${b.traitBonus}, ${b.dmgDice}${fmtBonus(b.dmgBonus)})</option>`).join('')}
         </select>
         <label class="dhr-hopespend" style="margin:0"><input type="checkbox" id="bf-stress" checked> −1 Stress</label>
-        <button class="btn small" id="bf-activate">🐾 Transformer</button>
+        <button class="btn small" id="bf-activate">${t('sheetTransformBtn')}</button>
       </div>
     </div>` : '';
 
   /* Compagnon animal (Rôdeur Maître des bêtes / Beastbound) */
   const compSection = c.companion ? `
     <div class="panel">
-      <div class="p-head"><span class="rb-lbl">🐺 Compagnon animal</span><span class="tag">Stress ${c.companion.stress?.current || 0}/${c.companion.stress?.max || 3}</span></div>
+      <div class="p-head"><span class="rb-lbl">${t('sheetCompanionBtn')}</span><span class="tag">Stress ${c.companion.stress?.current || 0}/${c.companion.stress?.max || 3}</span></div>
       <div class="dh-wgrid">
         <label class="dh-fl"><span>Nom</span><input data-comp="name" value="${esc(c.companion.name || '')}"></label>
-        <label class="dh-fl"><span>Espèce</span><input data-comp="species" value="${esc(c.companion.species || '')}"></label>
-        <label class="dh-fl"><span>Évasion</span><input type="number" data-comp="evasion" value="${c.companion.evasion || 10}" min="1" max="30"></label>
-        <label class="dh-fl"><span>Attaque</span><input data-comp="attackName" value="${esc(c.companion.attackName || '')}"></label>
-        <label class="dh-fl"><span>Dé de dégâts</span>
+        <label class="dh-fl"><span>${t('sheetSpecies')}</span><input data-comp="species" value="${esc(c.companion.species || '')}"></label>
+        <label class="dh-fl"><span>${t('sheetEvasion')}</span><input type="number" data-comp="evasion" value="${c.companion.evasion || 10}" min="1" max="30"></label>
+        <label class="dh-fl"><span>${t('sheetAttack')}</span><input data-comp="attackName" value="${esc(c.companion.attackName || '')}"></label>
+        <label class="dh-fl"><span>${t('sheetDamageDie')}</span>
           <select data-comp="dice">${DICE.map(d => `<option ${c.companion.dice === d ? 'selected' : ''}>${d}</option>`).join('')}</select></label>
-        <label class="dh-fl"><span>Portée</span><input data-comp="range" value="${esc(c.companion.range || 'Mêlée')}"></label>
+        <label class="dh-fl"><span>${t('sheetRange')}</span><input data-comp="range" value="${esc(c.companion.range || 'Mêlée')}"></label>
       </div>
       <div style="display:flex;align-items:center;gap:.45rem;margin:.6rem 0;flex-wrap:wrap">
-        <span class="dh-g-lbl">Stress du compagnon :</span>
+        <span class="dh-g-lbl">${t('sheetCompanionStress')}</span>
         ${Array.from({ length: c.companion.stress?.max || 3 }, (_, i) => `<button class="dh-box stress ${i < (c.companion.stress?.current || 0) ? 'on' : ''}" data-comp-st="${i}"></button>`).join('')}
-        <button class="btn ghost small" id="comp-add-st">+1 Case</button>
+        <button class="btn ghost small" id="comp-add-st">${t('sheetPlusSlot')}</button>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:.45rem">
         ${(c.companion.experiences || []).map((ex, i) => `
@@ -2222,7 +2248,7 @@ function tabFeatures(body, c, ctx) {
     featureSection(`Classe & Espoir${cl ? ` — ${esc(cl.fr)}` : ''}`, sec1.length,
       sec1.map(f => featureCardHTML(f, 'Classe', null, c)).join('')) +
     featureSection(`Sous-classe${sub ? ` — ${esc(sub.fr)}` : ''}`, subFeats.length,
-      subFeats.map(f => featureCardHTML(f, 'Sous-classe', f.__rank, c)).join('')) +
+      subFeats.map(f => featureCardHTML(f, t('sheetSubclass'), f.__rank, c)).join('')) +
     mcSection +
     trSection +
     bfSection +
@@ -2269,7 +2295,7 @@ function tabFeatures(body, c, ctx) {
     if (!bf) return;
     const baseId = bf.trait === 'variable' ? ($('#bf-base', body)?.value || '') : '';
     if (bf.trait === 'variable' && !baseId) {
-      toast('Choisissez d’abord la forme de base à faire évoluer.');
+      toast(t('sheetPickBaseBeastform'));
       return;
     }
     if ($('#bf-stress', body)?.checked) {
@@ -2345,8 +2371,8 @@ function tabBackground(body, c, ctx) {
   const { main } = ctx;
   body.innerHTML = `
     <div class="panel">
-      <div class="p-head"><span class="rb-lbl">Réponses de background</span></div>
-      ${Object.values(c.backgroundAnswers || {}).filter(v => v && v.trim()).map(a => `<p style="font-size:.86rem;color:var(--text-dim);line-height:1.6;margin-bottom:.6rem">— ${esc(a)}</p>`).join('') || '<div class="li-sub">Aucune réponse de background enregistrée.</div>'}
+      <div class="p-head"><span class="rb-lbl">${t('sheetBackgroundAnswers')}</span></div>
+      ${Object.values(c.backgroundAnswers || {}).filter(v => v && v.trim()).map(a => `<p style="font-size:.86rem;color:var(--text-dim);line-height:1.6;margin-bottom:.6rem">— ${esc(a)}</p>`).join('') || '<div class="li-sub">' + t('sheetNoBackground') + '</div>'}
     </div>
     <div class="panel" style="margin-top:.9rem">
       <div class="field" style="margin:0"><label>Notes de jeu</label>
@@ -2361,7 +2387,7 @@ function tabJournal(body, c, ctx) {
   body.innerHTML = `
     <div class="panel">
       <div class="p-head">
-        <span class="rb-lbl">Journal de bord</span>
+        <span class="rb-lbl">${t('sheetLogbook')}</span>
         <span class="tag">${c.journal.length} entrée(s)</span>
       </div>
       ${c.journal.map((j, i) => `
@@ -2373,10 +2399,10 @@ function tabJournal(body, c, ctx) {
           </button>
         </div>
         <div class="jrn-text">${esc(j.text)}</div>
-      </div>`).join('') || '<div class="li-sub" style="padding:.3rem 0">Le journal est vide. Consignez vos aventures au fil des sessions !</div>'}
+      </div>`).join('') || '<div class="li-sub" style="padding:.3rem 0">' + t('sheetLogEmpty') + '</div>'}
       <div class="field" style="margin-top:.7rem">
         <textarea id="jrn-new" rows="3" placeholder="Nouvelle entrée de journal… (date auto)"></textarea>
-        <button class="btn small" id="jrn-add" style="margin-top:.5rem">＋ Ajouter l'entrée</button>
+        <button class="btn small" id="jrn-add" style="margin-top:.5rem">${t('sheetAddEntry')}</button>
       </div>
     </div>`;
   const update = () => { saveChar(c); tabJournal(body, c, ctx); };
@@ -2384,7 +2410,7 @@ function tabJournal(body, c, ctx) {
     const t = $('#jrn-new', body);
     if (!t.value.trim()) return;
     const d = new Date();
-    c.journal.unshift({ date: d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }), text: t.value.trim() });
+    c.journal.unshift({ date: d.toLocaleDateString(getLang() === 'en' ? 'en-US' : 'fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }), text: t.value.trim() });
     saveChar(c); update();
   });
   $$('[data-del-jrn]', body).forEach(b => b.addEventListener('click', () => {
@@ -2402,7 +2428,7 @@ function chooseCardToVault(c, wanted, cards, onDone) {
   back.addEventListener('click', (e) => { if (e.target === back) back.remove(); });
   const inHand = c.domainCards.filter(x => x.inHand);
   sheet.innerHTML = `
-    <h3>Main complète — 5 cartes en main</h3>
+    <h3>${t('sheetHandFull')}</h3>
     <div class="ms-meta">Pour prendre « ${esc(wanted ? (cards.find(x => x.id === wanted.cardId)?.fr || 'cette carte') : 'cette carte')} », choisissez une carte à ranger au caveau :</div>
     <div class="wp-list">
       ${inHand.map(dc => {

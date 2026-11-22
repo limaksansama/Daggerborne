@@ -10,6 +10,7 @@
 import { $, el, esc, getState, setState, saveChar, getChar } from './core.js';
 import { calcDamageSpec } from './rules.js';
 
+import { t } from './i18n.js';
 let diceBox = null;
 let initPromise = null;
 let busy = false;               /* un jet à la fois */
@@ -170,7 +171,7 @@ async function rollDuality({ mod = 0, label = '', charId = null, weaponUid = nul
     const modTxt = mod ? ` ${fmt(mod)} (${label})` : (label ? ` (${label})` : '');
     const advTxt = advVal ? ` + ${advVal} (Avantage)` : disVal ? ` − ${disVal} (Désavantage)` : '';
     const critSummary = result === 'crit'
-      ? '<div class="d3d-detail" style="color:#fde68a;margin-top:4px">Réussite auto · +1 Espoir · −1 Stress · Projecteur conservé</div>'
+      ? '<div class="d3d-detail" style="color:#fde68a;margin-top:4px">' + t('d3dAutoSuccess') + '</div>'
       : '';
     pendingDamage = (charId && (weaponUid || customDamage))
       ? { charId, weaponUid, customDamage, crit: result === 'crit' }
@@ -181,7 +182,7 @@ async function rollDuality({ mod = 0, label = '', charId = null, weaponUid = nul
       : '✦ +1 Espoir appliqué';
 
     showBanner(`
-      <div class="d3d-dice"><span class="d3d-die hope">${hope}</span><span class="d3d-die fear">${fear}</span>${advVal ? `<span class="d3d-die" title="Avantage d6">+${advVal}</span>` : ''}${disVal ? `<span class="d3d-die" title="Désavantage d6">−${disVal}</span>` : ''}</div>
+      <div class="d3d-dice"><span class="d3d-die hope">${hope}</span><span class="d3d-die fear">${fear}</span>${advVal ? `<span class="d3d-die" title="${t('d3dAdv')}">+${advVal}</span>` : ''}${disVal ? `<span class="d3d-die" title="${t('d3dDisadv')}">−${disVal}</span>` : ''}</div>
       <div class="d3d-total">${total}</div>
       <div class="d3d-status ${result}">${word}</div>
       <div class="d3d-detail">Espoir ${hope} · Peur ${fear}${modTxt}${advTxt} = ${total}</div>
@@ -302,7 +303,7 @@ async function rollDice(notation, { label = '', critInfo = null } = {}) {
 }
 
 /* ---------- jet de dégâts générique (arme, Forme bestiale, Compagnon) avec support Critique SRD 2.0 ---------- */
-export async function rollCustomDamage({ qty = 1, dice = 'd6', bonus = 0, label = 'Dégâts', crit = false } = {}) {
+export async function rollCustomDamage({ qty = 1, dice = 'd6', bonus = 0, label = t('sheetDamage'), crit = false } = {}) {
   const spec = calcDamageSpec(qty, dice, bonus, { crit });
   if (spec.crit) {
     return rollDice(spec.fullNotation, {

@@ -8,6 +8,7 @@ import {
 import { ADVERSARY_POINT_COST, calcEncounterBudget, calcEncounterSpent, formatAtkBonus } from '../rules.js';
 import { rollDice } from '../dice3d.js';
 
+import { t } from '../i18n.js';
 let gmUi = { tab: 'fear', tier: null, type: null, q: '', envTier: null, envQ: '' };
 const openEncDetails = new Set();
 let gmSeq = 0;
@@ -63,12 +64,12 @@ async function drawFear(main, root, st) {
       <div style="display:flex;gap:.5rem;margin-top:.9rem;flex-wrap:wrap">
         <button class="btn ghost small" id="fear-add">＋ Peur</button>
         <button class="btn ghost small" id="fear-rem">− Peur</button>
-        <button class="btn ghost small" id="fear-reset">Réinitialiser</button>
+        <button class="btn ghost small" id="fear-reset">${t('gmReset')}</button>
       </div>
       <p class="ch-desc" style="margin-top:.7rem;font-size:.78rem">Les jets avec Peur des joueurs vous donnent une Peur (max recommandé 12). Dépensez-la pour mettre en avant un adversaire (1 Peur) ou déclencher un acte de Peur.</p>
     </div>
 
-    <div class="section-title">Comptes à rebours</div>
+    <div class="section-title">${t('gmCountdowns')}</div>
     <div id="cds"></div>
     <div class="card">
       <div style="display:flex;gap:.5rem;flex-wrap:wrap">
@@ -80,11 +81,11 @@ async function drawFear(main, root, st) {
       </div>
     </div>
 
-    <div class="section-title">Actes du MJ (dépenser la Peur)</div>
+    <div class="section-title">${t('gmGmActs')}</div>
     <div class="card">
-      <p class="ch-desc"><b style="color:var(--golden)">Mettre en avant (1 Peur)</b> — un adversaire agit immédiatement après la mise en avant d'un PJ.</p>
+      <p class="ch-desc"><b style="color:var(--golden)">${t('gmSpotlight')}</b> — un adversaire agit immédiatement après la mise en avant d'un PJ.</p>
       <p class="ch-desc" style="margin-top:.4rem"><b style="color:var(--golden)">Acte de Peur (1+ Peur)</b> — le MJ déclenche une feature de Peur d'un adversaire ou d'un environnement.</p>
-      <p class="ch-desc" style="margin-top:.4rem"><b style="color:var(--golden)">Acte standard</b> — n'importe quel adversaire agit une fois lorsque les projecteurs passent au MJ.</p>
+      <p class="ch-desc" style="margin-top:.4rem"><b style="color:var(--golden)">${t('gmStandardAct')}</b> — n'importe quel adversaire agit une fois lorsque les projecteurs passent au MJ.</p>
     </div>`;
 
   const pool = $('#fear-pool', main);
@@ -121,7 +122,7 @@ async function drawFear(main, root, st) {
   const drawCds = () => {
     cds.innerHTML = '';
     if (!st.countdowns.length) {
-      cds.innerHTML = '<div class="empty" style="margin:0 0 .8rem"><div class="e-title">Aucun compte à rebours</div><div class="e-sub">Suivez des événements qui avancent : pièges, renforts, rituels…</div></div>';
+      cds.innerHTML = '<div class="empty" style="margin:0 0 .8rem"><div class="e-title">' + t('gmNoCountdown') + '</div><div class="e-sub">' + t('gmTrackEvents') + '</div></div>';
     }
     for (const cd of st.countdowns) {
       const box = el(`<div class="card" style="margin-bottom:.6rem">
@@ -152,7 +153,7 @@ async function drawFear(main, root, st) {
 
   $('#cd-add', main).addEventListener('click', () => {
     const name = $('#cd-new', main).value.trim();
-    if (!name) { toast('Donnez un nom au compte à rebours.'); return; }
+    if (!name) { toast(t('gmNameCd')); return; }
     const max = +$('#cd-max', main).value;
     setState(s => { s.countdowns.push({ id: uid(), name, max, value: 0 }); });
     $('#cd-new', main).value = '';
@@ -173,7 +174,7 @@ async function drawEncounter(body, main, st, seq = gmSeq) {
   const activeEnv = enc.environmentId ? environments.find(e => e.id === enc.environmentId) : null;
 
   body.innerHTML = `
-    <div class="section-title" style="margin-top:0">Budget de points de combat (SRD 2.0)</div>
+    <div class="section-title" style="margin-top:0">${t('gmCombatBudget')}</div>
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.7rem;margin-bottom:.7rem">
         <div style="display:flex;align-items:center;gap:.5rem">
@@ -201,11 +202,11 @@ async function drawEncounter(body, main, st, seq = gmSeq) {
       </div>
     </div>
 
-    <div class="section-title">Environnement actif de la scène</div>
+    <div class="section-title">${t('gmActiveEnv')}</div>
     <div class="card">
       <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center">
         <select id="enc-env-sel" style="flex:1;min-width:200px;background:var(--panel-3);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:.55rem .7rem">
-          <option value="">— Aucun environnement sélectionné —</option>
+          <option value="">${t('gmNoEnv')}</option>
           ${environments.slice().sort((a, b) => a.tier - b.tier || (a.fr || a.en).localeCompare(b.fr || b.en, 'fr')).map(e =>
             `<option value="${esc(e.id)}" ${enc.environmentId === e.id ? 'selected' : ''}>P${e.tier} · ${esc(e.fr || e.en)}${e.difficulty ? ` (Diff ${e.difficulty})` : ''}</option>`
           ).join('')}
@@ -256,11 +257,11 @@ async function drawEncounter(body, main, st, seq = gmSeq) {
           <div>
             <span class="li-name">${esc(inst.name)}</span>
             <span class="tag">${TYPE_LABELS[inst.type] || inst.type} (${cost} pt${cost > 1 ? 's' : ''})</span>
-            ${defeated ? '<span class="tag" style="background:rgba(166,46,60,.3);border-color:#d46868;color:#ffb4b4">Vaincu</span>' : ''}
+            ${defeated ? '<span class="tag" style="background:rgba(166,46,60,.3);border-color:#d46868;color:#ffb4b4">' + t('gmDefeated') + '</span>' : ''}
             <div class="ms-meta" style="margin-top:.2rem">Diff ${inst.difficulty ?? '—'} · Seuils ${inst.major ?? '—'}/${inst.severe ?? '—'}${atkFmt ? ` · ATQ ${esc(atkFmt)}` : ''}</div>
           </div>
           <div style="display:flex;gap:.35rem;flex-wrap:wrap">
-            ${atkFmt ? `<button class="btn small" data-enc-atk="${inst.uid}" title="Jet d'attaque d20 ${esc(atkFmt)}">⚔ ATQ ${esc(atkFmt)}</button>` : ''}
+            ${atkFmt ? `<button class="btn small" data-enc-atk="${inst.uid}" title="${t('gmAtkRoll20')}">⚔ ATQ ${esc(atkFmt)}</button>` : ''}
             ${atkBadge}
             <button class="icon-btn" style="width:32px;height:32px" data-enc-del="${inst.uid}" title="Retirer"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
           </div>
@@ -295,7 +296,7 @@ async function drawEncounter(body, main, st, seq = gmSeq) {
           <details style="margin-top:.55rem" data-enc-det="${inst.uid}" ${openEncDetails.has(inst.uid) ? 'open' : ''}>
             <summary style="cursor:pointer;font-size:.76rem;color:var(--text-faint)">Statblock &amp; Features (${def.features.length})</summary>
             <div style="margin-top:.4rem">
-              ${def.motives ? `<p class="ch-desc" style="font-size:.78rem"><b style="color:var(--golden)">Motivations :</b> ${esc(def.motives)}</p>` : ''}
+              ${def.motives ? `<p class="ch-desc" style="font-size:.78rem"><b style="color:var(--golden)">${t('gmMotives')}</b> ${esc(def.motives)}</p>` : ''}
               ${def.features.map(f => `<p class="ch-desc" style="font-size:.78rem;margin-top:.3rem"><b>${esc(f.name)}</b> <span class="tag">${esc(f.kind)}</span> — ${esc(f.desc)}</p>`).join('')}
             </div>
           </details>` : ''}
@@ -326,7 +327,7 @@ async function drawEncounter(body, main, st, seq = gmSeq) {
   $('#enc-pick-adv', body).addEventListener('click', () => { gmUi.tab = 'bestiary'; render(main); });
   $('#enc-add-custom', body).addEventListener('click', () => openCustomAdversaryModal(() => render(main)));
   $('#enc-clear', body)?.addEventListener('click', () => {
-    if (!confirm('Retirer tous les adversaires de l\'affrontement ?')) return;
+    if (!confirm(t('gmClearEncConfirm'))) return;
     openEncDetails.clear();
     setState(s => { s.encounter.active = []; });
     render(main);
@@ -431,20 +432,20 @@ function openCustomAdversaryModal(onDone) {
   document.body.appendChild(back);
   back.addEventListener('click', (e) => { if (e.target === back) back.remove(); });
   sheet.innerHTML = `
-    <h3>Nouvel adversaire rapide</h3>
+    <h3>${t('gmNewQuickAdv')}</h3>
     <div class="field"><label>Nom *</label><input type="text" id="ca-name" placeholder="Ex. : Bandit du col"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem">
       <div class="field"><label>Type</label>
         <select id="ca-type" style="background:var(--panel-3);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:.5rem;width:100%">
           ${TYPES.map(t => `<option value="${t}" ${t === 'standard' ? 'selected' : ''}>${TYPE_LABELS[t]}</option>`).join('')}
         </select></div>
-      <div class="field"><label>Difficulté</label><input type="number" id="ca-diff" value="12" min="1" max="30"></div>
-      <div class="field"><label>PV max</label><input type="number" id="ca-hp" value="5" min="1" max="40"></div>
-      <div class="field"><label>Stress max</label><input type="number" id="ca-st" value="3" min="0" max="20"></div>
-      <div class="field"><label>Seuil Majeur</label><input type="number" id="ca-maj" value="7" min="1" max="50"></div>
-      <div class="field"><label>Seuil Grave</label><input type="number" id="ca-sev" value="14" min="1" max="80"></div>
+      <div class="field"><label>${t('sheetDifficulty')}</label><input type="number" id="ca-diff" value="12" min="1" max="30"></div>
+      <div class="field"><label>${t('gmHpMax')}</label><input type="number" id="ca-hp" value="5" min="1" max="40"></div>
+      <div class="field"><label>${t('gmStressMax')}</label><input type="number" id="ca-st" value="3" min="0" max="20"></div>
+      <div class="field"><label>${t('sheetThM')}</label><input type="number" id="ca-maj" value="7" min="1" max="50"></div>
+      <div class="field"><label>${t('sheetTh')}</label><input type="number" id="ca-sev" value="14" min="1" max="80"></div>
       <div class="field"><label>Bonus ATQ</label><input type="number" id="ca-atk" value="2" min="-5" max="20"></div>
-      <div class="field"><label>Dégâts (ex. 1d8+3)</label><input type="text" id="ca-dmg" value="1d8+2"></div>
+      <div class="field"><label>${t('gmDmgEx')}</label><input type="text" id="ca-dmg" value="1d8+2"></div>
     </div>
     <div style="display:flex;gap:.5rem;justify-content:flex-end;margin-top:.7rem">
       <button class="btn ghost small" id="ca-cancel">Annuler</button>
@@ -453,7 +454,7 @@ function openCustomAdversaryModal(onDone) {
   $('#ca-cancel', sheet).addEventListener('click', () => back.remove());
   $('#ca-ok', sheet).addEventListener('click', () => {
     const name = $('#ca-name', sheet).value.trim();
-    if (!name) { toast('Indiquez un nom.'); return; }
+    if (!name) { toast(t('gmNeedName')); return; }
     setState(s => {
       s.encounter = s.encounter || { pcCount: 4, adj: {}, active: [], environmentId: null };
       s.encounter.active.push({
@@ -467,7 +468,7 @@ function openCustomAdversaryModal(onDone) {
         major: parseInt($('#ca-maj', sheet).value, 10) || 7,
         severe: parseInt($('#ca-sev', sheet).value, 10) || 14,
         atkBonus: parseInt($('#ca-atk', sheet).value, 10) || 0,
-        atkName: 'Attaque',
+        atkName: t('sheetAttack'),
         atkDamage: $('#ca-dmg', sheet).value.trim() || '1d8',
         conditions: [],
       });
@@ -488,7 +489,7 @@ async function drawBestiary(body, main, seq = gmSeq) {
       <input type="text" id="gm-q" placeholder="Rechercher un adversaire…" value="${esc(gmUi.q)}">
     </div>
     <div class="filter-row" style="margin-bottom:.4rem">
-      <button class="filter-chip ${gmUi.tier === null ? 'active' : ''}" data-btier="">Tous paliers</button>
+      <button class="filter-chip ${gmUi.tier === null ? 'active' : ''}" data-btier="">${t('sheetAllTiers')}</button>
       ${[1, 2, 3, 4].map(t => `<button class="filter-chip ${gmUi.tier === t ? 'active' : ''}" data-btier="${t}">Palier ${t}</button>`).join('')}
     </div>
     <div class="filter-row" style="margin-bottom:.8rem">
@@ -510,17 +511,17 @@ async function drawBestiary(body, main, seq = gmSeq) {
       const box = el(`<details class="rules-block adv-block">
         <summary><b>${esc(a.en)}</b> <span class="tag">${TYPE_LABELS[a.type] || a.type}</span> <span class="ms-meta" style="display:inline">${T.tiers[a.tier]} · Diff ${a.difficulty ?? '—'} · PV ${a.hp ?? '—'} · Stress ${a.stress ?? '—'}</span></summary>
         <div style="display:flex;gap:.5rem;margin-bottom:.55rem;flex-wrap:wrap">
-          <button class="btn small" data-add-enc="${a.id}">⚔ Ajouter à l'affrontement</button>
+          <button class="btn small" data-add-enc="${a.id}">${t('gmAddEnc')}</button>
           ${atkFmt ? `<button class="btn ghost small" data-adv-atk="${a.id}">🎲 ATQ ${esc(atkFmt)}</button>` : ''}
         </div>
         <div class="statblock">
-          <div class="sb-row"><span class="sb-k">PV</span><span class="sb-v">${a.hp ?? '—'}</span><span class="sb-k">Stress</span><span class="sb-v">${a.stress ?? '—'}</span><span class="sb-k">Seuils</span><span class="sb-v">${a.major ?? '—'} / ${a.severe ?? '—'}</span>${a.horde ? `<span class="sb-k">Horde</span><span class="sb-v">${a.horde}/PV</span>` : ''}</div>
+          <div class="sb-row"><span class="sb-k">PV</span><span class="sb-v">${a.hp ?? '—'}</span><span class="sb-k">Stress</span><span class="sb-v">${a.stress ?? '—'}</span><span class="sb-k">${t('cmpThresholds')}</span><span class="sb-v">${a.major ?? '—'} / ${a.severe ?? '—'}</span>${a.horde ? `<span class="sb-k">Horde</span><span class="sb-v">${a.horde}/PV</span>` : ''}</div>
           ${a.atkName ? `<div class="sb-row"><span class="sb-k">ATQ</span><span class="sb-v">${esc(atkFmt || '—')}</span><span class="sb-k">Attaque</span><span class="sb-v">${esc(a.atkName)} (${esc(a.atkRange)})</span><span class="sb-k">Dégâts</span><span class="sb-v">${esc(a.atkDamage || '—')}</span></div>` : ''}
           ${a.experience ? `<div class="sb-row"><span class="sb-k">Expérience</span><span class="sb-v">${esc(a.experience)}</span></div>` : ''}
         </div>
         <p class="ch-desc">${esc(a.desc)}</p>
         ${a.motives ? `<p class="ch-desc"><b style="color:var(--golden)">Motivations &amp; tactiques :</b> ${esc(a.motives)}</p>` : ''}
-        <div class="section-title" style="margin-top:.6rem">Features</div>
+        <div class="section-title" style="margin-top:.6rem">${t('sheetFeatures')}</div>
         ${a.features.map(f => `<p class="ch-desc" style="margin-bottom:.5rem"><b>${esc(f.name)}</b> <span class="tag">${esc(f.kind)}</span> — ${esc(f.desc)}</p>`).join('')}
       </details>`);
       advList.appendChild(box);
@@ -566,7 +567,7 @@ async function drawEnvironments(body, main, seq = gmSeq) {
       <input type="text" id="gm-env-q" placeholder="Rechercher un environnement…" value="${esc(gmUi.envQ)}">
     </div>
     <div class="filter-row" style="margin-bottom:.8rem">
-      <button class="filter-chip ${gmUi.envTier === null ? 'active' : ''}" data-etier="">Tous paliers</button>
+      <button class="filter-chip ${gmUi.envTier === null ? 'active' : ''}" data-etier="">${t('sheetAllTiers')}</button>
       ${[1, 2, 3, 4].map(t => `<button class="filter-chip ${gmUi.envTier === t ? 'active' : ''}" data-etier="${t}">Palier ${t}</button>`).join('')}
     </div>
     <p class="page-sub" id="gm-env-count"></p>
@@ -583,12 +584,12 @@ async function drawEnvironments(body, main, seq = gmSeq) {
       const box = el(`<details class="rules-block adv-block">
         <summary><b>${esc(e.fr || e.en)}</b>${e.fr ? ` <span class="ms-meta" style="display:inline">(${esc(e.en)})</span>` : ''} <span class="tag">${esc(e.category)}</span> <span class="ms-meta" style="display:inline">${T.tiers[e.tier]}${e.difficulty ? ' · Difficulté ' + e.difficulty : ''}</span></summary>
         <div style="margin-bottom:.55rem">
-          <button class="btn small" data-set-env="${e.id}">🌳 Activer dans l'affrontement</button>
+          <button class="btn small" data-set-env="${e.id}">${t('gmActivateEnv')}</button>
         </div>
         <p class="ch-desc">${esc(e.descFr || e.desc)}</p>
         ${(e.impulsesFr || e.impulses) ? `<p class="ch-desc"><b style="color:var(--golden)">Impulsions :</b> ${esc(e.impulsesFr || e.impulses)}</p>` : ''}
         ${e.adversaries ? `<p class="ch-desc"><b style="color:var(--golden)">Adversaires potentiels :</b> ${esc(e.adversaries)}</p>` : ''}
-        <div class="section-title" style="margin-top:.6rem">Features</div>
+        <div class="section-title" style="margin-top:.6rem">${t('sheetFeatures')}</div>
         ${e.features.map(f => `<p class="ch-desc" style="margin-bottom:.5rem"><b>${esc(f.name)}</b> <span class="tag">${esc(f.kind)}</span> — ${esc(f.desc)}</p>`).join('')}
       </details>`);
       envList.appendChild(box);
@@ -614,51 +615,51 @@ async function drawEnvironments(body, main, seq = gmSeq) {
 async function drawRules(body, main) {
   body.innerHTML = `
     <details class="rules-block" open>
-      <summary>Seuils de dégâts &amp; Armure — SRD 2.0</summary>
+      <summary>${t('gmThresholdsArmor')}</summary>
       <div class="card"><p class="ch-desc">${esc(RULES_THRESHOLDS.desc)}</p></div>
     </details>
 
     <details class="rules-block">
-      <summary>Mouvements de mort &amp; Cicatrices — SRD 2.0</summary>
+      <summary>${t('gmDeathMoves')}</summary>
       ${RULES_DEATH.map(r => `<div class="card" style="margin-bottom:.5rem"><b style="color:var(--golden)">${esc(r.name)}</b> <span class="tag">${esc(r.tag)}</span><p class="ch-desc" style="margin-top:.3rem">${esc(r.desc)}</p></div>`).join('')}
     </details>
 
     <details class="rules-block">
-      <summary>Travail d'équipe, Tag Team &amp; Jets spéciaux — SRD 2.0</summary>
+      <summary>${t('gmTeamwork')}</summary>
       ${RULES_TEAMWORK.map(r => `<div class="card" style="margin-bottom:.5rem"><b style="color:var(--golden)">${esc(r.name)}</b> <span class="tag">${esc(r.tag)}</span><p class="ch-desc" style="margin-top:.3rem">${esc(r.desc)}</p></div>`).join('')}
     </details>
 
     <details class="rules-block">
-      <summary>Conditions (états) — SRD 2.0</summary>
+      <summary>${t('gmConditions')}</summary>
       ${RULES_CONDITIONS.map(c => `<div class="card" style="margin-bottom:.5rem"><b style="color:var(--golden)">${esc(c.name)}</b> <span class="tag">${esc(c.tag)}</span><p class="ch-desc" style="margin-top:.3rem">${esc(c.desc)}</p></div>`).join('')}
     </details>
 
     <details class="rules-block">
-      <summary>Repos &amp; temps morts (Downtime) — SRD 2.0</summary>
+      <summary>${t('gmRestDowntime')}</summary>
       ${RULES_REST.map(r => `<div class="card" style="margin-bottom:.5rem"><b style="color:var(--golden)">${esc(r.name)}</b> <span class="tag">${esc(r.tag)}</span><p class="ch-desc" style="margin-top:.3rem">${esc(r.desc)}</p></div>`).join('')}
     </details>
 
     <details class="rules-block">
-      <summary>Dangers spéciaux, Chutes &amp; Résistances — SRD 2.0</summary>
+      <summary>${t('gmDangers')}</summary>
       ${RULES_HAZARDS.map(r => `<div class="card" style="margin-bottom:.5rem"><b style="color:var(--golden)">${esc(r.name)}</b> <span class="tag">${esc(r.tag)}</span><p class="ch-desc" style="margin-top:.3rem">${esc(r.desc)}</p></div>`).join('')}
     </details>
 
     <details class="rules-block">
-      <summary>Créer un affrontement équilibré — SRD 2.0</summary>
+      <summary>${t('gmBalancedEnc')}</summary>
       <div class="card"><p class="ch-desc">${esc(RULES_ENCOUNTER.points)}</p>
         <ul class="rules-list">${RULES_ENCOUNTER.spend.map(s => `<li>${esc(s)}</li>`).join('')}</ul>
         <p class="ch-desc" style="margin-top:.4rem">${esc(RULES_ENCOUNTER.defeated)}</p></div>
     </details>
 
     <details class="rules-block">
-      <summary>Multiclassage (niveau 5+) — SRD 2.0</summary>
+      <summary>${t('gmMulticlass')}</summary>
       <div class="card"><p class="ch-desc">${esc(RULES_MULTICLASS.when)}</p>
         <ul class="rules-list">${RULES_MULTICLASS.what.map(w => `<li>${esc(w)}</li>`).join('')}</ul>
         <p class="ch-desc" style="margin-top:.4rem">${esc(RULES_MULTICLASS.cards)}</p></div>
     </details>
 
     <details class="rules-block">
-      <summary>Cadres de campagne (Campaign Frames) — SRD 2.0</summary>
+      <summary>${t('gmCampaignFrames')}</summary>
       ${RULES_CAMPAIGN_FRAMES.map(r => `<div class="card" style="margin-bottom:.5rem"><b style="color:var(--golden)">${esc(r.name)}</b> <span class="tag">${esc(r.tag)}</span><p class="ch-desc" style="margin-top:.3rem">${esc(r.desc)}</p></div>`).join('')}
     </details>`;
 }

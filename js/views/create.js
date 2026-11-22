@@ -1,15 +1,17 @@
 /* Assistant de création de personnage — 9 étapes guidées */
 import { $, $$, el, esc, go, T, data, toast, uid, newCharacter, saveChar, getState, setState } from '../core.js';
 
-const STEPS = [
+import { t } from '../i18n.js';
+/* fonction (et non constante) : les titres doivent suivre la langue courante */
+const STEPS = () => [
   { id: 'class', title: 'Classe' },
-  { id: 'subclass', title: 'Sous-classe' },
+  { id: 'subclass', title: t('sheetSubclass') },
   { id: 'ancestry', title: 'Ascendance' },
   { id: 'community', title: 'Communauté' },
   { id: 'traits', title: 'Traits' },
   { id: 'equipment', title: 'Équipement' },
   { id: 'cards', title: 'Cartes' },
-  { id: 'experiences', title: 'Expériences' },
+  { id: 'experiences', title: t('sheetExperiences') },
   { id: 'identity', title: 'Identité' },
 ];
 
@@ -48,7 +50,8 @@ function getMain() { return mainRef && mainRef.isConnected ? mainRef : document.
 
 async function draw(main) {
   if (!main || !main.isConnected) return;
-  const step = STEPS[wiz.step];
+  const steps = STEPS();
+  const step = steps[wiz.step];
   // guard against stale draws after navigation away (root removed from DOM)
   const myView = `<div class="view" id="wiz"></div>`;
   main.innerHTML = myView;
@@ -56,9 +59,9 @@ async function draw(main) {
   if (!root || !root.isConnected) return;
 
   root.innerHTML = `
-    <p class="page-sub" style="margin-top:.4rem">Étape ${wiz.step + 1} sur ${STEPS.length} — ${step.title}</p>
+    <p class="page-sub" style="margin-top:.4rem">Étape ${wiz.step + 1} sur ${steps.length} — ${step.title}</p>
     <div class="wizard-steps">
-      ${STEPS.map((s, i) => `
+      ${steps.map((s, i) => `
         <div class="wstep ${i === wiz.step ? 'active' : i < wiz.step ? 'done' : ''}" data-step="${i}">
           <span class="n">${i < wiz.step ? '✓' : i + 1}</span>
           <span>${s.title}</span>
@@ -68,9 +71,9 @@ async function draw(main) {
     <div class="wizard-nav">
       ${wiz.step > 0 ? '<button class="btn ghost" id="w-prev">← Retour</button>' : ''}
       <button class="btn ghost" id="w-reset" title="Effacer la création en cours et repartir de zéro">↺ Recommencer</button>
-      ${wiz.step < STEPS.length - 1
+      ${wiz.step < steps.length - 1
         ? '<button class="btn" id="w-next">Continuer →</button>'
-        : '<button class="btn" id="w-finish">✦ Créer le personnage</button>'}
+        : '<button class="btn" id="w-finish">' + t('createFinish') + '</button>'}
     </div>`;
 
   const body = $('#step-body', root);
@@ -85,7 +88,7 @@ async function draw(main) {
   }));
   $('#w-prev', root)?.addEventListener('click', () => { wiz.step--; draw(main); });
   $('#w-reset', root)?.addEventListener('click', () => {
-    if (confirm('Recommencer la création ? Les choix en cours seront perdus.')) {
+    if (confirm(t('createReset'))) {
       wiz = initWiz();
       draw(main);
     }
@@ -101,7 +104,7 @@ async function draw(main) {
 
 async function validate(main, stepId) {
   const need = {
-    class: [wiz.classId, 'Choisissez une classe pour continuer.'],
+    class: [wiz.classId, t('createNeedClass')],
     subclass: [wiz.subclassId, 'Choisissez une sous-classe.'],
     ancestry: [wiz.ancestryId && (!wiz.mixedAncestry || wiz.ancestry2Id), wiz.mixedAncestry ? 'Choisissez vos deux ascendances pour l\'Ascendance mixte.' : 'Choisissez une ascendance.'],
     community: [wiz.communityId, 'Choisissez une communauté.'],
@@ -121,7 +124,7 @@ async function stepClass(body) {
   const classes = await data('classes');
   const domains = await data('domains');
   const sorted = [...classes].sort((a, b) => a.fr.localeCompare(b.fr, 'fr'));
-  body.innerHTML = `<p class="page-sub" style="margin-bottom:.8rem">Votre classe définit vos domaines, vos points de vie et votre aptitude d'Espoir.</p>
+  body.innerHTML = `<p class="page-sub" style="margin-bottom:.8rem">${t('createClassHint')}</p>
   <div class="choice-grid" id="grid"></div>`;
   const grid = $('#grid', body);
   for (const c of sorted) {
@@ -129,7 +132,7 @@ async function stepClass(body) {
     const btn = el(`<button class="choice ${wiz.classId === c.id ? 'selected' : ''}" data-id="${c.id}">
       <div class="ch-head">
         <span class="ch-name">${esc(c.fr)}</span>
-        ${c.fan ? '<span class="tag fan">Hope & Fear</span>' : ''}
+        ${c.fan ? '<span class="tag fan">' + t('sheetHopeFear') + '</span>' : ''}
       </div>
       <div class="ch-sub">${domNames}</div>
       <div class="ch-stats">
@@ -189,7 +192,7 @@ async function stepAncestry(body) {
 
   body.innerHTML = `
   <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.6rem;margin-bottom:.7rem">
-    <p class="page-sub" style="margin:0">Votre ascendance accorde deux aptitudes. En <b>Ascendance mixte</b>, prenez la 1re aptitude d'une lignée et la 2e d'une autre.</p>
+    <p class="page-sub" style="margin:0">Votre ascendance accorde deux aptitudes. En <b>${t('createAncestryMix')}</b>${t('createAncMixHint')}</p>
     <label style="display:inline-flex;align-items:center;gap:.45rem;font-size:.82rem;color:var(--golden);cursor:pointer;background:var(--panel-2);padding:.4rem .7rem;border-radius:10px;border:1px solid var(--border)">
       <input type="checkbox" id="anc-mixed" ${wiz.mixedAncestry ? 'checked' : ''} style="accent-color:var(--golden)"> Ascendance mixte (SRD 2.0)
     </label>
@@ -489,7 +492,7 @@ async function stepCards(body) {
       <div class="ch-head">
         <img src="assets/icons/domain-card/${c.domain}.png" alt="" style="width:22px;height:22px">
         <span class="ch-name">${esc(c.fr)}</span>
-        ${c.fan ? '<span class="tag fan">trad. amateur</span>' : ''}
+        ${c.fan ? '<span class="tag fan">' + t('sheetTradAm') + '</span>' : ''}
       </div>
       <div class="ch-sub">${T.cardType[c.type]} · ${esc(domains[c.domain].fr)} · Prix de rappel ${c.recall}</div>
       <div class="ch-desc">${esc(c.desc)}</div>
@@ -612,7 +615,16 @@ async function finish(main) {
     };
   }
 
-  const hasAbility = (frName) => (finalAncestry?.abilities || []).some(ab => ab.fr === frName);
+  /* détection bilingue : les aptitudes sont nommées en FR (mode FR) ou EN (mode EN).
+     Map : nom FR -> équivalent EN (SRD 2.0). */
+  const ABILITY_ALIASES = {
+    'Endurance': ['Endurance'],
+    'Résilience élevée': ['High Stamina'],
+    'Leste': ['Nimble'],
+  };
+  const hasAbility = (frName) => (finalAncestry?.abilities || []).some(
+    ab => ab.fr === frName || ABILITY_ALIASES[frName]?.includes(ab.fr)
+  );
   const hpMax = cl.hp + (hasAbility('Endurance') ? 1 : 0);
   const stressMax = 6 + (hasAbility('Résilience élevée') ? 1 : 0);
   const evade = cl.evasion + (hasAbility('Leste') ? 1 : 0);

@@ -8,6 +8,7 @@
    pied sticky ; geste retour Android = étape précédente (popstate). */
 import { $, $$, el, esc, data, toast, saveChar, T, addToHand } from '../core.js';
 
+import { t } from '../i18n.js';
 export const LEVELUP_OPTIONS = {
   attributes: 'Gagnez un bonus de +1 à deux traits non cochés, puis cochez-les.',
   hitPointSlots: 'Gagnez de façon permanente un emplacement de PV.',
@@ -22,7 +23,8 @@ export const LEVELUP_OPTIONS = {
 /* structure du wizard : une seule fonction render() qui redessine l'étape courante */
 const TIER_OF = (lvl) => (lvl <= 1 ? 1 : lvl <= 4 ? 2 : lvl <= 7 ? 3 : 4);
 const TRAIT_KEYS = ['agility', 'strength', 'finesse', 'instinct', 'presence', 'knowledge'];
-const STEP_TITLES = ['Récompense de palier', 'Améliorations', 'Carte(s) de domaine', 'Échange de carte', 'Récapitulatif'];
+/* fonction (et non constante) : le titre doit suivre la langue courante */
+const stepTitles = () => ['Récompense de palier', 'Améliorations', 'Carte(s) de domaine', 'Échange de carte', t('createResume')];
 
 /* ---------- validation ---------- */
 export function traitsAvailable(c) {
@@ -165,7 +167,7 @@ async function runLevelUpWizard(c, ctx) {
   const footer = () => {
     const prev = wiz.step === 1
       ? `<button class="btn ghost" data-lu-prev>Annuler</button>`
-      : `<button class="btn ghost" data-lu-prev>Précédent</button>`;
+      : `<button class="btn ghost" data-lu-prev>${t('lvlPrev')}</button>`;
     let main = '', mainDis = false, mainAct = 'next';
     if (wiz.step === 1) { main = 'Suivant'; mainDis = !!(reward && !wiz.expName.trim()); }
     else if (wiz.step === 2) {
@@ -186,7 +188,7 @@ async function runLevelUpWizard(c, ctx) {
     <div class="lu-prog">
       ${[1, 2, 3, 4, 5].map(n => `
         <div class="lu-pseg ${n <= wiz.step ? 'on' : ''} ${n === wiz.step ? 'cur' : ''}"></div>`).join('')}
-      <span class="lu-plbl">Étape ${wiz.step}/5 · ${esc(STEP_TITLES[wiz.step - 1])}</span>
+      <span class="lu-plbl">Étape ${wiz.step}/5 · ${esc(stepTitles()[wiz.step - 1])}</span>
     </div>`;
 
   /* ================= RENDER ================= */
@@ -213,7 +215,7 @@ async function runLevelUpWizard(c, ctx) {
           ${reward ? `
           <li>✦ Gagnez une <b>Expérience supplémentaire</b> à <b>+2</b> — nommez-la ci-dessous</li>
           <li>✦ <b>+1 Maîtrise</b> permanent (dé de dégâts : ${c.proficiency + 1})</li>
-          ${newLevel !== 2 ? '<li>✦ Effacez toutes les <b>coches de traits</b> (ils redeviennent améliorables)</li>' : ''}` : ''}
+          ${newLevel !== 2 ? '<li>✦ Effacez toutes les <b>' + t('lvlTradeMarkChk') + '</b> (ils redeviennent améliorables)</li>' : ''}` : ''}
         </ul>
       </div>
       ${reward ? `
@@ -270,14 +272,14 @@ async function runLevelUpWizard(c, ctx) {
       </div>` : ''}
       ${wiz.choices.includes('proficiency') ? `
       <div class="lu-sub">
-        <div class="lu-sub-lbl">Maîtrise — option à double coût (2/2 points)</div>
+        <div class="lu-sub-lbl">${t('lvlMasteryDouble')}</div>
         <div class="lu-traitpick">
           ${[1, 2].map(n => `<button class="lu-tp ${wiz.profChecks >= n ? 'sel' : ''}" data-luprof="${n}">Case ${n} · +1 Maîtrise</button>`).join('')}
         </div>
       </div>` : ''}
       ${wiz.choices.includes('multiclass') ? `
       <div class="lu-sub">
-        <div class="lu-sub-lbl">Classe secondaire (multiclassage — option à double coût, 2/2 points)</div>
+        <div class="lu-sub-lbl">${t('lvlMulticlassLbl')}</div>
         <div class="lu-traitpick">
           ${classes.filter(x => x.id !== c.classId).map(x => `
             <button class="lu-tp ${wiz.multiclassId === x.id ? 'sel' : ''}" data-lumc="${x.id}">${esc(x.fr)}</button>`).join('')}
@@ -296,10 +298,10 @@ async function runLevelUpWizard(c, ctx) {
       const dNames = myDomains().map(d => domains[d]?.fr || d).join(' · ');
       body = `
       <div class="lu-count">Cartes sélectionnées : <b>${wiz.cardPicks.length} / ${cardQuota()}</b></div>
-      ${wiz.choices.includes('domainCard') ? '<div class="lu-hint">Option « carte de domaine supplémentaire » : vous pouvez en choisir deux.</div>' : ''}
+      ${wiz.choices.includes('domainCard') ? '<div class="lu-hint">' + t('lvlTwoCardsOpt') + '</div>' : ''}
       <div class="search-bar">
         <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
-        <input type="text" id="lu-q" placeholder="Rechercher (${esc(dNames)})…" value="${esc(wiz.q)}" autocomplete="off">
+        <input type="text" id="lu-q" placeholder="${t('lvlSearchDomains')}" value="${esc(wiz.q)}" autocomplete="off">
       </div>
       <div class="lu-filters">
         ${myDomains().map(d => `<button class="lu-chip ${wiz.domFilter === d ? 'on' : ''}" data-ludom="${d}">${esc(domains[d]?.fr || d)}</button>`).join('')}
@@ -325,7 +327,7 @@ async function runLevelUpWizard(c, ctx) {
             </div>
           </div>
           ${sel ? renderSwapChoices(i) : ''}`;
-        }).join('') || '<div class="dh-help">Aucune carte possédée.</div>'}
+        }).join('') || '<div class="dh-help">' + t('lvlNoCardsOwned') + '</div>'}
       </div>`;
     }
     /* ---------------- ÉTAPE 5 : récapitulatif ---------------- */
@@ -347,16 +349,16 @@ async function runLevelUpWizard(c, ctx) {
       .filter(cd => !wiz.lvlFilter || String(cd.level) === wiz.lvlFilter)
       .filter(cd => !wiz.q || (cd.fr + ' ' + cd.en).toLowerCase().includes(wiz.q.toLowerCase()))
       .sort((a, b) => a.level - b.level || a.fr.localeCompare(b.fr, 'fr'));
-    if (!list.length) return '<div class="dh-help">Aucune carte disponible avec ces filtres.</div>';
+    if (!list.length) return '<div class="dh-help">' + t('lvlNoCardsFilters') + '</div>';
     return list.map(cd => {
       const sel = wiz.cardPicks.includes(cd.id);
       const open = wiz.openCard === cd.id;
       return `<div class="lu-card ${sel ? 'sel' : ''} ${open ? 'open' : ''}" data-lucard="${cd.id}">
-        <div class="lc-row" data-luacc="${cd.id}" title="Cliquer pour déplier la description">
+        <div class="lc-row" data-luacc="${cd.id}" title="${t('lvlClickExpand')}">
           <span class="lc-lvl">Niv. ${cd.level}</span>
           <span class="lc-body"><b>${esc(cd.fr)}</b><small>${esc(domains[cd.domain]?.fr || cd.domain)} · ${T.cardType[cd.type] || ''}</small></span>
           <span class="lc-chev" aria-hidden="true">${open ? '⌃' : '⌄'}</span>
-          <button class="lc-add" data-lupick="${cd.id}" aria-label="Sélectionner">${sel ? '✓' : '＋'}</button>
+          <button class="lc-add" data-lupick="${cd.id}" aria-label="${t('lvlSelect')}">${sel ? '✓' : '＋'}</button>
         </div>
         ${open ? `<div class="lc-detail">${esc(cd.desc || '')}<div class="lc-tags"><span class="lc-tag">${T.cardType[cd.type] || cd.type}</span>${cd.recall ? `<span class="lc-tag">Coût de rappel : ${cd.recall}</span>` : ''}</div></div>` : ''}
       </div>`;
@@ -372,7 +374,7 @@ async function runLevelUpWizard(c, ctx) {
     return `<div class="lu-sub lu-swapbox">
       <div class="lu-sub-lbl">Remplacer « ${esc(old?.fr || '')} » par (niveau ≤ ${newLevel})</div>
       <div class="lu-swaplist">
-        ${list.map(cd => `<button class="lu-tp ${wiz.swapPick === cd.id ? 'sel' : ''}" data-lunew="${cd.id}">Niv. ${cd.level} · ${esc(cd.fr)}</button>`).join('') || '<div class="dh-help">Aucune carte disponible.</div>'}
+        ${list.map(cd => `<button class="lu-tp ${wiz.swapPick === cd.id ? 'sel' : ''}" data-lunew="${cd.id}">Niv. ${cd.level} · ${esc(cd.fr)}</button>`).join('') || '<div class="dh-help">' + t('lvlNoCards') + '</div>'}
       </div>
     </div>`;
   };

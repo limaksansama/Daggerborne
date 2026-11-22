@@ -1,6 +1,7 @@
 /* Daggerborne — no-build ES modules PWA (FR) */
 import { sanitizeCharacter } from './rules.js';
 
+import { t, getLang, T } from './i18n.js';
 // ---------- tiny helpers ----------
 export const $ = (sel, root = document) => root.querySelector(sel);
 export const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -166,8 +167,8 @@ export const cloudSync = {
   getStatus() {
     return {
       configured: false,
-      tierLabel: 'Option Pro (à venir)',
-      summary: 'La synchronisation automatique vers Google Drive sera proposée en option payante. Exportez vos sauvegardes JSON gratuitement à tout moment.',
+      tierLabel: t('settingsProSoon'),
+      summary: t('settingsCloudDesc'),
     };
   },
   exportPayload() {
@@ -238,35 +239,22 @@ export function importFullBackupFromText(rawText, mode = 'merge') {
 
 // ---------- data cache ----------
 const cache = {};
-const DATA_VER = 'v27';
+const DATA_VER = 'v28';
 export async function data(name) {
-  if (!cache[name]) {
-    const r = await fetch(`data/${name}.json?${DATA_VER}`);
+  const dir = getLang() === 'en' ? 'data/en' : 'data';
+  const key = getLang() + ':' + name;
+  if (!cache[key]) {
+    const r = await fetch(`${dir}/${name}.json?${DATA_VER}`);
     if (!r.ok) throw new Error(`data ${name}: ${r.status}`);
-    cache[name] = await r.json();
+    cache[key] = await r.json();
   }
-  return cache[name];
+  return cache[key];
 }
 
-// ---------- i18n-ish static strings ----------
-export const T = {
-  appName: 'Daggerborne',
-  pageHome: 'Accueil', pageChars: 'Personnages', pageDice: 'Dés', pageCompendium: 'Compendium', pageGM: 'MJ', pageSettings: 'Réglages',
-  traits: { agility: 'Agilité', strength: 'Force', finesse: 'Finesse', instinct: 'Instinct', presence: 'Présence', knowledge: 'Savoir' },
-  traitShort: { agility: 'AGI', strength: 'FOR', finesse: 'FIN', instinct: 'INS', presence: 'PRÉ', knowledge: 'SAV' },
-  traitVerbs: {
-    agility: 'Manœuvrer · Sauter · Sprinter',
-    strength: 'Empoigner · Fracasser · Soulever',
-    finesse: 'Bricoler · Cacher · Contrôler',
-    instinct: 'Percevoir · Se repérer · Sentir',
-    presence: 'Charmer · Duper · Jouer',
-    knowledge: 'Analyser · Comprendre · Se souvenir',
-  },
-  cardType: { spell: 'Sort', ability: 'Capacité', grimoire: 'Grimoire' },
-  burden: { oneHanded: 'Une main', twoHanded: 'Deux mains' },
-  damageType: { phy: 'Physique', mag: 'Magique' },
-  tiers: { 1: 'Palier 1 (Niveau 1)', 2: 'Palier 2 (Niv. 2–4)', 3: 'Palier 3 (Niv. 5–7)', 4: 'Palier 4 (Niv. 8–10)' },
-};
+// ---------- i18n : dictionnaire dynamique partagé (FR/EN) ----------
+/* T vient de i18n.js : il suit la langue courante. Garder une copie statique
+   en français ici laissait la navigation et les traits en français en mode EN. */
+export { T };
 
 // ---------- router ----------
 const routes = {};
@@ -421,9 +409,9 @@ export function exportJsonFile(filename, dataObj, title = 'Export JSON') {
         : 'Si le téléchargement ne démarre pas automatiquement sur votre tablette ou mobile, utilisez Partager ou Copier ci-dessous.'}
     </p>
     <div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.8rem">
-      ${canShareApi ? '<button class="btn" id="exp-share">📤 Partager / Enregistrer</button>' : ''}
-      <button class="btn ${canShareApi ? 'ghost' : ''}" id="exp-copy">📋 Copier le JSON</button>
-      <button class="btn ghost" id="exp-dl">📥 Télécharger (.json)</button>
+      ${canShareApi ? `<button class="btn" id="exp-share">📤 ${t('coreShare')}</button>` : ''}
+      <button class="btn ${canShareApi ? 'ghost' : ''}" id="exp-copy">📋 ${t('coreCopyJson')}</button>
+      <button class="btn ghost" id="exp-dl">💾 ${t('coreDownload')}</button>
     </div>
     <details style="margin-top:.2rem">
       <summary style="cursor:pointer;font-size:.78rem;color:var(--text-faint)">Afficher le JSON brut</summary>
@@ -503,7 +491,7 @@ export function openPasteJsonModal({ title = 'Coller un JSON', placeholder = '{ 
   back.addEventListener('click', (e) => { if (e.target === back) back.remove(); });
   sheet.innerHTML = `
     <h3>${esc(title)}</h3>
-    <div class="ms-meta">Collez le contenu JSON copié depuis un autre appareil ou une sauvegarde.</div>
+    <div class="ms-meta">${t('corePasteJson')}</div>
     <textarea id="paste-json-ta" rows="8" placeholder="${esc(placeholder)}" style="width:100%;margin:.6rem 0;background:var(--panel-3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:monospace;font-size:.75rem;padding:.55rem"></textarea>
     <div style="display:flex;gap:.5rem;justify-content:flex-end">
       <button class="btn ghost small" id="pj-cancel">Annuler</button>

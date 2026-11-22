@@ -11,6 +11,47 @@ export function tierOf(level) {
   return 4;
 }
 
+/* Bonus de seuils de dégâts accordé par la feature de certaines armures (SRD 2.0).
+   4 familles d'armures accordent un bonus aux seuils — dépendances dynamiques :
+   - Enchantée (Robes de mage)         : bonus = trait d'Incantation
+   - Éclatante (Armure de cercueil)    : bonus = emplacements d'armure non cochés
+   - Harmonisée (Exosquelette runique) : bonus = palier
+   - Renforcée (Cuirasse d'irontree)   : +2 tant que le dernier emplacement est coché
+   La détection est bilingue (texte FR et EN de la feature) et insensible à la casse. */
+export function armorThresholdBonus({ feature = '', spellcastValue = 0, tier = 1, armorMax = 0, armorUsed = 0 } = {}) {
+  const f = String(feature || '').toLowerCase();
+  const parts = [];
+  let flat = 0;
+  let detail = [];
+  const fr = /enchantée\s*:|éclatante\s*:|harmonisée\s*:|renforcée\s*:/;
+  const en = /enchanted\s*:|splintering\s*:|attuned\s*:|reinforced\s*:/;
+  if (!fr.test(f) && !en.test(f)) return { bonus: 0, parts: [] };
+
+  if (/enchantée|enchanted/.test(f)) {
+    // Bonus aux seuils de dégâts égal à votre trait d'Incantation.
+    flat += Math.max(0, Number(spellcastValue) || 0);
+    detail.push('Incantation');
+  }
+  if (/éclatante|splintering/.test(f)) {
+    // Bonus aux seuils de dégâts égal à vos emplacements d'armure non cochés.
+    flat += Math.max(0, (Number(armorMax) || 0) - (Number(armorUsed) || 0));
+    detail.push('Emplacements d\u2019armure libres');
+  }
+  if (/harmonisée|attuned/.test(f)) {
+    // Bonus aux seuils de dégâts égal à votre palier.
+    flat += Math.max(1, Number(tier) || 1);
+    detail.push('Palier');
+  }
+  if (/renforcée|reinforced/.test(f)) {
+    // +2 aux seuils quand le dernier emplacement d'armure est coché.
+    if ((Number(armorMax) || 0) > 0 && (Number(armorUsed) || 0) >= (Number(armorMax) || 0)) {
+      flat += 2;
+      detail.push('Renforcée (+2)');
+    }
+  }
+  return { bonus: flat, parts: detail };
+}
+
 export function formatSigned(n) {
   const v = Number(n) || 0;
   return v >= 0 ? `+${v}` : `${v}`;

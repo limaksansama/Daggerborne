@@ -2,6 +2,7 @@
 import { $, el, esc, parseHash, T, getState, getChar } from '../core.js';
 import { rollDuality } from '../dice3d.js';
 
+import { t } from '../i18n.js';
 let ui = { mod: 0, adv: false, disadv: false, trait: null, expMod: 0, label: '', charId: null };
 
 export async function render(main, params) {
@@ -30,10 +31,10 @@ export async function render(main, params) {
           ${Object.entries(T.traits).map(([k, v]) => `<option value="${k}" ${ui.trait === k ? 'selected' : ''}>${v} ${c.traits[k] > 0 ? '+' : ''}${c.traits[k]}</option>`).join('')}
           ${c.experiences.map((e, i) => ({ e, i })).filter(x => x.e.name && x.e.name.trim()).map(x => `<option value="exp${x.i}" ${ui.trait === `exp${x.i}` ? 'selected' : ''}>✦ ${esc(x.e.name)} (+${x.e.mod})</option>`).join('')}
         </select>` : ''}
-        <button class="btn ghost ${ui.adv ? 'sel' : ''}" id="btn-adv">▲ Avantage (d6)</button>
-        <button class="btn ghost ${ui.disadv ? 'sel' : ''}" id="btn-disadv">▼ Désavantage (d6)</button>
+        <button class="btn ghost ${ui.adv ? 'sel' : ''}" id="btn-adv">${t('sheetAdv6')}</button>
+        <button class="btn ghost ${ui.disadv ? 'sel' : ''}" id="btn-disadv">${t('sheetDisadv6')}</button>
       </div>
-      <button class="btn block" id="btn-roll" style="max-width:420px">✦ Lancer les dés</button>
+      <button class="btn block" id="btn-roll" style="max-width:420px">${t('sheetRollDice')}</button>
     </div>
 
     <div class="section-title">Historique</div>
