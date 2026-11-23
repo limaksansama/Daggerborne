@@ -80,10 +80,11 @@
 .dh-lv-shield > svg polygon { fill: url(#dhShieldGrad); stroke: var(--golden-60); stroke-width: 2; vector-effect: non-scaling-stroke; }
 .dh-lv-num { font-family: var(--font-title); font-size: 1.7rem; font-weight: 800; color: var(--golden); line-height: 1; }
 .dh-lv-lbl { font-size: .56rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--text-dim); margin-top: .2rem; }
-.dh-lv-btns { display: flex; gap: .35rem; }
+.dh-lv-btns { display: flex; gap: .35rem; align-items: center; }
 .dh-lv-btns button {
-  height: 26px; padding: 0 .6rem; border-radius: 8px; font-size: .85rem; font-weight: 800;
+  min-width: 44px; min-height: 44px; padding: 0 .65rem; border-radius: 9px; font-size: .9rem; font-weight: 800;
   border: 1px solid var(--border); color: var(--text); background: var(--panel-3);
+  display: inline-flex; align-items: center; justify-content: center; touch-action: manipulation;
 }
 .dh-lv-btns #dh-levelup {
   border-color: var(--golden-60); color: var(--golden); background: var(--golden-10);
@@ -236,14 +237,15 @@
 
 /* ===== jauges PV / Stress : cases pleines + déblocables pointillées ===== */
 .dh-gauge { margin-top: .6rem; }
-.dh-g-head { display: flex; align-items: center; gap: .5rem; margin-bottom: .3rem; }
+.dh-g-head { display: flex; align-items: center; flex-wrap: wrap; gap: .35rem .5rem; margin-bottom: .3rem; }
 .dh-g-lbl { font-size: .64rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim); }
 .dh-g-nums { font-family: var(--font-title); font-size: .82rem; color: var(--text-dim); }
 .dh-g-nums b { color: var(--text); font-size: 1rem; }
-.dh-g-tools { margin-left: auto; display: inline-flex; align-items: center; gap: .25rem; }
+.dh-g-tools { margin-left: auto; display: inline-flex; align-items: center; gap: .3rem; }
 .dh-g-lock {
-  width: 26px; height: 26px; border-radius: 7px; font-size: .8rem;
-  border: 1px solid var(--border); color: var(--text-faint); background: var(--panel-3);
+  min-width: 44px; min-height: 44px; border-radius: 9px; font-size: .95rem; font-weight: 800;
+  border: 1px solid var(--border); color: var(--text-dim); background: var(--panel-3);
+  display: inline-flex; align-items: center; justify-content: center; touch-action: manipulation;
 }
 .dh-g-lock:disabled { opacity: .35; cursor: not-allowed; }
 .dh-boxrow { display: flex; flex-wrap: wrap; gap: .28rem; }
@@ -313,10 +315,10 @@
 .dh-gold-lbl { display: flex; align-items: center; gap: .55rem; flex-wrap: wrap; justify-content: center; }
 .dh-gold-lbl > span { font-size: .6rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--text-dim); }
 .dh-gold-lbl .dh-gold-n { font-family: var(--font-title); font-size: .72rem; color: var(--golden); }
-.dh-gold-btns { display: inline-flex; gap: .45rem; }
+.dh-gold-btns { display: inline-flex; gap: .4rem; }
 .dh-gold-btns button {
-  min-width: 40px; height: 40px; border-radius: 10px; font-size: 1.05rem; font-weight: 800;
-  border: 1px solid var(--border); color: var(--text-dim); background: var(--panel-3);
+  min-width: 44px; min-height: 44px; border-radius: 10px; font-size: 1.05rem; font-weight: 800;
+  border: 1px solid var(--border); color: var(--text); background: var(--panel-3);
   display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
   touch-action: manipulation;
 }
@@ -325,15 +327,16 @@
   display: flex; align-items: center; justify-content: space-between; gap: .5rem;
   margin-top: .55rem; flex-wrap: wrap;
 }
-.dh-gold-foot > span { font-size: .62rem; color: var(--text-faint); }
+.dh-gold-foot > span { font-size: .66rem; color: var(--text-faint); }
 .dh-gold-foot b { color: var(--golden); font-family: var(--font-title); }
 
 /* ===== Aptitude de classe : grande zone ===== */
 .dh-cf textarea {
   width: 100%; min-height: 110px; resize: vertical;
-  background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
-  color: var(--text); font-size: .84rem; line-height: 1.55; padding: .55rem .65rem;
+  background: var(--panel); border: 1.5px solid var(--border-input, #695c48); border-radius: 10px;
+  color: var(--text); font-size: .84rem; line-height: 1.55; padding: .55rem .65rem; outline: none;
 }
+.dh-cf textarea:focus { border-color: var(--golden); box-shadow: 0 0 0 2px rgba(243,194,103,.18); }
 
 /* ===== trait coché (amélioré ce palier) ===== */
 .dh-trait.marked { border-color: #9fe0b055; }
@@ -490,15 +493,17 @@
 /* champs compacts */
 .dh-fl { display: flex; flex-direction: column; gap: .15rem; min-width: 0; }
 .dh-fl span {
-  font-size: .54rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--text-faint);
+  font-size: .58rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--text-faint);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .dh-fl input, .dh-fl select {
-  background: var(--panel-3); border: 1px solid var(--border); border-radius: 8px;
-  color: var(--text); font-size: .8rem; font-weight: 600; padding: .35rem .5rem;
-  width: 100%; min-width: 0; outline: none;
+  background: var(--panel-3); border: 1.5px solid var(--border-input, #695c48); border-radius: 8px;
+  color: var(--text); font-size: .82rem; font-weight: 600; padding: .4rem .5rem;
+  width: 100%; min-width: 0; outline: none; transition: border-color .15s, box-shadow .15s;
 }
-.dh-fl input:focus, .dh-fl select:focus { border-color: var(--golden-60); }
+.dh-fl input:focus, .dh-fl select:focus {
+  border-color: var(--golden); box-shadow: 0 0 0 2px rgba(243,194,103,.18);
+}
 .dh-fl input[type=number] { -moz-appearance: textfield; appearance: textfield; }
 .dh-fl input[type=number]::-webkit-outer-spin-button, .dh-fl input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .dh-fl.w2 { grid-column: span 1; }
@@ -536,9 +541,10 @@
 .dh-roll .dhr-vs { font-family: var(--font-title); font-size: 1.4rem; color: var(--text-faint); }
 .dh-roll .dhr-mods { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
 .dh-roll .dhr-mods select {
-  background: var(--panel-3); border: 1px solid var(--border); border-radius: 10px;
-  color: var(--text); padding: .5rem; font-weight: 700; font-size: .8rem; outline: none;
+  background: var(--panel-3); border: 1.5px solid var(--border-input, #695c48); border-radius: 10px;
+  color: var(--text); padding: .5rem; font-weight: 700; font-size: .82rem; outline: none;
 }
+.dh-roll .dhr-mods select:focus { border-color: var(--golden); box-shadow: 0 0 0 2px rgba(243,194,103,.18); }
 .dh-roll .dhr-hopespend {
   display: flex; align-items: center; gap: .45rem; margin-top: .6rem;
   font-size: .78rem; color: var(--text-dim); font-weight: 600;
@@ -582,37 +588,43 @@
   .dh-traitrow { grid-template-columns: repeat(3, 1fr); }
 }
 
-/* ===== MOBILE : onglets Combat / Stats / Équipement / Plus ===== */
+/* ===== MOBILE : onglets Combat / Traits & Exp. / Cartes / Sac & Or ===== */
 @media (max-width: 999px) {
   .dh-mtabs {
     display: flex; gap: .3rem; margin-bottom: .7rem;
     border: 1px solid var(--border); border-radius: 12px; padding: .25rem;
-    background: var(--panel); position: sticky; top: 52px; z-index: 40;
+    background: var(--panel); position: sticky; top: calc(var(--safe-top) + 58px); z-index: 40;
   }
   .dh-mtabs .mt {
-    flex: 1; background: none; border: none; color: var(--text-faint);
+    flex: 1; min-height: 44px; background: none; border: 1px solid transparent; color: var(--text-dim);
     font-size: .68rem; font-weight: 800; letter-spacing: .02em; text-transform: uppercase;
-    padding: .5rem .2rem; border-radius: 9px; white-space: nowrap;
+    padding: .45rem .25rem; border-radius: 9px; white-space: nowrap;
   }
-  .dh-mtabs .mt.active { background: var(--golden-10); color: var(--golden); }
+  .dh-mtabs .mt.active { background: var(--golden-10); color: var(--golden); border-color: var(--golden-40); }
 
   /* navigation par onglets : la racine .dh-sheet porte data-mtab */
-  .dh-sheet[data-mtab="combat"] .dh-defstrip { display: grid; grid-template-columns: 1fr; }
-  .dh-sheet[data-mtab="stats"] .dh-defstrip,
-  .dh-sheet[data-mtab="equip"] .dh-defstrip,
-  .dh-sheet[data-mtab="more"] .dh-defstrip { display: none; }
+  .dh-sheet[data-mtab="combat"] .dh-defstrip,
+  .dh-sheet[data-mtab="traits"] .dh-defstrip { display: grid; grid-template-columns: 1fr; }
+  .dh-sheet[data-mtab="combat"] .dh-traitrow { display: none; }
+  .dh-sheet[data-mtab="traits"] .dh-shield-block { display: none; }
+  .dh-sheet[data-mtab="traits"] .dh-traitrow { margin-top: 0; }
+  .dh-sheet[data-mtab="cards"] .dh-defstrip,
+  .dh-sheet[data-mtab="bag"] .dh-defstrip { display: none; }
+
   .dh-sheet[data-mtab="combat"] .dh-main .dh-col > section.s-combat,
-  .dh-sheet[data-mtab="stats"] .dh-main .dh-col > section.s-stats,
-  .dh-sheet[data-mtab="equip"] .dh-main .dh-col > section.s-equip { display: block; }
+  .dh-sheet[data-mtab="traits"] .dh-main .dh-col > section.s-traits,
+  .dh-sheet[data-mtab="bag"] .dh-main .dh-col > section.s-bag { display: block; }
   .dh-sheet[data-mtab="combat"] .dh-main .dh-col > section:not(.s-combat),
-  .dh-sheet[data-mtab="stats"] .dh-main .dh-col > section:not(.s-stats),
-  .dh-sheet[data-mtab="equip"] .dh-main .dh-col > section:not(.s-equip) { display: none; }
-  .dh-sheet[data-mtab="more"] .dh-main { display: none; }
-  .dh-sheet[data-mtab="more"] .dh-morewrap { display: block; }
-  .dh-sheet:not([data-mtab="more"]) .dh-morewrap { display: none; }
-  /* une seule colonne verticale : les .dh-col s'empilent */
-  .dh-sheet:not([data-mtab="more"]) .dh-main { display: block; }
-  .dh-sheet:not([data-mtab="more"]) .dh-main .dh-col { display: flex; flex-direction: column; gap: .7rem; margin-bottom: .7rem; }
+  .dh-sheet[data-mtab="traits"] .dh-main .dh-col > section:not(.s-traits),
+  .dh-sheet[data-mtab="bag"] .dh-main .dh-col > section:not(.s-bag) { display: none; }
+
+  .dh-sheet[data-mtab="cards"] .dh-main { display: none; }
+  .dh-sheet[data-mtab="cards"] .dh-morewrap { display: block; }
+  .dh-sheet:not([data-mtab="cards"]) .dh-morewrap { display: none; }
+
+  /* une seule colonne verticale : les .dh-col s'empilent en 1fr */
+  .dh-sheet:not([data-mtab="cards"]) .dh-main { display: grid; grid-template-columns: 1fr; gap: .7rem; }
+  .dh-sheet:not([data-mtab="cards"]) .dh-main .dh-col { display: flex; flex-direction: column; gap: .7rem; margin-bottom: 0; }
 
   /* bande défenses en colonne sur mobile */
   .dh-defstrip .dh-shield-block { border-right: none; border-bottom: 1px dotted var(--border); padding: 0 0 .6rem; }
@@ -665,11 +677,11 @@
 .dh-fl-hope { width: 100%; }
 .dh-fl-hope textarea {
   width: 100%; min-height: 96px; resize: vertical;
-  background: var(--panel-3); border: 1px solid var(--border); border-radius: 8px;
+  background: var(--panel-3); border: 1.5px solid var(--border-input, #695c48); border-radius: 8px;
   color: var(--text); font-size: .8rem; font-weight: 500; line-height: 1.55;
   padding: .45rem .55rem; outline: none; white-space: pre-wrap; overflow-wrap: break-word;
 }
-.dh-fl-hope textarea:focus { border-color: var(--golden-60); }
+.dh-fl-hope textarea:focus { border-color: var(--golden); box-shadow: 0 0 0 2px rgba(243,194,103,.18); }
 
 /* dégradés partagés des boucliers SVG (défs injectés par la vue fiche) */
 .dh-svgdefs { position: absolute; width: 0; height: 0; overflow: hidden; }
@@ -700,7 +712,8 @@
   opacity: .35; cursor: not-allowed; border-color: #a03030;
   background: repeating-linear-gradient(45deg, #2a1218, #2a1218 3px, #140b10 3px, #140b10 6px);
 }
-.dh-hope-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: .35rem; font-size: .72rem; color: var(--text-dim); }
+.dh-hope-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .35rem .5rem; margin-bottom: .35rem; font-size: .74rem; color: var(--text-dim); }
+.dh-hope-head > span:last-child { display: inline-flex; align-items: center; gap: .3rem; }
 .dh-hope-head b { color: var(--golden); }
 
 /* Conditions (états) & boutons Dégâts / Mort */
@@ -729,8 +742,12 @@
   border-radius: 999px; padding: .2rem .6rem; font-size: .7rem; font-weight: 700; cursor: pointer;
 }
 .dc-use-btn.used { background: rgba(212, 104, 104, .16); border-color: #d46868; color: #ffb4b4; text-decoration: line-through; }
-.dc-tok { display: inline-flex; align-items: center; gap: .25rem; background: var(--panel-3); border: 1px solid var(--border-gold); border-radius: 999px; padding: .1rem .35rem; font-size: .72rem; color: var(--golden); font-weight: 800; }
-.dc-tok button { background: none; border: none; color: var(--text); font-weight: 800; cursor: pointer; padding: 0 .25rem; }
+.dc-tok { display: inline-flex; align-items: center; gap: .2rem; background: var(--panel-3); border: 1px solid var(--border-gold); border-radius: 999px; padding: 0; font-size: .72rem; color: var(--golden); font-weight: 800; }
+.dc-tok button {
+  background: none; border: none; color: var(--text); font-weight: 800; font-size: 1rem;
+  cursor: pointer; min-width: 44px; min-height: 44px;
+  display: inline-flex; align-items: center; justify-content: center; touch-action: manipulation;
+}
 
 /* Forme bestiale active badge */
 .dh-bf-banner {

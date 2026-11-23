@@ -1,5 +1,5 @@
 /* Service worker — cache-first PWA for Daggerborne */
-const VERSION = 'daggerborne-v64';
+const VERSION = 'daggerborne-v65';
 const CORE = [
   './', './index.html', './manifest.webmanifest',
   './css/app.css', './css/sheet2.css', './css/dice-box.css', './js/app.js', './js/core.js',
@@ -30,6 +30,7 @@ const CORE = [
   './assets/icons/domain-card/midnight.png', './assets/icons/domain-card/sage.png',
   './assets/icons/domain-card/splendor.png', './assets/icons/domain-card/valor.png',
   /* logo communautaire officiel DPCGL (fiole d'alchimie) — requis hors-ligne */
+  './assets/dpcgl-community-logo-light.png',
   './public/assets/dpcgl-community-logo.png',
   './public/assets/dpcgl-community-logo-light.png',
   /* ---- moteur de dés 3D : physique WASM + thèmes résine calligraphiés (v40) ---- */

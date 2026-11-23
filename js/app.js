@@ -10,7 +10,7 @@ import * as dice from './views/dice.js';
 import * as compendium from './views/compendium.js';
 import * as gm from './views/gm.js';
 import * as settings from './views/settings.js';
-import { initFab, refreshFab } from './fab.js';
+import { initFab, refreshFab, setFabRoute } from './fab.js';
 
 registerRoute('home', home.render);
 registerRoute('chars', chars.render);
@@ -89,10 +89,17 @@ window.addEventListener('dh:langchange', (e) => {
 const TITLES = () => ({ home: '', chars: T.pageChars, create: getLang() === 'en' ? 'Creation' : 'Création', sheet: getLang() === 'en' ? 'Sheet' : 'Fiche', dice: T.pageDice, compendium: T.pageCompendium, gm: T.pageGM, settings: T.pageSettings });
 const routes = { home: home.render, chars: chars.render, create: create.render, sheet: sheet.render, dice: dice.render, compendium: compendium.render, gm: gm.render, settings: settings.render };
 
+let lastRouteKey = null;
+
 async function route() {
   /* ferme d'éventuelles modales orphelines lors d'une navigation directe */
   document.querySelectorAll('.modal-back').forEach(m => m.remove());
   const { path, param } = parseHash();
+  const nextKey = `${path}:${param || ''}`;
+  if (lastRouteKey !== null && lastRouteKey !== nextKey) window.scrollTo?.(0, 0);
+  lastRouteKey = nextKey;
+  if (document.body?.dataset) document.body.dataset.route = path;
+  setFabRoute(path);
   const main = $('#main');
   $$('[data-nav]').forEach(b => b.classList.toggle('active', b.dataset.nav === path));
   const titles = TITLES();

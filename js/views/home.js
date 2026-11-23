@@ -67,7 +67,7 @@ export async function render(main, params) {
     const classes = recent.some(c => !c.className && c.classId) ? await data('classes') : [];
     for (const c of recent) {
       const cl = classes.find(x => x.id === c.classId);
-      const card = el(`<button class="choice" data-char="${c.id}">
+      const card = el(`<button class="choice" data-char="${esc(c.id)}">
         <div class="ch-head"><span class="ch-name">${esc(c.name || t('unnamed'))}</span></div>
         <div class="ch-sub">${esc(c.ancestry?.fr || c.heritage || '')}${c.ancestry && c.community ? ' · ' : ''}${esc(c.community?.fr || '')}</div>
         <div class="ch-stats">

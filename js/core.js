@@ -1,5 +1,8 @@
 /* Daggerborne — no-build ES modules PWA (FR) */
-import { sanitizeCharacter } from './rules.js';
+import { sanitizeCharacter, isPlainObject, stripUnsafeKeys, sanitizeId } from './rules.js';
+
+export const MAX_CHAR_IMPORT_BYTES = 2 * 1024 * 1024;
+export const MAX_BACKUP_IMPORT_BYTES = 10 * 1024 * 1024;
 
 import { t, getLang, T } from './i18n.js';
 // ---------- tiny helpers ----------
@@ -39,29 +42,125 @@ let state = loadSync();
 let idbReady = false;
 let idbAvailable = typeof indexedDB !== 'undefined';
 
-function normalizeState(s) {
+const clampInt = (v, fallback, min, max) => {
+  const n = typeof v === 'number' ? v : Number(v);
+  return Number.isFinite(n) ? Math.max(min, Math.min(max, Math.trunc(n))) : fallback;
+};
+
+function sanitizeRoll(r) {
+  if (!isPlainObject(r)) return null;
+  const hasDuality = r.hope !== null && r.hope !== undefined && r.fear !== null && r.fear !== undefined;
+  const result = (r.result === 'crit' || r.result === 'hope' || r.result === 'fear' || r.result === 'plain')
+    ? r.result
+    : (hasDuality ? 'hope' : 'plain');
+  return {
+    id: sanitizeId(r.id) || ('r' + uid()),
+    t: clampInt(r.t, Date.now(), 0, Number.MAX_SAFE_INTEGER),
+    hope: hasDuality ? clampInt(r.hope, 1, 1, 12) : null,
+    fear: hasDuality ? clampInt(r.fear, 1, 1, 12) : null,
+    mod: clampInt(r.mod, 0, -99, 99),
+    adv: r.adv != null ? clampInt(r.adv, 1, 1, 6) : null,
+    dis: r.dis != null ? clampInt(r.dis, 1, 1, 6) : null,
+    total: clampInt(r.total, 0, -999, 9999),
+    result,
+    label: typeof r.label === 'string' ? r.label.slice(0, 200) : '',
+    notation: typeof r.notation === 'string' ? r.notation.slice(0, 80) : '',
+    charName: typeof r.charName === 'string' ? r.charName.slice(0, 120) : null,
+    difficulty: r.difficulty != null ? clampInt(r.difficulty, 0, 0, 99) : null,
+    ...(typeof r.success === 'boolean' ? { success: r.success } : {}),
+  };
+}
+
+function sanitizeCountdown(cd) {
+  if (!isPlainObject(cd)) return null;
+  const max = clampInt(cd.max, 4, 1, 24);
+  const value = clampInt(cd.value, 0, 0, max);
+  return {
+    id: sanitizeId(cd.id) || uid(),
+    name: typeof cd.name === 'string' ? cd.name.slice(0, 160) : 'Compte à rebours',
+    max,
+    value,
+  };
+}
+
+function sanitizeEncounterInst(inst) {
+  if (!isPlainObject(inst)) return null;
+  const hpMax = clampInt(inst.hpMax, 4, 1, 40);
+  const stressMax = clampInt(inst.stressMax, 0, 0, 20);
+  return {
+    uid: sanitizeId(inst.uid) || uid(),
+    advId: typeof inst.advId === 'string' ? inst.advId.slice(0, 120) : null,
+    name: typeof inst.name === 'string' ? inst.name.slice(0, 160) : 'Adversaire',
+    type: typeof inst.type === 'string' ? inst.type.slice(0, 40) : 'standard',
+    tier: clampInt(inst.tier, 1, 1, 4),
+    difficulty: inst.difficulty != null ? clampInt(inst.difficulty, 12, 1, 40) : null,
+    hpMax,
+    hpMarked: clampInt(inst.hpMarked, 0, 0, hpMax),
+    stressMax,
+    stressMarked: clampInt(inst.stressMarked, 0, 0, stressMax),
+    major: inst.major != null ? clampInt(inst.major, 7, 0, 99) : null,
+    severe: inst.severe != null ? clampInt(inst.severe, 14, 0, 199) : null,
+    atkBonus: inst.atkBonus != null && inst.atkBonus !== '' ? String(inst.atkBonus).slice(0, 16) : null,
+    atkName: typeof inst.atkName === 'string' ? inst.atkName.slice(0, 120) : '',
+    atkDamage: typeof inst.atkDamage === 'string' ? inst.atkDamage.slice(0, 60) : '',
+    conditions: (Array.isArray(inst.conditions) ? inst.conditions : []).filter(x => typeof x === 'string').slice(0, 12).map(x => x.slice(0, 40)),
+  };
+}
+
+function sanitizeEncounter(enc) {
+  const def = defaultState().encounter;
+  if (!isPlainObject(enc)) return def;
+  const cleanAdj = {};
+  if (isPlainObject(enc.adj)) {
+    for (const k of ['easier', 'twoSolos', 'extraDmg', 'lowerTier', 'noHeavy', 'harder']) {
+      if (enc.adj[k]) cleanAdj[k] = true;
+    }
+  }
+  return {
+    pcCount: clampInt(enc.pcCount, 4, 1, 10),
+    adj: cleanAdj,
+    active: (Array.isArray(enc.active) ? enc.active : []).map(sanitizeEncounterInst).filter(Boolean).slice(0, 100),
+    environmentId: typeof enc.environmentId === 'string' ? enc.environmentId.slice(0, 120) : null,
+  };
+}
+
+function sanitizeSettings(st) {
+  const def = defaultState().settings;
+  if (!isPlainObject(st)) return def;
+  return {
+    diceAnim: st.diceAnim !== false,
+    massiveDamageRule: Boolean(st.massiveDamageRule),
+  };
+}
+
+function safeJsonParse(rawText) {
+  return stripUnsafeKeys(JSON.parse(rawText));
+}
+
+function normalizeState(raw) {
   const def = defaultState();
-  if (!s || typeof s !== 'object') return def;
+  if (!isPlainObject(raw)) return def;
+  const s = stripUnsafeKeys(raw);
   return {
     ...def,
-    ...s,
+    ...(typeof s._savedAt === 'number' && Number.isFinite(s._savedAt) ? { _savedAt: s._savedAt } : {}),
     characters: Array.isArray(s.characters)
       ? s.characters
-        .filter(c => c && typeof c === 'object' && !Array.isArray(c))
+        .filter(isPlainObject)
         .map(c => sanitizeCharacter(c, newCharacter()))
       : [],
-    rolls: Array.isArray(s.rolls) ? s.rolls : [],
-    fear: Number.isFinite(s.fear) ? s.fear : 0,
-    countdowns: Array.isArray(s.countdowns) ? s.countdowns : [],
-    encounter: { ...def.encounter, ...(s.encounter || {}), active: Array.isArray(s.encounter?.active) ? s.encounter.active : [] },
-    settings: { ...def.settings, ...(s.settings || {}) },
+    rolls: Array.isArray(s.rolls) ? s.rolls.map(sanitizeRoll).filter(Boolean).slice(0, 60) : [],
+    fear: clampInt(s.fear, 0, 0, 30),
+    countdowns: Array.isArray(s.countdowns) ? s.countdowns.map(sanitizeCountdown).filter(Boolean).slice(0, 40) : [],
+    encounter: sanitizeEncounter(s.encounter),
+    settings: sanitizeSettings(s.settings),
   };
 }
 
 function loadSync() {
   try {
     const raw = localStorage.getItem(LS_KEY);
-    if (raw) return normalizeState(JSON.parse(raw));
+    if (raw) return normalizeState(safeJsonParse(raw));
   } catch (e) { /* fresh */ }
   return defaultState();
 }
@@ -192,26 +291,32 @@ export function ensureCharacter(obj) {
 
 /* Import d'un personnage depuis un texte JSON */
 export function importCharacterFromText(rawText) {
-  const obj = JSON.parse(rawText);
-  if (!obj || typeof obj !== 'object' || typeof obj.name !== 'string' || !obj.traits || typeof obj.traits !== 'object') {
+  if (typeof rawText !== 'string' || rawText.length > MAX_CHAR_IMPORT_BYTES) {
+    throw new Error('Fichier trop volumineux (max 2 Mo).');
+  }
+  const raw = safeJsonParse(rawText);
+  if (!isPlainObject(raw) || typeof raw.name !== 'string' || !isPlainObject(raw.traits)) {
     throw new Error('Format de personnage invalide.');
   }
-  if (!obj.name.trim()) obj.name = 'Sans nom';
-  ensureCharacter(obj);
-  obj.id = uid();
-  obj.updatedAt = Date.now();
-  setState(s => { s.characters.push(obj); });
-  return obj;
+  const clean = ensureCharacter(raw);
+  if (!clean.name.trim()) clean.name = 'Sans nom';
+  clean.id = uid();
+  clean.updatedAt = Date.now();
+  setState(s => { s.characters.push(clean); });
+  return clean;
 }
 
 /* Import d'une sauvegarde globale (remplacement ou fusion) */
 export function importFullBackupFromText(rawText, mode = 'merge') {
-  const parsed = JSON.parse(rawText);
-  const payload = parsed?.schema === 'daggerborne-backup-v1' && parsed.data ? parsed.data : parsed;
-  if (!payload || !Array.isArray(payload.characters)) {
+  if (typeof rawText !== 'string' || rawText.length > MAX_BACKUP_IMPORT_BYTES) {
+    throw new Error('Sauvegarde trop volumineuse (max 10 Mo).');
+  }
+  const parsed = safeJsonParse(rawText);
+  const payload = isPlainObject(parsed) && parsed.schema === 'daggerborne-backup-v1' && isPlainObject(parsed.data) ? parsed.data : parsed;
+  if (!isPlainObject(payload) || !Array.isArray(payload.characters)) {
     throw new Error('Sauvegarde invalide : liste de personnages introuvable.');
   }
-  const incomingChars = payload.characters.map(c => ensureCharacter({ ...c }));
+  const incomingChars = payload.characters.filter(isPlainObject).map(c => ensureCharacter(c));
   let added = 0;
   let updated = 0;
   if (mode === 'replace') {
@@ -234,9 +339,11 @@ export function importFullBackupFromText(rawText, mode = 'merge') {
         }
       }
       if (Array.isArray(payload.countdowns) && !s.countdowns.length) {
-        s.countdowns = payload.countdowns;
+        s.countdowns = payload.countdowns.map(sanitizeCountdown).filter(Boolean).slice(0, 40);
       }
-      if (Number.isFinite(payload.fear) && s.fear === 0) s.fear = payload.fear;
+      if (Number.isFinite(payload.fear) && s.fear === 0) {
+        s.fear = clampInt(payload.fear, 0, 0, 30);
+      }
     });
   }
   return { added, updated, total: state.characters.length };
@@ -296,7 +403,7 @@ export function newCharacter(base) {
     stress: { max: 6, current: 0, active: 6, unlocked: 0 },
     hope: { max: 6, current: 2 },
     scars: 0,
-    hopeFeature: '', classFeature: '',
+    hopeFeature: '', classFeature: '', customClassFeature: false,
     evasion: 10,
     level: 1, proficiency: 1,
     traitMarks: [], subcardTaken: {}, subcardCount: 0, tierUses: {},

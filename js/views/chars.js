@@ -1,5 +1,5 @@
 /* Liste des personnages */
-import { $, $$, el, esc, go, getState, toast, data, importCharacterFromText, openPasteJsonModal } from '../core.js';
+import { $, $$, el, esc, go, getState, toast, data, importCharacterFromText, openPasteJsonModal, MAX_CHAR_IMPORT_BYTES } from '../core.js';
 import { t } from '../i18n.js';
 
 export async function render(main, params) {
@@ -28,7 +28,7 @@ export async function render(main, params) {
     const classes = needsClassLookup ? await data('classes') : [];
     for (const c of [...st.characters].sort((a, b) => b.updatedAt - a.updatedAt)) {
       const clsName = c.className || classes.find(x => x.id === c.classId)?.fr || '';
-      const card = el(`<button class="char-card" data-id="${c.id}">
+      const card = el(`<button class="char-card" data-id="${esc(c.id)}">
         <span class="ava">${c.portrait ? `<img src="${esc(c.portrait)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block">` : esc((c.name || '?')[0].toUpperCase())}</span>
         <span class="cc-body">
           <span class="cc-name">${esc(c.name || t('unnamed'))}</span>
@@ -60,7 +60,12 @@ export async function render(main, params) {
   });
   $('#file-import', main).addEventListener('change', (e) => {
     const f = e.target.files[0];
+    e.target.value = '';
     if (!f) return;
+    if (f.size > MAX_CHAR_IMPORT_BYTES) {
+      toast('Fichier trop volumineux (max 2 Mo).');
+      return;
+    }
     const rd = new FileReader();
     rd.onload = () => {
       try {
@@ -72,6 +77,5 @@ export async function render(main, params) {
       }
     };
     rd.readAsText(f);
-    e.target.value = '';
   });
 }

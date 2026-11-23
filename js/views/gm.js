@@ -99,12 +99,15 @@ async function drawFear(main, root, st) {
       </linearGradient></defs></svg>`;
     for (let i = 0; i < Math.max(st.fear, 12); i++) {
       const on = i < st.fear;
-      html += `<button type="button" class="fear-pip ${on ? 'on' : ''}" data-fear="${i}"
+      html += `<button type="button" class="fear-pip ${on ? 'on' : ''}${i === 11 ? ' cap12' : ''}" data-fear="${i}"
         aria-label="${on ? `Retirer la Peur ${i + 1}` : `Définir la Peur à ${i + 1}`}">
         <svg viewBox="0 0 36 42" focusable="false">
           <path class="hex-body" d="${HEX}"/>
           <path class="hex-inner" d="${HEX_IN}"/>
         </svg></button>`;
+      if (i === 11) {
+        html += `<span class="fear-cap-sep" title="${esc(t('gmFearRecMax'))}" aria-hidden="true"><span>12</span></span>`;
+      }
     }
     pool.innerHTML = html;
     $$('.fear-pip', pool).forEach(p => p.addEventListener('click', () => {
@@ -127,11 +130,11 @@ async function drawFear(main, root, st) {
     for (const cd of st.countdowns) {
       const box = el(`<div class="card" style="margin-bottom:.6rem">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
-          <span class="li-name">${esc(cd.name)} <span class="tag">${cd.value}/${cd.max}</span></span>
-          <button class="icon-btn" style="width:30px;height:30px" data-cd-del="${cd.id}"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+          <span class="li-name">${esc(cd.name)} <span class="tag">${esc(cd.value)}/${esc(cd.max)}</span></span>
+          <button class="icon-btn" style="width:30px;height:30px" data-cd-del="${esc(cd.id)}"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
         </div>
         <div class="pip-track">
-          ${Array.from({ length: cd.max }, (_, i) => `<span class="pip ${i < cd.value ? 'on stress' : ''}" data-cd="${cd.id}" data-i="${i}"></span>`).join('')}
+          ${Array.from({ length: cd.max }, (_, i) => `<span class="pip ${i < cd.value ? 'on stress' : ''}" data-cd="${esc(cd.id)}" data-i="${i}"></span>`).join('')}
         </div>
       </div>`);
       cds.appendChild(box);
@@ -179,9 +182,9 @@ async function drawEncounter(body, main, st, seq = gmSeq) {
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.7rem;margin-bottom:.7rem">
         <div style="display:flex;align-items:center;gap:.5rem">
           <span class="li-name">Joueurs (PJ) :</span>
-          <button class="btn ghost small" id="enc-pc-dec">−</button>
+          <button class="btn ghost small btn-pm" id="enc-pc-dec">−</button>
           <b style="color:var(--golden);font-size:1.1rem;min-width:1.6rem;text-align:center">${pcCount}</b>
-          <button class="btn ghost small" id="enc-pc-inc">+</button>
+          <button class="btn ghost small btn-pm" id="enc-pc-inc">+</button>
         </div>
         <div class="tag" style="font-size:.85rem;padding:.35rem .7rem;${spent > budget ? 'border-color:#d46868;color:#ffb4b4' : ''}">
           Dépensés : <b>${spent}</b> / <b>${budget}</b> pts
@@ -248,52 +251,53 @@ async function drawEncounter(body, main, st, seq = gmSeq) {
       const atkHasDice = inst.atkDamage && /\d*d\d+/i.test(String(inst.atkDamage));
       const atkBadge = inst.atkDamage
         ? (atkHasDice
-            ? `<button class="btn ghost small" data-enc-dmg="${inst.uid}" title="Lancer les dégâts (${inst.atkDamage})">🎲 ${esc(inst.atkDamage)}</button>`
+            ? `<button class="btn ghost small" data-enc-dmg="${esc(inst.uid)}" title="Lancer les dégâts (${esc(inst.atkDamage)})">🎲 ${esc(inst.atkDamage)}</button>`
             : `<span class="tag" style="align-self:center">⚔ ${esc(inst.atkDamage)} (fixe)</span>`)
         : '';
       const atkFmt = formatAtkBonus(inst.atkBonus);
+      const safeUid = esc(inst.uid);
       const card = el(`<div class="card" style="margin-bottom:.75rem;${defeated ? 'opacity:.62;border-color:rgba(212,104,104,.4)' : ''}">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem;flex-wrap:wrap">
           <div>
             <span class="li-name">${esc(inst.name)}</span>
-            <span class="tag">${TYPE_LABELS[inst.type] || inst.type} (${inst.type === 'minion' ? `1 pt / groupe de ${pcCount}` : `${cost} pt${cost > 1 ? 's' : ''}`})</span>
+            <span class="tag">${esc(TYPE_LABELS[inst.type] || inst.type)} (${inst.type === 'minion' ? `1 pt / groupe de ${esc(pcCount)}` : `${esc(cost)} pt${cost > 1 ? 's' : ''}`})</span>
             ${defeated ? '<span class="tag" style="background:rgba(166,46,60,.3);border-color:#d46868;color:#ffb4b4">' + t('gmDefeated') + '</span>' : ''}
-            <div class="ms-meta" style="margin-top:.2rem">Diff ${inst.difficulty ?? '—'} · Seuils ${inst.major ?? '—'}/${inst.severe ?? '—'}${atkFmt ? ` · ATQ ${esc(atkFmt)}` : ''}</div>
+            <div class="ms-meta" style="margin-top:.2rem">Diff ${esc(inst.difficulty ?? '—')} · Seuils ${esc(inst.major ?? '—')}/${esc(inst.severe ?? '—')}${atkFmt ? ` · ATQ ${esc(atkFmt)}` : ''}</div>
           </div>
           <div style="display:flex;gap:.35rem;flex-wrap:wrap">
-            ${atkFmt ? `<button class="btn small" data-enc-atk="${inst.uid}" title="${t('gmAtkRoll20')}">⚔ ATQ ${esc(atkFmt)}</button>` : ''}
+            ${atkFmt ? `<button class="btn small" data-enc-atk="${safeUid}" title="${t('gmAtkRoll20')}">⚔ ATQ ${esc(atkFmt)}</button>` : ''}
             ${atkBadge}
-            <button class="icon-btn" style="width:32px;height:32px" data-enc-del="${inst.uid}" title="Retirer"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+            <button class="icon-btn" style="width:32px;height:32px" data-enc-del="${safeUid}" title="Retirer"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
           </div>
         </div>
 
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.6rem;margin-top:.65rem">
           <div>
-            <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--text-dim);margin-bottom:.25rem">
-              <span>PV marqués : <b style="color:var(--golden)">${inst.hpMarked}</b> / ${inst.hpMax}</span>
-              <span><button class="btn ghost small" style="padding:1px 7px" data-enc-hp="${inst.uid}:-1">−</button> <button class="btn ghost small" style="padding:1px 7px" data-enc-hp="${inst.uid}:1">+</button></span>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:.75rem;color:var(--text-dim);margin-bottom:.25rem">
+              <span>PV marqués : <b style="color:var(--golden)">${esc(inst.hpMarked)}</b> / ${esc(inst.hpMax)}</span>
+              <span style="display:inline-flex;gap:.3rem"><button class="btn ghost small btn-pm" data-enc-hp="${safeUid}:-1">−</button><button class="btn ghost small btn-pm" data-enc-hp="${safeUid}:1">+</button></span>
             </div>
-            <div class="pip-track">${Array.from({ length: Math.min(20, Math.max(1, inst.hpMax)) }, (_, i) => `<span class="pip ${i < inst.hpMarked ? 'on' : ''}" data-enc-hppip="${inst.uid}:${i}"></span>`).join('')}</div>
+            <div class="pip-track">${Array.from({ length: Math.min(20, Math.max(1, inst.hpMax)) }, (_, i) => `<span class="pip ${i < inst.hpMarked ? 'on' : ''}" data-enc-hppip="${safeUid}:${i}"></span>`).join('')}</div>
           </div>
           ${inst.stressMax > 0 ? `
           <div>
-            <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--text-dim);margin-bottom:.25rem">
-              <span>Stress : <b style="color:var(--golden)">${inst.stressMarked}</b> / ${inst.stressMax}</span>
-              <span><button class="btn ghost small" style="padding:1px 7px" data-enc-st="${inst.uid}:-1">−</button> <button class="btn ghost small" style="padding:1px 7px" data-enc-st="${inst.uid}:1">+</button></span>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:.75rem;color:var(--text-dim);margin-bottom:.25rem">
+              <span>Stress : <b style="color:var(--golden)">${esc(inst.stressMarked)}</b> / ${esc(inst.stressMax)}</span>
+              <span style="display:inline-flex;gap:.3rem"><button class="btn ghost small btn-pm" data-enc-st="${safeUid}:-1">−</button><button class="btn ghost small btn-pm" data-enc-st="${safeUid}:1">+</button></span>
             </div>
-            <div class="pip-track">${Array.from({ length: Math.min(12, inst.stressMax) }, (_, i) => `<span class="pip ${i < inst.stressMarked ? 'on stress' : ''}" data-enc-stpip="${inst.uid}:${i}"></span>`).join('')}</div>
+            <div class="pip-track">${Array.from({ length: Math.min(12, inst.stressMax) }, (_, i) => `<span class="pip ${i < inst.stressMarked ? 'on stress' : ''}" data-enc-stpip="${safeUid}:${i}"></span>`).join('')}</div>
           </div>` : ''}
         </div>
 
         <div style="display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.6rem">
           ${ADV_CONDS.map(cond => {
             const on = (inst.conditions || []).includes(cond);
-            return `<button class="filter-chip ${on ? 'active' : ''}" style="padding:.2rem .55rem;font-size:.72rem" data-enc-cond="${inst.uid}:${esc(cond)}">${cond}</button>`;
+            return `<button class="filter-chip ${on ? 'active' : ''}" style="padding:.2rem .55rem;font-size:.72rem" data-enc-cond="${safeUid}:${esc(cond)}">${esc(cond)}</button>`;
           }).join('')}
         </div>
 
         ${def?.features?.length ? `
-          <details style="margin-top:.55rem" data-enc-det="${inst.uid}" ${openEncDetails.has(inst.uid) ? 'open' : ''}>
+          <details style="margin-top:.55rem" data-enc-det="${safeUid}" ${openEncDetails.has(inst.uid) ? 'open' : ''}>
             <summary style="cursor:pointer;font-size:.76rem;color:var(--text-faint)">Bloc de statistiques &amp; aptitudes (${def.features.length})</summary>
             <div style="margin-top:.4rem">
               ${def.motives ? `<p class="ch-desc" style="font-size:.78rem"><b style="color:var(--golden)">${t('gmMotives')}</b> ${esc(def.motives)}</p>` : ''}

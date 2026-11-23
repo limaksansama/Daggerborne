@@ -2,7 +2,7 @@
    en-tête identité + badge Niveau · bande Évasion/Armure + 6 cartes de traits ·
    2 colonnes (Dégâts&Santé/Espoir/Expériences/Or/Aptitude || Armes/Armure/Inventaire).
    Thème sombre conservé, mobile = onglets Combat / Stats / Équipement / Plus. */
-import { $, $$, el, esc, go, T, data, toast, getChar, saveChar, getState, setState, uid, exportJsonFile, importCharacterFromText } from '../core.js';
+import { $, $$, el, esc, go, T, data, toast, getChar, saveChar, getState, setState, uid, exportJsonFile, importCharacterFromText, MAX_CHAR_IMPORT_BYTES } from '../core.js';
 import { rollDuality, rollDice, rollAttack, rollDamage, rollCustomDamage, isRolling } from '../dice3d.js';
 import { computeDamageApplication, calcDamageSpec, tierOf, nextDieStep, armorThresholdBonus, equipmentPenalty } from '../rules.js';
 import { openLevelUp } from './levelup.js';
@@ -20,11 +20,11 @@ const MORE_TABS = [
   { id: 'background', label: 'Background' },
   { id: 'journal', label: 'Journal' },
 ];
-const MTABS = [
-  { id: 'combat', label: 'Combat' },
-  { id: 'stats', label: 'Stats & Ressources' },
-  { id: 'equip', label: 'Équipement' },
-  { id: 'more', label: 'Plus' },
+const MTABS = () => [
+  { id: 'combat', label: t('sheetTabCombat') },
+  { id: 'traits', label: t('sheetTabTraitsExp') },
+  { id: 'cards', label: t('sheetTabCards') },
+  { id: 'bag', label: t('sheetTabBagGold') },
 ];
 let ui = { mtab: 'combat', more: 'cards', atkAdv: false, atkDis: false, atkCrit: false };
 const CAMPAIGN_LABELS = { everyday: 'Quotidien', western: 'Western', monster: 'Chasse' };
@@ -34,7 +34,7 @@ const fmtBonus = (b) => {
 };
 
 /* ============ migration vers le modèle « feuille officielle » ============ */
-function migrate(c, weapons, armors, subclasses, classes, generalItems = [], ancestries = [], communities = [], subclassesFr = [], subclassesEn = []) {
+function migrate(c, weapons, armors, subclasses, classes, generalItems = [], ancestries = [], communities = [], classesFr = [], classesEn = [], subclassesFr = [], subclassesEn = []) {
   let dirty = false;
   if (!c.className && c.classId && classes) {
     const cl = classes.find(x => x.id === c.classId);
@@ -87,29 +87,36 @@ function migrate(c, weapons, armors, subclasses, classes, generalItems = [], anc
     dirty = true;
   }
   if (c.classFeature === undefined) { c.classFeature = ''; dirty = true; }
-  /* La carte de Fondation de sous-classe est acquise dès le niveau 1.
-     Le libellé est remplacé, et non ajouté, lors d'un changement de langue. */
-  if (subMatch?.features?.length) {
-    if (!c.subcardCount) { c.subcardCount = 1; dirty = true; }
-    const foundation = subMatch.features[0];
-    const foundationNames = new Set([
-      foundation.name,
-      subclassesFr.find(s => s.id === c.subclassId)?.features?.[0]?.name,
-      subclassesEn.find(s => s.id === c.subclassId)?.features?.[0]?.name,
+  /* Pré-remplissage & synchronisation SRD 2.0 : aptitudes de classe + carte de Fondation de sous-classe.
+     Respecte les modifications libres du joueur (c.customClassFeature === true). */
+  const clForFeat = classes?.find(x => x.id === c.classId);
+  if (subMatch?.features?.length && !c.subcardCount) { c.subcardCount = 1; dirty = true; }
+  if (!c.customClassFeature && (clForFeat?.features?.length || subMatch?.features?.length)) {
+    const classFeatNames = new Set([
+      ...(clForFeat?.features || []).map(f => f.name),
+      ...(classesFr?.find(x => x.id === c.classId)?.features || []).map(f => f.name),
+      ...(classesEn?.find(x => x.id === c.classId)?.features || []).map(f => f.name),
     ].filter(Boolean));
-    const foundationLine = `✦ ${foundation.name} — ${foundation.desc}`;
-    const lines = String(c.classFeature || '').split('\n');
-    const idx = lines.findIndex(line => [...foundationNames].some(name => line.startsWith(`✦ ${name} —`)));
-    if (idx >= 0) {
-      if (lines[idx] !== foundationLine) { lines[idx] = foundationLine; dirty = true; }
-      for (let i = lines.length - 1; i >= 0; i--) {
-        if (i !== idx && [...foundationNames].some(name => lines[i].startsWith(`✦ ${name} —`))) {
-          lines.splice(i, 1); dirty = true;
-        }
-      }
-      c.classFeature = lines.join('\n');
-    } else {
-      c.classFeature = (c.classFeature ? c.classFeature + '\n\n' : '') + foundationLine;
+    const foundationNames = new Set([
+      subMatch?.features?.[0]?.name,
+      subclassesFr?.find(s => s.id === c.subclassId)?.features?.[0]?.name,
+      subclassesEn?.find(s => s.id === c.subclassId)?.features?.[0]?.name,
+    ].filter(Boolean));
+    const blocks = String(c.classFeature || '')
+      .replace(/\n+(?=[•✦] )/g, '\n\n')
+      .split(/\n{2,}/)
+      .map(s => s.trim())
+      .filter(Boolean);
+    const remaining = blocks.filter(block => {
+      const isClassBlock = [...classFeatNames].some(name => block.startsWith(`• ${name} —`));
+      const isSubBlock = [...foundationNames].some(name => block.startsWith(`✦ ${name} —`));
+      return !isClassBlock && !isSubBlock;
+    });
+    const desiredClassBlocks = (clForFeat?.features || []).map(f => `• ${f.name} — ${f.desc}`);
+    const desiredSubBlocks = subMatch?.features?.[0] ? [`✦ ${subMatch.features[0].name} — ${subMatch.features[0].desc}`] : [];
+    const nextClassFeature = [...desiredClassBlocks, ...desiredSubBlocks, ...remaining].join('\n\n');
+    if (nextClassFeature !== c.classFeature) {
+      c.classFeature = nextClassFeature;
       dirty = true;
     }
   }
@@ -342,10 +349,10 @@ export async function render(main, params) {
   const focusKey = active?.dataset?.f || active?.dataset?.ef || active?.dataset?.wf || active?.dataset?.af || null;
   const focusSel = focusKey ? `[data-f="${focusKey}"],[data-ef="${focusKey}"],[data-wf="${focusKey}"],[data-af="${focusKey}"]` : null;
   const scrollY = window.scrollY;
-  const [classes, subclasses, weapons, armors, cards, domains, generalItems, transformations, beastforms, ancestries, communities, subclassesFr, subclassesEn] = await Promise.all([
-    data('classes'), data('subclasses'), data('weapons'), data('armors'), data('domainCards'), data('domains'), data('generalItems'), data('transformations'), data('beastforms'), data('ancestries'), data('communities'), data('subclasses', 'fr'), data('subclasses', 'en'),
+  const [classes, subclasses, weapons, armors, cards, domains, generalItems, transformations, beastforms, ancestries, communities, classesFr, classesEn, subclassesFr, subclassesEn] = await Promise.all([
+    data('classes'), data('subclasses'), data('weapons'), data('armors'), data('domainCards'), data('domains'), data('generalItems'), data('transformations'), data('beastforms'), data('ancestries'), data('communities'), data('classes', 'fr'), data('classes', 'en'), data('subclasses', 'fr'), data('subclasses', 'en'),
   ]);
-  migrate(c, weapons, armors, subclasses, classes, generalItems, ancestries, communities, subclassesFr, subclassesEn);
+  migrate(c, weapons, armors, subclasses, classes, generalItems, ancestries, communities, classesFr, classesEn, subclassesFr, subclassesEn);
   const cl = classes.find(x => x.id === c.classId);
   const sub = subclasses.find(x => x.id === c.subclassId);
   const bfMeta = c.beastform?.id ? beastforms.find(b => b.id === c.beastform.id) : null;
@@ -363,6 +370,8 @@ export async function render(main, params) {
   const thr = thresholds(c, { subclasses });
   const gt = c.goldTrack;
   const goldTotal = gt.handfuls + gt.bags * 10 + gt.chests * 100;
+
+  if (!['combat', 'traits', 'cards', 'bag'].includes(ui.mtab)) ui.mtab = 'combat';
 
   main.innerHTML = `
   <div class="view dh-sheet" data-mtab="${ui.mtab}">
@@ -428,11 +437,11 @@ export async function render(main, params) {
 
     <!-- ===== ONGLETS MOBILE (sticky, sous le header) ===== -->
     <div class="dh-mtabs">
-      ${MTABS.map(t => `<button class="mt ${ui.mtab === t.id ? 'active' : ''}" data-mtab="${t.id}">${t.label}</button>`).join('')}
+      ${MTABS().map(tb => `<button class="mt ${ui.mtab === tb.id ? 'active' : ''}" data-mtab="${tb.id}">${esc(tb.label)}</button>`).join('')}
     </div>
 
     <!-- ===== BANDE DÉFENSES : Évasion · Armure + 12 cases · 6 TRAITS ===== -->
-    <div class="dh-defstrip s-combat">
+    <div class="dh-defstrip">
       <div class="dh-shield-block">
         <div class="dh-shield eva" title="Difficulté de base pour vous toucher · base ${c.evasion}${activeBf?.evasionBonus ? ` + ${activeBf.evasionBonus} Forme bestiale` : ''}${gearPenalty.evasion ? ` ${gearPenalty.evasion} équipement (${gearPenalty.parts.join(' · ')})` : ''}">
           <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polygon points="1,1 99,1 99,72 50,99 1,72"/></svg>
@@ -532,7 +541,7 @@ export async function render(main, params) {
         </section>
 
         <!-- ESPOIR -->
-        <section class="dh-panel s-stats">
+        <section class="dh-panel s-traits">
           <div class="dh-banner"><i></i><span>Espoir</span><i></i></div>
           <div class="dh-hope-head">
             <span>Espoir : <b>${c.hope.current}</b>/${effHopeMax}</span>
@@ -554,7 +563,7 @@ export async function render(main, params) {
         </section>
 
         <!-- EXPÉRIENCES -->
-        <section class="dh-panel s-stats">
+        <section class="dh-panel s-traits">
           <div class="dh-banner"><i></i><span>${t('sheetExperiences')}</span><i></i></div>
           ${c.experiences.map((e, i) => `
           <div class="dh-exprow">
@@ -565,7 +574,7 @@ export async function render(main, params) {
         </section>
 
         <!-- OR -->
-        <section class="dh-panel s-stats">
+        <section class="dh-panel s-bag">
           <div class="dh-banner"><i></i><span>Or</span><i></i></div>
           <div class="dh-gold">
             <div class="dh-goldgrp">
@@ -591,7 +600,7 @@ export async function render(main, params) {
         </section>
 
         <!-- APTITUDE DE CLASSE -->
-        <section class="dh-panel s-stats">
+        <section class="dh-panel s-traits">
           <div class="dh-banner"><i></i><span>${t('sheetClassAbility')}</span><i></i></div>
           <div class="dh-cf">
             <textarea data-f="classFeature" rows="6" placeholder="${t('sheetClassFeatures')}">${esc(c.classFeature)}</textarea>
@@ -603,7 +612,7 @@ export async function render(main, params) {
       <div class="dh-col">
 
         <!-- ARMES -->
-        <section class="dh-panel s-equip">
+        <section class="dh-panel s-combat">
           <div class="dh-banner"><i></i><span>Armes</span><i></i></div>
 
           <!-- ===== ACTIONS & ATTAQUES : tableau tactique rapide (style D&D Beyond) ===== -->
@@ -646,8 +655,8 @@ export async function render(main, params) {
                   <small>${T.traits[w.trait] || ''} · ${w.hands === 'two' ? t('sheet2Hands') : t('sheet1Hand')} · ${esc(L(w.range || ''))}</small>
                 </span>
                 <span class="dha-range">${esc(L(w.range || '—'))}</span>
-                <button class="dha-btn atk" data-dha-atk="${w.uid}" title="Jet de Dualité + ${T.traits[w.trait] || ''}">${mod >= 0 ? '+' + mod : mod}</button>
-                <button class="dha-btn dmg" data-dha-dmg="${w.uid}" title="${ui.atkCrit ? `Dégâts critiques : ${spec.critMax} + ${spec.normalNotation}` : `Dégâts : ${spec.qty} × ${w.dice}${spec.flatBonus ? ' ' + fmtBonus(spec.flatBonus) : ''}`}">${dmgLabel}</button>
+                <button class="dha-btn atk" data-dha-atk="${esc(w.uid)}" title="Jet de Dualité + ${esc(T.traits[w.trait] || '')}">${mod >= 0 ? '+' + mod : mod}</button>
+                <button class="dha-btn dmg" data-dha-dmg="${esc(w.uid)}" title="${ui.atkCrit ? `Dégâts critiques : ${spec.critMax} + ${spec.normalNotation}` : `Dégâts : ${spec.qty} × ${esc(w.dice)}${spec.flatBonus ? ' ' + fmtBonus(spec.flatBonus) : ''}`}">${esc(dmgLabel)}</button>
               </div>`;
             }).join('') || (!activeBf ? '<div class="dh-help">' + t('sheetEquipHint') + '</div>' : '')}
             ${c.companion ? (() => {
@@ -658,11 +667,11 @@ export async function render(main, params) {
               <span class="dha-icon" title="${t('sheetCompanion')}">🐺</span>
               <span class="dha-name">
                 <b>${esc(c.companion.name || 'Compagnon')}</b>
-                <small>${esc(c.companion.attackName || t('sheetAttack'))} · ${esc(L(c.companion.range || 'Mêlée'))} · Éva ${c.companion.evasion || 10}</small>
+                <small>${esc(c.companion.attackName || t('sheetAttack'))} · ${esc(L(c.companion.range || 'Mêlée'))} · Éva ${esc(c.companion.evasion || 10)}</small>
               </span>
               <span class="dha-range">${esc(L(c.companion.range || 'Mêlée'))}</span>
               <button class="dha-btn atk" data-comp-atk title="Jet d'attaque du compagnon (Instinct)">${signed(effTrait('instinct'))}</button>
-              <button class="dha-btn dmg" data-comp-dmg title="${ui.atkCrit ? `Dégâts critiques : ${compSpec.critMax} + ${compSpec.normalNotation}` : 'Dégâts du compagnon'}">${compLabel}</button>
+              <button class="dha-btn dmg" data-comp-dmg title="${ui.atkCrit ? `Dégâts critiques : ${compSpec.critMax} + ${compSpec.normalNotation}` : 'Dégâts du compagnon'}">${esc(compLabel)}</button>
             </div>`;
             })() : ''}
           </div>
@@ -681,7 +690,7 @@ export async function render(main, params) {
         </section>
 
         <!-- ARMURE ACTIVE -->
-        <section class="dh-panel s-equip">
+        <section class="dh-panel s-combat">
           <div class="dh-banner"><i></i><span>${t('sheetActiveArmor')}</span><i></i></div>
           <div class="dh-wgrid armor">
             <label class="dh-fl w2"><span>Nom</span><input data-af="name" value="${esc(c.armorCard.name)}" placeholder="Ex. : Cotte de mailles"></label>
@@ -695,7 +704,7 @@ export async function render(main, params) {
         </section>
 
         <!-- INVENTAIRE -->
-        <section class="dh-panel s-equip">
+        <section class="dh-panel s-bag">
           <div class="dh-banner"><i></i><span>${t('sheetInventory')}</span><i></i></div>
           <div class="dh-inv-tools">
             <div class="search-bar">
@@ -740,8 +749,8 @@ export async function render(main, params) {
                   <span class="ii-sub">${T.traits[weaponDef.trait] || ''} · ${esc(L(weaponDef.range))} · ${weaponDef.dice}${fmtBonus(weaponDef.dmgBonus)}${weaponDef.burden === 'twoHanded' ? ' · 2 mains' : ''}</span>
                   <div class="ii-actions">
                     ${owned
-                      ? `<button class="btn small ghost" data-inv-eq-weapon="${weaponDef.id}" data-owned-uid="${owned.uid}">${equipped ? t('sheetStow') : t('sheetEquip')}</button>`
-                      : `<button class="btn small" data-inv-eq-weapon="${weaponDef.id}">${t('sheetEquip')}</button>`}
+                      ? `<button class="btn small ghost" data-inv-eq-weapon="${esc(weaponDef.id)}" data-owned-uid="${esc(owned.uid)}">${equipped ? t('sheetStow') : t('sheetEquip')}</button>`
+                      : `<button class="btn small" data-inv-eq-weapon="${esc(weaponDef.id)}">${t('sheetEquip')}</button>`}
                     <div class="ii-qty">
                       <button class="qbtn" data-qty="${i}:-1">−</button>
                       <span class="qval">${it.qty ?? 1}</span>
@@ -861,7 +870,7 @@ function weaponCardHTML(w, i, c) {
         </select></label>
       ${(() => {
         const wSpec = calcDamageSpec(c.proficiency, w.dice, w.dmgBonus, { crit: ui.atkCrit });
-        return `<button class="btn small dh-wdmg" data-wroll="${i}" title="${ui.atkCrit ? `Dégâts critiques : ${wSpec.critMax} + ${wSpec.normalNotation}` : `Lancer les dégâts : ${wSpec.qty} × ${w.dice}${wSpec.flatBonus ? ' ' + fmtBonus(wSpec.flatBonus) : ''}`}">${ui.atkCrit ? `💥 ${wSpec.critMax}+${wSpec.normalNotation}` : `🎲 ${wSpec.normalNotation}`}</button>`;
+        return `<button class="btn small dh-wdmg" data-wroll="${i}" title="${ui.atkCrit ? `Dégâts critiques : ${wSpec.critMax} + ${wSpec.normalNotation}` : `Lancer les dégâts : ${wSpec.qty} × ${esc(w.dice)}${wSpec.flatBonus ? ' ' + fmtBonus(wSpec.flatBonus) : ''}`}">${ui.atkCrit ? `💥 ${wSpec.critMax}+${wSpec.normalNotation}` : `🎲 ${wSpec.normalNotation}`}</button>`;
       })()}
     </div>
     <label class="dh-fl"><span>${t('sheetFeature')}</span><input data-wf="${i}:feature" value="${esc(w.feature)}" placeholder="${t('sheetFeatureWeapon')}"></label>
@@ -955,6 +964,10 @@ function bindAll(root, c, ctx) {
       c.transformation = inp.value;
       refresh();
       return;
+    }
+    else if (k === 'classFeature') {
+      c.customClassFeature = true;
+      c.classFeature = inp.value;
     }
     else c[k] = inp.value;
     saveChar(c);
@@ -1416,7 +1429,12 @@ function bindAll(root, c, ctx) {
   $('#btn-import', root).addEventListener('click', () => $('#file-import', root).click());
   $('#file-import', root).addEventListener('change', (e) => {
     const f = e.target.files[0];
+    e.target.value = '';
     if (!f) return;
+    if (f.size > MAX_CHAR_IMPORT_BYTES) {
+      toast('Fichier trop volumineux (max 2 Mo).');
+      return;
+    }
     const rd = new FileReader();
     rd.onload = () => {
       try {
@@ -1426,7 +1444,6 @@ function bindAll(root, c, ctx) {
       } catch (err) { toast('Fichier invalide : export de personnage attendu.'); }
     };
     rd.readAsText(f);
-    e.target.value = '';
   });
   $('#btn-delete', root).addEventListener('click', () => {
     if (!confirm(t('sheetDeleteConfirm', { name: c.name }))) return;
@@ -2198,17 +2215,17 @@ async function tabCards(body, c, ctx) {
     const actions = [];
     if (inVaultList) {
       /* caveau : remise en main au prix de rappel (↻ X Espoirs) */
-      actions.push(`<button class="btn ghost small" data-return-card="${dc.cardId}">↻ Remettre en main (${card.recall ? `${card.recall} Espoir${card.recall > 1 ? 's' : ''}` : 'Gratuit'})</button>`);
+      actions.push(`<button class="btn ghost small" data-return-card="${esc(dc.cardId)}">↻ Remettre en main (${card.recall ? `${card.recall} Espoir${card.recall > 1 ? 's' : ''}` : 'Gratuit'})</button>`);
     } else {
       if (cost.hope) actions.push(`<button class="btn ghost small" data-fx-hope="${cost.hope}">Activer (${cost.hope === 1 ? '1 Espoir' : `${cost.hope} Espoirs`})</button>`);
       if (cost.stress) actions.push(`<button class="btn ghost small" data-fx-stress="${cost.stress}">Marquer ${cost.stress === 1 ? '1 Stress' : `${cost.stress} Stress`}</button>`);
-      if (cost.dice) actions.push(`<button class="btn ghost small" data-fx-dice="${cost.dice}" data-fx-name="${esc(card.fr)}" title="Lancer ${cost.dice}">🎲 ${cost.dice}</button>`);
-      actions.push(`<button class="btn ghost small" data-toggle-hand="${dc.cardId}">${t('sheetToVault')}</button>`);
+      if (cost.dice) actions.push(`<button class="btn ghost small" data-fx-dice="${esc(cost.dice)}" data-fx-name="${esc(card.fr)}" title="Lancer ${esc(cost.dice)}">🎲 ${esc(cost.dice)}</button>`);
+      actions.push(`<button class="btn ghost small" data-toggle-hand="${esc(dc.cardId)}">${t('sheetToVault')}</button>`);
     }
-    actions.push(`<button class="btn ghost small" data-remove-card="${dc.cardId}">Retirer</button>`);
+    actions.push(`<button class="btn ghost small" data-remove-card="${esc(dc.cardId)}">Retirer</button>`);
     const metaCtrls = `<span class="dc-meta-ctrls">
       ${cost.perRest ? `<button class="dc-use-btn ${isUsed ? 'used' : ''}" data-use-key="${esc(useKey)}">${cost.perLong ? '1×/long repos' : '1×/repos'}</button>` : ''}
-      <span class="dc-tok" title="Jetons sur la carte"><button data-tok="${esc(dc.cardId)}:-1">−</button><span>${tok} jtn</span><button data-tok="${esc(dc.cardId)}:1">+</button></span>
+      <span class="dc-tok" title="Jetons sur la carte"><button data-tok="${esc(dc.cardId)}:-1">−</button><span>${esc(tok)} jtn</span><button data-tok="${esc(dc.cardId)}:1">+</button></span>
     </span>`;
     return `<div class="dcard ${dc.inHand ? '' : 'inactive'}">
       <div class="dc-head">
@@ -2625,7 +2642,7 @@ function chooseCardToVault(c, wanted, cards, onDone) {
       ${inHand.map(dc => {
         const cd = cards.find(x => x.id === dc.cardId);
         if (!cd) return '';
-        return `<button class="inv-sug" data-vault="${dc.cardId}">
+        return `<button class="inv-sug" data-vault="${esc(dc.cardId)}">
           <span class="is-body"><span class="is-name">${esc(cd.fr)}</span>
           <span class="is-sub">Niv. ${cd.level} · ranger au caveau</span></span>
           <span class="is-add">↧</span>

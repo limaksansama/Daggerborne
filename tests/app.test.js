@@ -685,10 +685,154 @@ test('levelup: enforces 2-point budget, allows multiclass 2-pt option, and updat
   assert.ok(c.experiences.some(e => e.name === 'Pisteur des ombres'));
 });
 
-/* ==================== FAB Smoke Test ==================== */
-test('fab: mounts cleanly on document.body', () => {
+/* ==================== FAB Smoke & Route/Collapse Tests ==================== */
+test('fab: mounts cleanly, reacts to dice/create routes, and toggles mobile collapsed state', async () => {
   globalThis.document.body.children = [];
+  const fabMod = await import('../js/fab.js');
   initFab();
   const wrap = globalThis.document.body.querySelector('.d3d-fab-wrap');
   assert.ok(wrap, 'Floating dice menu should mount cleanly');
+
+  fabMod.setFabRoute('dice');
+  assert.equal(wrap.classList.contains('on-dice'), true);
+  assert.equal(wrap.classList.contains('on-create'), false);
+
+  fabMod.setFabRoute('create');
+  assert.equal(wrap.classList.contains('on-dice'), false);
+  assert.equal(wrap.classList.contains('on-create'), true);
+
+  const toggle = wrap.querySelector('#d3d-dock-toggle');
+  assert.ok(toggle);
+  const wasCollapsed = wrap.classList.contains('collapsed');
+  toggle.click();
+  assert.equal(wrap.classList.contains('collapsed'), !wasCollapsed);
+  toggle.click();
+  assert.equal(wrap.classList.contains('collapsed'), wasCollapsed);
+});
+
+/* ==================== Security Import & XSS Escaping Tests ==================== */
+test('security: import validation rejects malformed traits/oversized payloads and escapes rendered DOM sinks', async () => {
+  resetTestState();
+  assert.throws(() => core.importCharacterFromText(JSON.stringify({ name: 'Bad', traits: [] })), /Format de personnage invalide/);
+  assert.throws(() => core.importCharacterFromText('x'.repeat(core.MAX_CHAR_IMPORT_BYTES + 1)), /trop volumineux/);
+  assert.throws(() => core.importFullBackupFromText('x'.repeat(core.MAX_BACKUP_IMPORT_BYTES + 1)), /trop volumineuse/);
+
+  const evilBackup = JSON.stringify({
+    schema: 'daggerborne-backup-v1',
+    data: {
+      fear: 99,
+      countdowns: [{ id: '" onmouseover="alert(1)', name: '<img src=x onerror=alert(1)>', max: '4" onfocus="', value: 2 }],
+      rolls: [{ id: 'r1', t: Date.now(), hope: 10, fear: 4, mod: 0, total: 14, result: 'hope', label: '<script>alert(1)</script>' }],
+      encounter: {
+        pcCount: 4,
+        active: [{
+          uid: '" onclick="alert(1)',
+          name: '<img src=x onerror=alert(1)>',
+          type: '<svg onload=alert(1)>',
+          difficulty: '12<script>',
+          hpMax: 6,
+          hpMarked: '2<img src=x>',
+          stressMax: 3,
+          stressMarked: 1,
+          atkBonus: '+2',
+          atkDamage: '1d8+2',
+          conditions: [],
+        }],
+      },
+      characters: [{
+        id: '" onmouseover="alert(1)',
+        name: '<script>alert(1)</script>',
+        portrait: 'javascript:alert(1)',
+        traits: { agility: 1, strength: 0, finesse: 0, instinct: 0, presence: 0, knowledge: 0 },
+        weapons: [{ uid: '" onerror="alert(1)', name: '<b>Dagger</b>', trait: 'agility', range: 'Melee', dice: 'd6" onclick="', dmgType: 'phy', hands: 'one', state: 'active', primary: true }],
+        companion: { name: 'Wolf', evasion: '10" onmouseover="', dice: 'd8<img', attackName: 'Bite', range: 'Melee', stress: { max: 3, current: 0 }, experiences: [] },
+      }],
+    },
+  });
+
+  const res = core.importFullBackupFromText(evilBackup, 'replace');
+  assert.equal(res.added, 1);
+  const st = core.getState();
+  assert.equal(st.fear, 30);
+  assert.equal(st.characters[0].portrait, '');
+
+  const main = globalThis.document.createElement('main');
+  await views.chars.render(main, null);
+  assert.ok(!main.innerHTML.includes('<script>alert(1)'), 'chars view must escape script tags');
+  assert.ok(!main.innerHTML.includes('javascript:alert(1)'), 'chars view must not render unsafe portrait');
+  assert.ok(!main.innerHTML.includes('" onmouseover="alert(1)'), 'chars view must sanitize/escape character id');
+
+  await views.sheet.render(main, st.characters[0].id);
+  assert.ok(!main.innerHTML.includes('" onerror="alert(1)'), 'sheet view must sanitize/escape weapon uid');
+  assert.ok(!main.innerHTML.includes('d6" onclick="'), 'sheet view must sanitize/escape weapon dice');
+
+  await views.gm.render(main, null);
+  assert.ok(!main.innerHTML.includes('<img src=x onerror=alert(1)>'), 'gm countdowns must escape name');
+  main.querySelector('[data-gmtab="encounter"]').click();
+  await new Promise(r => setTimeout(r, 20));
+  assert.ok(!main.innerHTML.includes('<svg onload=alert(1)>'), 'gm encounter must escape type');
+  assert.ok(!main.innerHTML.includes('" onclick="alert(1)'), 'gm encounter must sanitize/escape uid');
+
+  await views.dice.render(main, null);
+  assert.ok(!main.innerHTML.includes('<script>alert(1)</script>'), 'dice history must escape label');
+});
+
+/* ==================== UI/UX & Pre-fill Regression Tests ==================== */
+test('ui & sheet: pre-fills class+subclass features, preserves custom edits, switches mobile tabs, and renders GM 12-Fear marker', async () => {
+  resetTestState();
+  const classes = await core.data('classes', 'fr');
+  const subclasses = await core.data('subclasses', 'fr');
+  const wizClass = classes[0];
+  const wizSub = subclasses.find(s => s.classId === wizClass.id);
+
+  /* Migrate / render new character without classFeature: should auto-fill class features + Foundation */
+  const pc = core.newCharacter({
+    id: 'prefill-pc',
+    name: 'Lyra',
+    classId: wizClass.id,
+    className: wizClass.fr,
+    subclassId: wizSub.id,
+    subclassText: wizSub.fr,
+  });
+  core.saveChar(pc);
+
+  const main = new MockElement('main');
+  globalThis.document.body.appendChild(main);
+  try {
+    await views.sheet.render(main, 'prefill-pc');
+    assert.ok(pc.classFeature.includes(wizClass.features[0].name), 'Class feature should be pre-filled from SRD');
+    assert.ok(pc.classFeature.includes(wizSub.features[0].name), 'Subclass foundation should be pre-filled from SRD');
+    assert.equal(pc.customClassFeature, false);
+
+    /* Switching sheet mobile sub-tabs updates data-mtab */
+    const mtabLabels = [...main.querySelectorAll('.dh-mtabs [data-mtab]')].map(b => b.dataset.mtab);
+    assert.deepEqual(mtabLabels, ['combat', 'traits', 'cards', 'bag']);
+    main.querySelector('.dh-mtabs [data-mtab="traits"]').click();
+    assert.equal(main.querySelector('.dh-sheet').dataset.mtab, 'traits');
+    main.querySelector('.dh-mtabs [data-mtab="bag"]').click();
+    assert.equal(main.querySelector('.dh-sheet').dataset.mtab, 'bag');
+
+    /* Manual edit locks customClassFeature so language toggle preserves player text */
+    const cfInput = main.querySelector('[data-f="classFeature"]');
+    assert.ok(cfInput);
+    cfInput.value = 'Note personnalisée du joueur';
+    cfInput.dispatchEvent({ type: 'change', target: cfInput });
+    assert.equal(pc.customClassFeature, true);
+
+    i18n.setLang('en');
+    await views.sheet.render(main, 'prefill-pc');
+    assert.equal(pc.classFeature, 'Note personnalisée du joueur');
+    const enMtabs = [...main.querySelectorAll('.dh-mtabs [data-mtab]')].map(b => b.textContent.replaceAll('&amp;', '&'));
+    assert.deepEqual(enMtabs, ['Combat', 'Traits & Exp.', 'Cards', 'Bag & Gold']);
+
+    /* GM Fear Pool renders visual marker after 12th hex */
+    await views.gm.render(main, null);
+    main.querySelector('[data-gmtab="fear"]')?.click();
+    await new Promise(r => setTimeout(r, 20));
+    assert.ok(main.querySelector('.fear-pip.cap12'), '12th Fear pip should carry .cap12');
+    assert.ok(main.querySelector('.fear-cap-sep'), 'Visual separator after 12th Fear pip should render');
+  } finally {
+    i18n.setLang('fr');
+    main.remove();
+  }
 });

@@ -13,8 +13,8 @@
     "build:android": "npx cap sync android"
   },
   "dependencies": {
-    "@capacitor/android": "6.2.1",
-    "@capacitor/core": "6.2.1",
+    "@capacitor/android": "6.2.3",
+    "@capacitor/core": "6.2.3",
     "express": "^5.3.0"
   },
   "devDependencies": {

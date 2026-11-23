@@ -28,8 +28,8 @@ export async function render(main, params) {
       <div class="roll-controls">
         ${c ? `<select id="roll-trait" style="grid-column:1/-1;background:var(--panel-3);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:.6rem;font-weight:700">
           <option value="">— Trait (aucun) —</option>
-          ${Object.entries(T.traits).map(([k, v]) => `<option value="${k}" ${ui.trait === k ? 'selected' : ''}>${v} ${c.traits[k] > 0 ? '+' : ''}${c.traits[k]}</option>`).join('')}
-          ${c.experiences.map((e, i) => ({ e, i })).filter(x => x.e.name && x.e.name.trim()).map(x => `<option value="exp${x.i}" ${ui.trait === `exp${x.i}` ? 'selected' : ''}>✦ ${esc(x.e.name)} (+${x.e.mod})</option>`).join('')}
+          ${Object.entries(T.traits).map(([k, v]) => `<option value="${esc(k)}" ${ui.trait === k ? 'selected' : ''}>${esc(v)} ${c.traits[k] > 0 ? '+' : ''}${esc(c.traits[k])}</option>`).join('')}
+          ${c.experiences.map((e, i) => ({ e, i })).filter(x => x.e.name && x.e.name.trim()).map(x => `<option value="exp${x.i}" ${ui.trait === `exp${x.i}` ? 'selected' : ''}>✦ ${esc(x.e.name)} (+${esc(x.e.mod)})</option>`).join('')}
         </select>` : ''}
         <button class="btn ghost ${ui.adv ? 'sel' : ''}" id="btn-adv">${t('sheetAdv6')}</button>
         <button class="btn ghost ${ui.disadv ? 'sel' : ''}" id="btn-disadv">${t('sheetDisadv6')}</button>
@@ -47,19 +47,20 @@ export async function render(main, params) {
   }
   for (const r of st.rolls.slice(0, 25)) {
     if (r.hope == null) {
+      const notation = r.notation || 'Dés';
       histEl.appendChild(el(`<div class="hist-item">
-        <span class="hi-out plain">${esc(r.notation || 'Dés')}</span>
+        <span class="hi-out plain" title="${esc(notation)}">${esc(notation)}</span>
         <span class="hi-detail">${esc(r.label || 'Jet de dés')}</span>
-        <span class="hi-total">${r.total}</span>
+        <span class="hi-total">${esc(r.total)}</span>
       </div>`));
       continue;
     }
-    const cls = r.result === 'crit' ? 'crit' : r.result;
+    const cls = r.result === 'crit' ? 'crit' : (r.result === 'fear' ? 'fear' : 'hope');
     const label = r.result === 'crit' ? 'Critique' : r.result === 'hope' ? 'Espoir' : 'Peur';
     histEl.appendChild(el(`<div class="hist-item">
-      <span class="hi-out ${cls}">${label}</span>
-      <span class="hi-detail">${esc(r.label || 'Jet')}${r.difficulty ? ` (Diff. ${r.difficulty}${r.success !== undefined ? (r.success ? ' ✓' : ' ✗') : ''})` : ''} · Espoir d12:${r.hope} Peur d12:${r.fear}${r.mod ? ` mod:${r.mod > 0 ? '+' : ''}${r.mod}` : ''}${r.adv ? ` avantage d6:+${r.adv}` : ''}${r.dis ? ` désavantage d6:−${r.dis}` : ''}</span>
-      <span class="hi-total">${r.total}</span>
+      <span class="hi-out ${cls}">${esc(label)}</span>
+      <span class="hi-detail">${esc(r.label || 'Jet')}${r.difficulty ? ` (Diff. ${esc(r.difficulty)}${r.success !== undefined ? (r.success ? ' ✓' : ' ✗') : ''})` : ''} · Espoir d12:${esc(r.hope)} Peur d12:${esc(r.fear)}${r.mod ? ` mod:${r.mod > 0 ? '+' : ''}${esc(r.mod)}` : ''}${r.adv ? ` avantage d6:+${esc(r.adv)}` : ''}${r.dis ? ` désavantage d6:−${esc(r.dis)}` : ''}</span>
+      <span class="hi-total">${esc(r.total)}</span>
     </div>`));
   }
 

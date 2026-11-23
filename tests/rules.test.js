@@ -367,3 +367,26 @@ test('sanitizeCharacter: neutralise les types invalides d’un import', () => {
   assert.deepEqual(out.cardUses, {});
   assert.ok(out.hp.current >= 0 && out.hp.current <= 12);
 });
+
+test('sanitizeCharacter: bloque les portraits non sûrs, les clés prototype et normalise armes/compagnon/jetons', () => {
+  const malicious = JSON.parse('{"name":"Test","id":"\\" onclick=\\"alert(1)","portrait":"javascript:alert(1)","__proto__":{"polluted":true},"weapons":[{"uid":"bad\\"id","dice":"d99<script>","trait":"invalid","dmgBonus":"999"}],"companion":{"evasion":"10\\" onfocus=\\"alert(1)","dice":"d8<img","stress":{"max":"99","current":"50"}},"cardTokens":{"c1":"<img src=x onerror=alert(1)>"}}');
+  const out = sanitizeCharacter(malicious, newCharacter());
+  assert.equal(({}).polluted, undefined);
+  assert.equal(Object.prototype.hasOwnProperty.call(out, '__proto__'), false);
+  assert.equal(out.portrait, '');
+  assert.ok(/^[a-zA-Z0-9_-]+$/.test(out.id));
+  assert.equal(out.weapons[0].dice, 'd6');
+  assert.equal(out.weapons[0].trait, 'agility');
+  assert.ok(/^[a-zA-Z0-9_-]+$/.test(out.weapons[0].uid));
+  assert.equal(out.companion.evasion, 10);
+  assert.equal(out.companion.dice, 'd6');
+  assert.equal(out.companion.stress.max, 8);
+  assert.equal(out.companion.stress.current, 8);
+  assert.equal(out.cardTokens.c1, 0);
+
+  const svgPortrait = sanitizeCharacter({ portrait: 'data:image/svg+xml;base64,PHN2Zz4=' }, newCharacter());
+  assert.equal(svgPortrait.portrait, '');
+
+  const validPortrait = sanitizeCharacter({ portrait: 'data:image/jpeg;base64,/9j/4AAQSkZJRg==' }, newCharacter());
+  assert.equal(validPortrait.portrait, 'data:image/jpeg;base64,/9j/4AAQSkZJRg==');
+});

@@ -2,7 +2,7 @@
 import {
   $$,
   $, esc, getState, setState, toast, exportJsonFile,
-  importFullBackupFromText, openPasteJsonModal, getStorageInfo, cloudSync,
+  importFullBackupFromText, openPasteJsonModal, getStorageInfo, cloudSync, MAX_BACKUP_IMPORT_BYTES,
 } from '../core.js';
 import { t, getLang } from '../i18n.js';
 
@@ -135,6 +135,10 @@ export async function render(main, params) {
     const f = e.target.files?.[0];
     e.target.value = '';
     if (!f) return;
+    if (f.size > MAX_BACKUP_IMPORT_BYTES) {
+      toast('Sauvegarde trop volumineuse (max 10 Mo).');
+      return;
+    }
     const rd = new FileReader();
     rd.onload = () => {
       try { applyBackupText(rd.result); }

@@ -254,13 +254,108 @@ export function calcEncounterSpent(entries = [], pcCount = 4) {
 }
 
 const NESTED_PLAIN_KEYS = ['traits', 'hp', 'stress', 'hope', 'thresholds', 'armorSlots', 'armorCard', 'goldTrack'];
-const isPlainObject = (v) => !!v && typeof v === 'object' && !Array.isArray(v);
+const UNSAFE_OBJECT_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
+const ALLOWED_WEAPON_DICE = new Set(['d4', 'd6', 'd8', 'd10', 'd12']);
+const SAFE_PORTRAIT_RE = /^data:image\/(?:jpeg|jpg|png|webp|gif);base64,[A-Za-z0-9+/=]+$/i;
+const SAFE_ID_RE = /^[a-zA-Z0-9_-]{1,64}$/;
+
+export const isPlainObject = (v) => !!v && typeof v === 'object' && !Array.isArray(v);
 const clampNum = (v, fallback, min, max) => {
   const n = typeof v === 'number' ? v : Number(v);
   return Number.isFinite(n) ? Math.max(min, Math.min(max, n)) : fallback;
 };
 
-export function sanitizeCharacter(obj, blankTemplate) {
+export function stripUnsafeKeys(val, depth = 0) {
+  if (depth > 16) return null;
+  if (Array.isArray(val)) return val.map(v => stripUnsafeKeys(v, depth + 1));
+  if (!isPlainObject(val)) return val;
+  const out = {};
+  for (const k of Object.keys(val)) {
+    if (UNSAFE_OBJECT_KEYS.has(k)) continue;
+    out[k] = stripUnsafeKeys(val[k], depth + 1);
+  }
+  return out;
+}
+
+export function sanitizePortrait(val) {
+  if (typeof val !== 'string') return '';
+  const trimmed = val.trim();
+  if (!trimmed || trimmed.length > 2 * 1024 * 1024) return '';
+  return SAFE_PORTRAIT_RE.test(trimmed) ? trimmed : '';
+}
+
+export function sanitizeId(val, fallback = '') {
+  if (typeof val !== 'string') return fallback;
+  const s = val.trim();
+  return SAFE_ID_RE.test(s) ? s : fallback;
+}
+
+function sanitizeWeapon(w) {
+  const dice = typeof w.dice === 'string' && ALLOWED_WEAPON_DICE.has(w.dice.toLowerCase()) ? w.dice.toLowerCase() : 'd6';
+  const trait = typeof w.trait === 'string' && TRAIT_KEYS.includes(w.trait) ? w.trait : 'agility';
+  return {
+    uid: sanitizeId(w.uid) || ('w' + Math.random().toString(36).slice(2, 10)),
+    compendiumId: typeof w.compendiumId === 'string' ? w.compendiumId.slice(0, 120) : null,
+    name: typeof w.name === 'string' ? w.name.slice(0, 160) : '',
+    trait,
+    range: typeof w.range === 'string' ? w.range.slice(0, 80) : '',
+    dice,
+    dmgBonus: clampNum(w.dmgBonus, 0, -20, 50),
+    dmgType: w.dmgType === 'mag' ? 'mag' : 'phy',
+    feature: typeof w.feature === 'string' ? w.feature.slice(0, 1200) : '',
+    hands: w.hands === 'two' ? 'two' : 'one',
+    state: w.state === 'inventory' ? 'inventory' : 'active',
+    primary: Boolean(w.primary),
+    secondary: Boolean(w.secondary) && !Boolean(w.primary),
+  };
+}
+
+function sanitizeInventoryItem(it) {
+  const out = {
+    name: typeof it.name === 'string' ? it.name.slice(0, 160) : '',
+    qty: clampNum(it.qty, 1, 0, 999),
+  };
+  if (typeof it.desc === 'string' && it.desc) out.desc = it.desc.slice(0, 2000);
+  if (typeof it.itemId === 'string' && it.itemId) out.itemId = it.itemId.slice(0, 120);
+  if (typeof it.type === 'string' && it.type) out.type = it.type.slice(0, 60);
+  return out;
+}
+
+function sanitizeCompanion(comp) {
+  if (!isPlainObject(comp)) return null;
+  const dice = typeof comp.dice === 'string' && ALLOWED_WEAPON_DICE.has(comp.dice.toLowerCase()) ? comp.dice.toLowerCase() : 'd6';
+  const stMax = clampNum(comp.stress?.max, 3, 1, 8);
+  const stCur = clampNum(comp.stress?.current, 0, 0, stMax);
+  const exps = (Array.isArray(comp.experiences) ? comp.experiences : [])
+    .filter(isPlainObject)
+    .slice(0, 8)
+    .map(e => ({ name: typeof e.name === 'string' ? e.name.slice(0, 120) : '', mod: clampNum(e.mod, 2, -9, 9) }));
+  return {
+    name: typeof comp.name === 'string' ? comp.name.slice(0, 120) : '',
+    species: typeof comp.species === 'string' ? comp.species.slice(0, 120) : '',
+    evasion: clampNum(comp.evasion, 10, 1, 30),
+    dice,
+    range: typeof comp.range === 'string' ? comp.range.slice(0, 80) : 'Mêlée',
+    dmgType: comp.dmgType === 'mag' ? 'mag' : 'phy',
+    attackName: typeof comp.attackName === 'string' ? comp.attackName.slice(0, 120) : '',
+    stress: { max: stMax, current: stCur },
+    experiences: exps,
+    upgrades: (Array.isArray(comp.upgrades) ? comp.upgrades : []).filter(x => typeof x === 'string').slice(0, 20),
+  };
+}
+
+function sanitizeBeastform(bf) {
+  if (!isPlainObject(bf) || typeof bf.id !== 'string' || !bf.id.trim()) return null;
+  const out = {
+    id: bf.id.slice(0, 120),
+    fr: typeof bf.fr === 'string' ? bf.fr.slice(0, 160) : '',
+  };
+  if (typeof bf.baseId === 'string' && bf.baseId) out.baseId = bf.baseId.slice(0, 120);
+  return out;
+}
+
+export function sanitizeCharacter(rawObj, blankTemplate) {
+  const obj = isPlainObject(rawObj) ? stripUnsafeKeys(rawObj) : {};
   /* Anciens modèles : hp/stress n'avaient pas encore active/unlocked. */
   const hadHpActive = isPlainObject(obj.hp) && obj.hp.active !== undefined;
   const hadStressActive = isPlainObject(obj.stress) && obj.stress.active !== undefined;
@@ -289,15 +384,26 @@ export function sanitizeCharacter(obj, blankTemplate) {
   if (!Array.isArray(obj.journal)) obj.journal = [];
   if (!Array.isArray(obj.traitMarks)) obj.traitMarks = [];
   if (!Array.isArray(obj.extraDomains)) obj.extraDomains = [];
-  if (!obj.cardUses || typeof obj.cardUses !== 'object') obj.cardUses = {};
-  if (!obj.cardTokens || typeof obj.cardTokens !== 'object') obj.cardTokens = {};
-  if (!obj.subcardTaken || typeof obj.subcardTaken !== 'object') obj.subcardTaken = {};
-  if (!obj.tierUses || typeof obj.tierUses !== 'object') obj.tierUses = {};
-  if (!obj.backgroundAnswers || typeof obj.backgroundAnswers !== 'object') obj.backgroundAnswers = {};
+  if (!isPlainObject(obj.cardUses)) obj.cardUses = {};
+  if (!isPlainObject(obj.cardTokens)) obj.cardTokens = {};
+  if (!isPlainObject(obj.subcardTaken)) obj.subcardTaken = {};
+  if (!isPlainObject(obj.tierUses)) obj.tierUses = {};
+  if (!isPlainObject(obj.backgroundAnswers)) obj.backgroundAnswers = {};
+
+  obj.id = sanitizeId(obj.id, sanitizeId(blankTemplate.id, 'c' + Math.random().toString(36).slice(2, 10)));
+  obj.createdAt = clampNum(obj.createdAt, Date.now(), 0, Number.MAX_SAFE_INTEGER);
+  obj.updatedAt = clampNum(obj.updatedAt, Date.now(), 0, Number.MAX_SAFE_INTEGER);
+
   /* Normalisation des types : un JSON importé peut contenir des chaînes,
      des tableaux ou des null à la place des nombres attendus par les vues. */
-  for (const k of ['name', 'pronouns', 'portrait', 'heritage', 'subclassText', 'transformation', 'classFeature', 'hopeFeature', 'notes', 'className']) {
+  for (const k of ['name', 'pronouns', 'heritage', 'subclassText', 'transformation', 'classFeature', 'hopeFeature', 'notes', 'className']) {
     if (typeof obj[k] !== 'string') obj[k] = typeof obj[k] === 'number' ? String(obj[k]) : '';
+  }
+  obj.portrait = sanitizePortrait(obj.portrait);
+  for (const k of ['classId', 'subclassId', 'multiclassClassId', 'primaryWeaponId', 'secondaryWeaponId', 'armorId']) {
+    if (obj[k] !== null && obj[k] !== undefined) {
+      obj[k] = typeof obj[k] === 'string' ? obj[k].slice(0, 120) : null;
+    }
   }
   obj.level = clampNum(obj.level, 1, 1, 10);
   obj.proficiency = clampNum(obj.proficiency, 1, 1, 6);
@@ -305,8 +411,11 @@ export function sanitizeCharacter(obj, blankTemplate) {
   obj.scars = clampNum(obj.scars, 0, 0, 6);
   obj.shortRestsSinceLong = clampNum(obj.shortRestsSinceLong, 0, 0, 99);
   obj.subcardCount = clampNum(obj.subcardCount, 0, 0, 6);
+  obj.multiclassed = Boolean(obj.multiclassed);
+  obj.customClassFeature = Boolean(obj.customClassFeature);
+
   if (!isPlainObject(obj.traits)) obj.traits = {};
-  for (const k of Object.keys(obj.traits)) obj.traits[k] = clampNum(obj.traits[k], 0, -9, 9);
+  for (const k of TRAIT_KEYS) obj.traits[k] = clampNum(obj.traits[k], 0, -9, 9);
 
   const groups = {
     hp: { max: [6, 0, 12], current: [6, 0, 12], active: [6, 0, 12], unlocked: [0, 0, 12] },
@@ -335,6 +444,7 @@ export function sanitizeCharacter(obj, blankTemplate) {
   }
   const armorTpl = isPlainObject(blankTemplate.armorCard) ? blankTemplate.armorCard : {};
   obj.armorCard = { ...armorTpl, ...(isPlainObject(obj.armorCard) ? obj.armorCard : {}) };
+  obj.armorCard.compendiumId = typeof obj.armorCard.compendiumId === 'string' ? obj.armorCard.compendiumId.slice(0, 120) : null;
   obj.armorCard.baseScore = clampNum(obj.armorCard.baseScore, 0, 0, 12);
   obj.armorCard.baseMajor = clampNum(obj.armorCard.baseMajor, 0, 0, 40);
   obj.armorCard.baseSevere = clampNum(obj.armorCard.baseSevere, 0, 0, 60);
@@ -348,17 +458,67 @@ export function sanitizeCharacter(obj, blankTemplate) {
 
   obj.experiences = (Array.isArray(obj.experiences) ? obj.experiences : [])
     .filter(isPlainObject)
-    .map(e => ({ ...e, name: typeof e.name === 'string' ? e.name : '', mod: clampNum(e.mod, 2, -9, 9) }));
+    .map(e => ({ name: typeof e.name === 'string' ? e.name : '', mod: clampNum(e.mod, 2, -9, 9) }));
   while (obj.experiences.length < 2) obj.experiences.push({ name: '', mod: 2 });
-  obj.weapons = (Array.isArray(obj.weapons) ? obj.weapons : []).filter(isPlainObject);
-  obj.inventory = (Array.isArray(obj.inventory) ? obj.inventory : []).filter(isPlainObject);
-  obj.domainCards = (Array.isArray(obj.domainCards) ? obj.domainCards : []).filter(x => isPlainObject(x) && x.cardId);
-  obj.journal = (Array.isArray(obj.journal) ? obj.journal : []).filter(isPlainObject);
-  obj.conditions = (Array.isArray(obj.conditions) ? obj.conditions : []).filter(x => typeof x === 'string');
-  obj.traitMarks = (Array.isArray(obj.traitMarks) ? obj.traitMarks : []).filter(x => typeof x === 'string');
-  obj.extraDomains = (Array.isArray(obj.extraDomains) ? obj.extraDomains : []).filter(x => typeof x === 'string');
-  for (const key of ['cardUses', 'cardTokens', 'subcardTaken', 'tierUses', 'backgroundAnswers']) {
-    if (!isPlainObject(obj[key])) obj[key] = {};
+
+  obj.weapons = (Array.isArray(obj.weapons) ? obj.weapons : []).filter(isPlainObject).map(sanitizeWeapon);
+  obj.inventory = (Array.isArray(obj.inventory) ? obj.inventory : []).filter(isPlainObject).map(sanitizeInventoryItem);
+  obj.domainCards = (Array.isArray(obj.domainCards) ? obj.domainCards : [])
+    .filter(x => isPlainObject(x) && typeof x.cardId === 'string' && x.cardId.trim())
+    .map(x => ({
+      cardId: x.cardId.slice(0, 120),
+      ...(x.inHand !== undefined ? { inHand: Boolean(x.inHand) } : {}),
+    }));
+  obj.journal = (Array.isArray(obj.journal) ? obj.journal : [])
+    .filter(isPlainObject)
+    .map(j => ({
+      date: typeof j.date === 'string' ? j.date.slice(0, 80) : '',
+      text: typeof j.text === 'string' ? j.text.slice(0, 10000) : '',
+    }));
+  obj.conditions = (Array.isArray(obj.conditions) ? obj.conditions : []).filter(x => typeof x === 'string').map(x => x.slice(0, 80));
+  obj.traitMarks = (Array.isArray(obj.traitMarks) ? obj.traitMarks : []).filter(x => typeof x === 'string').map(x => x.slice(0, 40));
+  obj.extraDomains = (Array.isArray(obj.extraDomains) ? obj.extraDomains : []).filter(x => typeof x === 'string').map(x => x.slice(0, 80));
+  obj.companion = sanitizeCompanion(obj.companion);
+  obj.beastform = sanitizeBeastform(obj.beastform);
+
+  const cleanBoolMap = (m) => {
+    const out = {};
+    if (!isPlainObject(m)) return out;
+    for (const [k, v] of Object.entries(m)) {
+      if (!UNSAFE_OBJECT_KEYS.has(k)) out[k.slice(0, 160)] = Boolean(v);
+    }
+    return out;
+  };
+  const cleanIntMap = (m, min, max) => {
+    const out = {};
+    if (!isPlainObject(m)) return out;
+    for (const [k, v] of Object.entries(m)) {
+      if (!UNSAFE_OBJECT_KEYS.has(k)) out[k.slice(0, 160)] = clampNum(v, 0, min, max);
+    }
+    return out;
+  };
+  const cleanStrMap = (m) => {
+    const out = {};
+    if (!isPlainObject(m)) return out;
+    for (const [k, v] of Object.entries(m)) {
+      if (!UNSAFE_OBJECT_KEYS.has(k) && typeof v === 'string') out[k.slice(0, 80)] = v.slice(0, 5000);
+    }
+    return out;
+  };
+  obj.cardUses = cleanBoolMap(obj.cardUses);
+  obj.subcardTaken = cleanBoolMap(obj.subcardTaken);
+  obj.tierUses = cleanBoolMap(obj.tierUses);
+  obj.cardTokens = cleanIntMap(obj.cardTokens, 0, 20);
+  obj.backgroundAnswers = cleanStrMap(obj.backgroundAnswers);
+
+  if (obj.hopeAbility !== undefined && obj.hopeAbility !== null) {
+    if (typeof obj.hopeAbility === 'string') obj.hopeAbility = obj.hopeAbility.slice(0, 200);
+    else if (isPlainObject(obj.hopeAbility)) {
+      obj.hopeAbility = {
+        name: typeof obj.hopeAbility.name === 'string' ? obj.hopeAbility.name.slice(0, 200) : '',
+        desc: typeof obj.hopeAbility.desc === 'string' ? obj.hopeAbility.desc.slice(0, 2000) : '',
+      };
+    } else obj.hopeAbility = '';
   }
   return obj;
 }

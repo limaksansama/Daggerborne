@@ -766,11 +766,12 @@ async function finish(main) {
     backgroundAnswers: { ...wiz.answers },
     className: cl.fr, hopeAbility: { name: cl.hopeAbility, desc: cl.hopeDesc },
   });
-  /* La carte de Fondation de sous-classe est acquise au niveau 1. */
-  if (sub?.features?.[0]) {
-    c.subcardCount = 1;
-    c.classFeature = `✦ ${sub.features[0].name} — ${sub.features[0].desc}`;
-  }
+  /* Pré-remplissage SRD 2.0 : aptitudes de classe + carte de Fondation de sous-classe (niveau 1). */
+  const classFeatLines = (cl?.features || []).map(f => `• ${f.name} — ${f.desc}`);
+  const subFoundationLine = sub?.features?.[0] ? `✦ ${sub.features[0].name} — ${sub.features[0].desc}` : '';
+  if (subFoundationLine) c.subcardCount = 1;
+  c.classFeature = [...classFeatLines, ...(subFoundationLine ? [subFoundationLine] : [])].join('\n\n');
+  c.customClassFeature = false;
   saveChar(c);
   wiz = null;
   toast(`✦ ${c.name} est prêt pour l'aventure !`);

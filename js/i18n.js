@@ -514,6 +514,12 @@ const STRINGS = {
   sheetVaultBtn: ['Caveau', 'Vault'],
   sheetVaultEmpty: ['Le caveau est vide.', 'The vault is empty.'],
   sheetVaultHint: ['Les cartes au caveau ne comptent pas dans la limite de 5 en main.', "Vaulted cards don't count toward the 5-card hand limit."],
+  fabToggleDock: ['Réduire ou afficher les raccourcis de dés', 'Collapse or expand dice shortcuts'],
+  gmFearRecMax: ['Maximum recommandé : 12 Peurs', 'Recommended max: 12 Fear'],
+  sheetTabCombat: ['Combat', 'Combat'],
+  sheetTabTraitsExp: ['Traits & Exp.', 'Traits & Exp.'],
+  sheetTabCards: ['Cartes', 'Cards'],
+  sheetTabBagGold: ['Sac & Or', 'Bag & Gold'],
 };
 
 export function t(key, vars) {

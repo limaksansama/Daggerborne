@@ -499,7 +499,7 @@ async function showDetail(main, raw, type) {
     if (st.characters.length === 1) { addEntryToInventory(st.characters[0].id, raw, type); back.remove(); return; }
     const pick = el(`<div class="modal-back"></div>`);
     const ps = el(`<div class="modal-sheet"><h3>${t('sheetAddToWhichChar')}</h3>
-      ${st.characters.map(c => `<button class="choice" data-cid="${c.id}" style="margin-bottom:.5rem;width:100%"><span class="ch-name">${esc(c.name)}</span></button>`).join('')}
+      ${st.characters.map(c => `<button class="choice" data-cid="${esc(c.id)}" style="margin-bottom:.5rem;width:100%"><span class="ch-name">${esc(c.name)}</span></button>`).join('')}
       <div class="modal-close-row"><button class="btn ghost small" id="p-close">Annuler</button></div></div>`);
     pick.appendChild(ps);
     document.body.appendChild(pick);
@@ -534,7 +534,7 @@ async function showDetail(main, raw, type) {
     // choose char
     const pick = el(`<div class="modal-back"></div>`);
     const ps = el(`<div class="modal-sheet"><h3>${t('sheetAddToWhichChar')}</h3>
-      ${st.characters.map(c => `<button class="choice" data-cid="${c.id}" style="margin-bottom:.5rem;width:100%"><span class="ch-name">${esc(c.name)}</span></button>`).join('')}
+      ${st.characters.map(c => `<button class="choice" data-cid="${esc(c.id)}" style="margin-bottom:.5rem;width:100%"><span class="ch-name">${esc(c.name)}</span></button>`).join('')}
       <div class="modal-close-row"><button class="btn ghost small" id="p-close">Annuler</button></div></div>`);
     pick.appendChild(ps);
     document.body.appendChild(pick);
