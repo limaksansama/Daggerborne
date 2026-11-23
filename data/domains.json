@@ -1,1 +1,43 @@
-{"arcana": {"fr": "Arcane", "desc": "L'Arcane est le domaine de la magie innée, instinctive. Ses adeptes puisent dans les forces brutes et énigmatiques des royaumes pour manipuler leur énergie et celle des éléments."}, "blade": {"fr": "Lame", "desc": "La Lame est le domaine des maîtres d'armes. Par l'acier, l'arc ou une arme plus particulière, ses fidèles se consacrent à la maîtrise d'une mort inexorable."}, "bone": {"fr": "Os", "desc": "L'Os est le domaine de la tactique et du corps. Ses pratiquants exercent un contrôle surnaturel sur leur corps et prévoient le comportement d'autrui au combat."}, "codex": {"fr": "Codex", "desc": "Le Codex est le domaine des études magiques intensives : équations de pouvoir couchées dans les livres, sur les parchemins ou gravées sur les murs."}, "dread": {"fr": "Effroi", "desc": "L'Effroi est le domaine des cauchemars et de la peur. Invoquer des monstruosités, affaiblir ses ennemis, canaliser une magie terrifiante.", "fan": true}, "grace": {"fr": "Grâce", "desc": "La Grâce est le domaine du charisme : contes captivants, sorts enchanteurs et tissus de mensonges pour redéfinir la réalité."}, "midnight": {"fr": "Minuit", "desc": "Le Minuit est le domaine des ombres et des secrets : astuces ingénieuses, magie discrète, trésors bien protégés."}, "sage": {"fr": "Sagesse", "desc": "La Sagesse est le domaine du monde naturel : la vitalité des fleurs et la férocité des prédateurs, une magie primale."}, "splendor": {"fr": "Splendeur", "desc": "La Splendeur est le domaine de la vie : guérir et contrôler la mort, donner la vie ou y mettre fin."}, "valor": {"fr": "Vaillance", "desc": "La Vaillance est le domaine de la protection : une force formidable pour défendre autrui, à l'attaque comme en défense."}}
+{
+  "arcana": {
+    "fr": "Arcane",
+    "desc": "L'Arcane est le domaine de la magie innée, instinctive. Ses adeptes puisent dans les forces brutes et énigmatiques des royaumes pour manipuler leur énergie et celle des éléments."
+  },
+  "blade": {
+    "fr": "Lame",
+    "desc": "La Lame est le domaine des maîtres d'armes. Par l'acier, l'arc ou une arme plus particulière, ses fidèles se consacrent à la maîtrise d'une mort inexorable."
+  },
+  "bone": {
+    "fr": "Os",
+    "desc": "L'Os est le domaine de la tactique et du corps. Ses pratiquants exercent un contrôle surnaturel sur leur corps et prévoient le comportement d'autrui au combat."
+  },
+  "codex": {
+    "fr": "Codex",
+    "desc": "Le Codex est le domaine des études magiques intensives : équations de pouvoir couchées dans les livres, sur les parchemins ou gravées sur les murs."
+  },
+  "dread": {
+    "fr": "Effroi",
+    "desc": "L'Effroi est le domaine des cauchemars et de la peur. Invoquer des monstruosités, affaiblir ses ennemis, canaliser une magie terrifiante.",
+    "fan": true
+  },
+  "grace": {
+    "fr": "Grâce",
+    "desc": "La Grâce est le domaine du charisme : contes captivants, sorts enchanteurs et tissus de mensonges pour redéfinir la réalité."
+  },
+  "midnight": {
+    "fr": "Minuit",
+    "desc": "Le Minuit est le domaine des ombres et des secrets : astuces ingénieuses, magie discrète, trésors bien protégés."
+  },
+  "sage": {
+    "fr": "Sagesse",
+    "desc": "La Sagesse est le domaine du monde naturel : la vitalité des fleurs et la férocité des prédateurs, une magie primale."
+  },
+  "splendor": {
+    "fr": "Splendeur",
+    "desc": "La Splendeur est le domaine de la vie : guérir et contrôler la mort, donner la vie ou y mettre fin."
+  },
+  "valor": {
+    "fr": "Vaillance",
+    "desc": "La Vaillance est le domaine de la protection : une force formidable pour défendre autrui, à l'attaque comme en défense."
+  }
+}

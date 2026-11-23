@@ -35,7 +35,7 @@
     "major": 9,
     "severe": 20,
     "heavy": false,
-    "desc": "Fuyante : Lorsque vous êtes la cible d'une attaque, cochez 1 emplacement d'armure pour infliger un désavantage au jet d'attaque.",
+    "desc": "Fuyante : Lorsque vous êtes la cible d'une attaque, marquez 1 emplacement d'armure pour infliger un désavantage au jet d'attaque.",
     "img": "icons/equipment/chest/breastplate-layered-leather-black.webp"
   },
   {
@@ -61,7 +61,7 @@
     "major": 14,
     "severe": 38,
     "heavy": false,
-    "desc": "Maudite : Lorsque vous cochez des PV suite à une attaque, lancez 1d4. Sur 4, l'attaquant marque autant de Stress.",
+    "desc": "Maudite : Lorsque vous marquez des PV suite à une attaque, lancez 1d4. Sur 4, l'attaquant marque autant de Stress.",
     "img": "icons/equipment/chest/tech-green.webp"
   },
   {
@@ -74,7 +74,7 @@
     "major": 9,
     "severe": 21,
     "heavy": false,
-    "desc": "Résiliente : Avant de cocher votre dernier emplacement d'armure, lancez 1d6. Sur 6, réduisez la gravité d'un palier sans cocher d'emplacement d'armure.",
+    "desc": "Résiliente : Avant de marquer votre dernier emplacement d'armure, lancez 1d6. Sur 6, réduisez la gravité d'un palier sans marquer d'emplacement d'armure.",
     "img": "icons/equipment/chest/breastplate-gorget-steel.webp"
   },
   {
@@ -100,7 +100,7 @@
     "major": 16,
     "severe": 39,
     "heavy": false,
-    "desc": "Physique : Vous ne pouvez pas cocher d'emplacement d'armure pour réduire les dégâts magiques.",
+    "desc": "Physique : Vous ne pouvez pas marquer d'emplacement d'armure pour réduire les dégâts magiques.",
     "img": "icons/equipment/chest/breastplate-collared-steel-grey.webp"
   },
   {
@@ -178,7 +178,7 @@
     "major": 15,
     "severe": 40,
     "heavy": false,
-    "desc": "Vitrifiée : Contre des dégâts Graves ou plus, cochez 2 emplacements d'armure pour les annuler. Vous subissez −5 aux seuils de dégâts jusqu'à réparation lors d'un temps mort.",
+    "desc": "Vitrifiée : Contre des dégâts Graves ou plus, marquez 2 emplacements d'armure pour les annuler. Vous subissez −5 aux seuils de dégâts jusqu'à réparation lors d'un temps mort.",
     "img": "icons/equipment/chest/breastplate-layered-gilded-black.webp"
   },
   {
@@ -282,7 +282,7 @@
     "major": 15,
     "severe": 40,
     "heavy": false,
-    "desc": "Fortifiée : Lorsque vous cochez un emplacement d'armure, réduisez la gravité d'une attaque de deux paliers au lieu d'un.",
+    "desc": "Fortifiée : Lorsque vous marquez un emplacement d'armure, réduisez la gravité d'une attaque de deux paliers au lieu d'un.",
     "img": "icons/equipment/chest/breastplate-layered-steel.webp"
   },
   {
@@ -451,7 +451,7 @@
     "major": 9,
     "severe": 20,
     "heavy": false,
-    "desc": "Renforcée : Lorsque vous cochez votre dernier emplacement d'armure, augmentez vos seuils de dégâts de +2 jusqu'à ce qu'au moins 1 emplacement soit effacé.",
+    "desc": "Renforcée : Lorsque vous marquez votre dernier emplacement d'armure, augmentez vos seuils de dégâts de +2 jusqu'à ce qu'au moins 1 emplacement soit effacé.",
     "img": "icons/equipment/chest/breastplate-layered-leather-brown-silver.webp"
   },
   {
@@ -464,7 +464,7 @@
     "major": 13,
     "severe": 36,
     "heavy": false,
-    "desc": "Divine : Lorsque vous cochez un emplacement d'armure, gagnez 1 Espoir.",
+    "desc": "Divine : Lorsque vous marquez un emplacement d'armure, gagnez 1 Espoir.",
     "img": "icons/equipment/chest/breastplate-collared-steel-green.webp"
   },
   {
@@ -516,7 +516,7 @@
     "major": 11,
     "severe": 23,
     "heavy": false,
-    "desc": "Pleine d'espoir : Lorsque vous devriez dépenser 1 Espoir, vous pouvez cocher 1 emplacement d'armure à la place.",
+    "desc": "Pleine d'espoir : Lorsque vous devriez dépenser 1 Espoir, vous pouvez marquer 1 emplacement d'armure à la place.",
     "img": "icons/equipment/chest/breastplate-banded-leather-purple.webp"
   },
   {
@@ -581,7 +581,7 @@
     "major": 17,
     "severe": 43,
     "heavy": false,
-    "desc": "Douloureuse : Chaque fois que vous cochez un emplacement d'armure, marquez 1 Stress.",
+    "desc": "Douloureuse : Chaque fois que vous marquez un emplacement d'armure, marquez 1 Stress.",
     "img": "icons/magic/symbols/rune-sigil-red-orange.webp"
   },
   {
@@ -620,7 +620,7 @@
     "major": 16,
     "severe": 39,
     "heavy": false,
-    "desc": "Magique : Vous ne pouvez pas cocher d'emplacement d'armure pour réduire les dégâts physiques.",
+    "desc": "Magique : Vous ne pouvez pas marquer d'emplacement d'armure pour réduire les dégâts physiques.",
     "img": "icons/equipment/chest/coat-collared-red.webp"
   },
   {
@@ -698,7 +698,7 @@
     "major": 11,
     "severe": 27,
     "heavy": false,
-    "desc": "Impénétrable : Une fois par repos court, lorsque vous devriez cocher votre dernier PV, marquez 1 Stress à la place.",
+    "desc": "Impénétrable : Une fois par repos court, lorsque vous devriez marquer votre dernier PV, marquez 1 Stress à la place.",
     "img": "icons/equipment/chest/breastplate-rivited-red.webp"
   },
   {
@@ -750,7 +750,7 @@
     "major": 13,
     "severe": 36,
     "heavy": false,
-    "desc": "Chronostase : Cochez 1 emplacement d'armure pour lancer 1d4 et ajouter son résultat à votre Évasion contre une attaque entrante.",
+    "desc": "Chronostase : Marquez 1 emplacement d'armure pour lancer 1d4 et ajouter son résultat à votre Évasion contre une attaque entrante.",
     "img": "icons/equipment/chest/robe-layered-red.webp"
   },
   {
@@ -962,7 +962,7 @@
     "major": 4,
     "severe": 10,
     "heavy": false,
-    "desc": "Éclatante : Bonus aux seuils de dégâts égal à vos emplacements d'armure non cochés.",
+    "desc": "Éclatante : Bonus aux seuils de dégâts égal à vos emplacements d'armure non marqués.",
     "campaign": "monster",
     "img": "icons/equipment/chest/breastplate-collared-leather-grey.webp"
   },
@@ -976,7 +976,7 @@
     "major": 6,
     "severe": 15,
     "heavy": false,
-    "desc": "Éclatante : Bonus aux seuils de dégâts égal à vos emplacements d'armure non cochés.",
+    "desc": "Éclatante : Bonus aux seuils de dégâts égal à vos emplacements d'armure non marqués.",
     "campaign": "monster",
     "img": "icons/equipment/chest/breastplate-collared-leather-grey.webp"
   },
@@ -990,7 +990,7 @@
     "major": 8,
     "severe": 22,
     "heavy": false,
-    "desc": "Éclatante : Bonus aux seuils de dégâts égal à vos emplacements d'armure non cochés.",
+    "desc": "Éclatante : Bonus aux seuils de dégâts égal à vos emplacements d'armure non marqués.",
     "campaign": "monster",
     "img": "icons/equipment/chest/breastplate-collared-leather-grey.webp"
   },
@@ -1004,7 +1004,7 @@
     "major": 10,
     "severe": 31,
     "heavy": false,
-    "desc": "Éclatante : Bonus aux seuils de dégâts égal à vos emplacements d'armure non cochés.",
+    "desc": "Éclatante : Bonus aux seuils de dégâts égal à vos emplacements d'armure non marqués.",
     "campaign": "monster",
     "img": "icons/equipment/chest/breastplate-collared-leather-grey.webp"
   },

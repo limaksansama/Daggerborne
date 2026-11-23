@@ -347,7 +347,7 @@
     "range": "Mêlée",
     "dice": "d8",
     "dmgType": "mag",
-    "desc": "Déviante : Lorsque vous êtes attaqué, cochez 1 emplacement d'armure pour ajouter votre Valeur d'armure à votre Évasion contre cette attaque.",
+    "desc": "Déviante : Lorsque vous êtes attaqué, marquez 1 emplacement d'armure pour ajouter votre Valeur d'armure à votre Évasion contre cette attaque.",
     "img": "icons/equipment/hand/tech-gauntlet-white-heavy.webp",
     "dmgBonus": 0
   },
@@ -731,7 +731,7 @@
     "range": "Proche",
     "dice": "d6",
     "dmgType": "mag",
-    "desc": "Empoisonnée : Lorsqu'une cible coche des PV sur une attaque obtenue avec Peur, elle coche autant de Stress.",
+    "desc": "Empoisonnée : Lorsqu'une cible marque des PV sur une attaque obtenue avec Peur, elle marque autant de Stress.",
     "img": "icons/commodities/biological/tentacle-thorned-green.webp",
     "dmgBonus": 8
   },
@@ -747,7 +747,7 @@
     "range": "Mêlée",
     "dice": "d8",
     "dmgType": "phy",
-    "desc": "Mortelle : Lorsque vous infligez des dégâts Graves, la cible coche 1 PV supplémentaire.",
+    "desc": "Mortelle : Lorsque vous infligez des dégâts Graves, la cible marque 1 PV supplémentaire.",
     "img": "icons/weapons/swords/greatsword-flamberge.webp",
     "dmgBonus": 3
   },
@@ -1787,7 +1787,7 @@
     "range": "Mêlée",
     "dice": "d4",
     "dmgType": "phy",
-    "desc": "Déviante : Lorsque vous êtes attaqué, cochez 1 emplacement d'armure pour ajouter votre Valeur d'armure disponible à votre Évasion contre cette attaque.",
+    "desc": "Déviante : Lorsque vous êtes attaqué, marquez 1 emplacement d'armure pour ajouter votre Valeur d'armure disponible à votre Évasion contre cette attaque.",
     "img": "icons/equipment/shield/heater-wooden-worn.webp",
     "dmgBonus": 4
   },
@@ -2011,7 +2011,7 @@
     "range": "Très proche",
     "dice": "d10",
     "dmgType": "phy",
-    "desc": "Calée : Lorsqu'un adversaire à portée de cette arme vous inflige des dégâts, marquez 2 Stress pour lui faire cocher 1 PV.",
+    "desc": "Calée : Lorsqu'un adversaire à portée de cette arme vous inflige des dégâts, marquez 2 Stress pour lui faire marquer 1 PV.",
     "img": "icons/weapons/polearms/spear-hooked-spike.webp",
     "dmgBonus": 5
   },
@@ -2347,7 +2347,7 @@
     "range": "Éloignée",
     "dice": "d8",
     "dmgType": "phy",
-    "desc": "Incendiaire : −1 en Agilité ; sur une attaque réussie, toutes les créatures à portée Très proche de la cible cochent 1 PV.",
+    "desc": "Incendiaire : −1 en Agilité ; sur une attaque réussie, toutes les créatures à portée Très proche de la cible marquent 1 PV.",
     "img": "icons/weapons/guns/gun-green.webp",
     "dmgBonus": 12
   },
@@ -2539,7 +2539,7 @@
     "range": "Mêlée",
     "dice": "d4",
     "dmgType": "phy",
-    "desc": "Protectrice : Lorsque vous cochez un emplacement d'armure, les dégâts sont aussi réduits pour les alliés en Mêlée qui ont subi la même attaque.",
+    "desc": "Protectrice : Lorsque vous marquez un emplacement d'armure, les dégâts sont aussi réduits pour les alliés en Mêlée qui ont subi la même attaque.",
     "img": "icons/equipment/shield/kite-wooden-dragon-green.webp",
     "dmgBonus": 6
   },
@@ -2891,7 +2891,7 @@
     "range": "Mêlée",
     "dice": "d8",
     "dmgType": "phy",
-    "desc": "Non létale : Au lieu de cocher des PV, la cible coche autant de Stress.",
+    "desc": "Non létale : Au lieu de marquer des PV, la cible marque autant de Stress.",
     "img": "icons/weapons/maces/mace-round-steel.webp",
     "dmgBonus": 0
   },
@@ -4795,7 +4795,7 @@
     "range": "Proche",
     "dice": "d8",
     "dmgType": "mag",
-    "desc": "Givreuse : Lorsqu'une attaque fait cocher au moins 2 PV à la cible, elle devient temporairement Entravée.",
+    "desc": "Givreuse : Lorsqu'une attaque fait marquer au moins 2 PV à la cible, elle devient temporairement Entravée.",
     "img": "icons/weapons/staves/staff-ornate-teal.webp",
     "dmgBonus": 6
   },
@@ -4907,7 +4907,7 @@
     "range": "Mêlée",
     "dice": "d8",
     "dmgType": "phy",
-    "desc": "Mortelle : Lorsque vous infligez des dégâts Graves, la cible coche 1 PV supplémentaire.",
+    "desc": "Mortelle : Lorsque vous infligez des dégâts Graves, la cible marque 1 PV supplémentaire.",
     "img": "icons/weapons/hammers/hammer-war-spiked.webp",
     "dmgBonus": 3
   },

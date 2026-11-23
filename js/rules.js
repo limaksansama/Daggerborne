@@ -254,8 +254,16 @@ export function calcEncounterSpent(entries = [], pcCount = 4) {
 }
 
 const NESTED_PLAIN_KEYS = ['traits', 'hp', 'stress', 'hope', 'thresholds', 'armorSlots', 'armorCard', 'goldTrack'];
+const isPlainObject = (v) => !!v && typeof v === 'object' && !Array.isArray(v);
+const clampNum = (v, fallback, min, max) => {
+  const n = typeof v === 'number' ? v : Number(v);
+  return Number.isFinite(n) ? Math.max(min, Math.min(max, n)) : fallback;
+};
 
 export function sanitizeCharacter(obj, blankTemplate) {
+  /* Anciens modèles : hp/stress n'avaient pas encore active/unlocked. */
+  const hadHpActive = isPlainObject(obj.hp) && obj.hp.active !== undefined;
+  const hadStressActive = isPlainObject(obj.stress) && obj.stress.active !== undefined;
   for (const k of Object.keys(blankTemplate)) {
     const tmplVal = blankTemplate[k];
     if (obj[k] === undefined || obj[k] === null) {
@@ -286,7 +294,72 @@ export function sanitizeCharacter(obj, blankTemplate) {
   if (!obj.subcardTaken || typeof obj.subcardTaken !== 'object') obj.subcardTaken = {};
   if (!obj.tierUses || typeof obj.tierUses !== 'object') obj.tierUses = {};
   if (!obj.backgroundAnswers || typeof obj.backgroundAnswers !== 'object') obj.backgroundAnswers = {};
-  if (typeof obj.shortRestsSinceLong !== 'number') obj.shortRestsSinceLong = 0;
+  /* Normalisation des types : un JSON importé peut contenir des chaînes,
+     des tableaux ou des null à la place des nombres attendus par les vues. */
+  for (const k of ['name', 'pronouns', 'portrait', 'heritage', 'subclassText', 'transformation', 'classFeature', 'hopeFeature', 'notes', 'className']) {
+    if (typeof obj[k] !== 'string') obj[k] = typeof obj[k] === 'number' ? String(obj[k]) : '';
+  }
+  obj.level = clampNum(obj.level, 1, 1, 10);
+  obj.proficiency = clampNum(obj.proficiency, 1, 1, 6);
+  obj.evasion = clampNum(obj.evasion, 10, 0, 30);
+  obj.scars = clampNum(obj.scars, 0, 0, 6);
+  obj.shortRestsSinceLong = clampNum(obj.shortRestsSinceLong, 0, 0, 99);
+  obj.subcardCount = clampNum(obj.subcardCount, 0, 0, 6);
+  if (!isPlainObject(obj.traits)) obj.traits = {};
+  for (const k of Object.keys(obj.traits)) obj.traits[k] = clampNum(obj.traits[k], 0, -9, 9);
+
+  const groups = {
+    hp: { max: [6, 0, 12], current: [6, 0, 12], active: [6, 0, 12], unlocked: [0, 0, 12] },
+    stress: { max: [6, 0, 12], current: [0, 0, 12], active: [6, 0, 12], unlocked: [0, 0, 12] },
+    hope: { max: [6, 0, 6], current: [2, 0, 6] },
+    armorSlots: { max: [12, 0, 12], used: [0, 0, 12] },
+    thresholds: { bonus: [0, -9, 20] },
+    goldTrack: { handfuls: [0, 0, 10], bags: [0, 0, 10], chests: [0, 0, 1] },
+  };
+  for (const [group, fields] of Object.entries(groups)) {
+    const tpl = isPlainObject(blankTemplate[group]) ? blankTemplate[group] : {};
+    const cur = isPlainObject(obj[group]) ? obj[group] : {};
+    obj[group] = { ...tpl, ...cur };
+    for (const [field, [fallback, min, max]] of Object.entries(fields)) {
+      obj[group][field] = clampNum(obj[group][field], fallback, min, max);
+    }
+  }
+  obj.armorSlots.max = 12;
+  if (!hadHpActive) {
+    obj.hp.active = clampNum(obj.hp.max, 6, 0, 12);
+    obj.hp.unlocked = 0;
+  }
+  if (!hadStressActive) {
+    obj.stress.active = clampNum(obj.stress.max, 6, 0, 12);
+    obj.stress.unlocked = 0;
+  }
+  const armorTpl = isPlainObject(blankTemplate.armorCard) ? blankTemplate.armorCard : {};
+  obj.armorCard = { ...armorTpl, ...(isPlainObject(obj.armorCard) ? obj.armorCard : {}) };
+  obj.armorCard.baseScore = clampNum(obj.armorCard.baseScore, 0, 0, 12);
+  obj.armorCard.baseMajor = clampNum(obj.armorCard.baseMajor, 0, 0, 40);
+  obj.armorCard.baseSevere = clampNum(obj.armorCard.baseSevere, 0, 0, 60);
+  obj.armorCard.name = typeof obj.armorCard.name === 'string' ? obj.armorCard.name : '';
+  obj.armorCard.feature = typeof obj.armorCard.feature === 'string' ? obj.armorCard.feature : '';
+  obj.hp.unlocked = Math.min(obj.hp.unlocked, 12 - obj.hp.active);
+  obj.stress.unlocked = Math.min(obj.stress.unlocked, 12 - obj.stress.active);
+  obj.hp.current = Math.min(obj.hp.current, obj.hp.active + obj.hp.unlocked);
+  obj.stress.current = Math.min(obj.stress.current, obj.stress.active + obj.stress.unlocked);
+  obj.hope.current = Math.min(obj.hope.current, obj.hope.max);
+
+  obj.experiences = (Array.isArray(obj.experiences) ? obj.experiences : [])
+    .filter(isPlainObject)
+    .map(e => ({ ...e, name: typeof e.name === 'string' ? e.name : '', mod: clampNum(e.mod, 2, -9, 9) }));
+  while (obj.experiences.length < 2) obj.experiences.push({ name: '', mod: 2 });
+  obj.weapons = (Array.isArray(obj.weapons) ? obj.weapons : []).filter(isPlainObject);
+  obj.inventory = (Array.isArray(obj.inventory) ? obj.inventory : []).filter(isPlainObject);
+  obj.domainCards = (Array.isArray(obj.domainCards) ? obj.domainCards : []).filter(x => isPlainObject(x) && x.cardId);
+  obj.journal = (Array.isArray(obj.journal) ? obj.journal : []).filter(isPlainObject);
+  obj.conditions = (Array.isArray(obj.conditions) ? obj.conditions : []).filter(x => typeof x === 'string');
+  obj.traitMarks = (Array.isArray(obj.traitMarks) ? obj.traitMarks : []).filter(x => typeof x === 'string');
+  obj.extraDomains = (Array.isArray(obj.extraDomains) ? obj.extraDomains : []).filter(x => typeof x === 'string');
+  for (const key of ['cardUses', 'cardTokens', 'subcardTaken', 'tierUses', 'backgroundAnswers']) {
+    if (!isPlainObject(obj[key])) obj[key] = {};
+  }
   return obj;
 }
 

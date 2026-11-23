@@ -6,15 +6,15 @@ import { t, getLang, T } from './i18n.js';
 export const $ = (sel, root = document) => root.querySelector(sel);
 export const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 export const el = (html) => {
-  const t = document.createElement('template');
-  t.innerHTML = html.trim();
-  return t.content.firstElementChild;
+  const tpl = document.createElement('template');
+  tpl.innerHTML = html.trim();
+  return tpl.content.firstElementChild;
 };
 export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const toast = (msg) => {
-  const t = el(`<div class="toast">${esc(msg)}</div>`);
-  document.body.appendChild(t);
-  setTimeout(() => t.remove(), 2600);
+  const node = el(`<div class="toast">${esc(msg)}</div>`);
+  document.body.appendChild(node);
+  setTimeout(() => node.remove(), 2600);
 };
 export const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 
@@ -45,7 +45,11 @@ function normalizeState(s) {
   return {
     ...def,
     ...s,
-    characters: Array.isArray(s.characters) ? s.characters : [],
+    characters: Array.isArray(s.characters)
+      ? s.characters
+        .filter(c => c && typeof c === 'object' && !Array.isArray(c))
+        .map(c => sanitizeCharacter(c, newCharacter()))
+      : [],
     rolls: Array.isArray(s.rolls) ? s.rolls : [],
     fear: Number.isFinite(s.fear) ? s.fear : 0,
     countdowns: Array.isArray(s.countdowns) ? s.countdowns : [],
@@ -110,7 +114,8 @@ async function idbSet(key, val) {
 export async function initStorage() {
   const fromIdb = await idbGet(IDB_KEY);
   if (fromIdb && Array.isArray(fromIdb.characters)) {
-    const lsRaw = localStorage.getItem(LS_KEY);
+    let lsRaw = null;
+    try { lsRaw = localStorage.getItem(LS_KEY); } catch (e) { /* stockage indisponible */ }
     const idbUpdated = fromIdb._savedAt || 0;
     const lsUpdated = state?._savedAt || 0;
     if (!lsRaw || idbUpdated >= lsUpdated) {
@@ -239,7 +244,7 @@ export function importFullBackupFromText(rawText, mode = 'merge') {
 
 // ---------- data cache ----------
 const cache = {};
-const DATA_VER = 'v32';
+const DATA_VER = 'v35';
 export async function data(name) {
   const dir = getLang() === 'en' ? 'data/en' : 'data';
   const key = getLang() + ':' + name;
@@ -265,7 +270,12 @@ export function go(path, param) {
 export function parseHash() {
   const h = location.hash.replace(/^#+\/?/, '') || 'home';
   const [path, ...rest] = h.split('/');
-  return { path: routes[path] ? path : 'home', param: rest.join('/') ? decodeURIComponent(rest.join('/')) : null };
+  const rawParam = rest.join('/');
+  let param = null;
+  if (rawParam) {
+    try { param = decodeURIComponent(rawParam); } catch (e) { param = rawParam; }
+  }
+  return { path: routes[path] ? path : 'home', param };
 }
 
 // ---------- character model ----------

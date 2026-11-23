@@ -24,7 +24,7 @@ let root = null;
 export function initFab() {
   if (root) return;
   root = el(`<div class="d3d-fab-wrap">
-    <button class="d3d-fab-hist" id="d3d-hist-btn" title="Historique des jets">${CLOCK}</button>
+    <button class="d3d-fab-hist" id="d3d-hist-btn" title="${t('fabHistoryTitle')}">${CLOCK}</button>
     <div style="position:relative">
       <div class="d3d-menu" id="d3d-menu">
         <button class="d3d-quick" id="d3d-quick">
@@ -32,15 +32,15 @@ export function initFab() {
           <span>${t('fab2d12')}</span>
         </button>
         <div class="d3d-dice-row">
-          ${DICE.map(d => `<button class="d3d-dbtn" data-d3d-die="${d}" title="Ajouter un d${d}">${D12_SM('#312e81', d)}<span>d${d}</span><span class="cnt"></span></button>`).join('')}
+          ${DICE.map(d => `<button class="d3d-dbtn" data-d3d-die="${d}" title="${t('fabAddDie')} d${d}">${D12_SM('#312e81', d)}<span>d${d}</span><span class="cnt"></span></button>`).join('')}
         </div>
         <div style="display:flex;gap:8px;align-items:center">
-          <button class="d3d-clear" id="d3d-clear" title="Vider la sélection" style="display:none">× vider</button>
-          <button class="d3d-launch" id="d3d-launch" style="flex:1;display:none">LANCER !</button>
+          <button class="d3d-clear" id="d3d-clear" title="${t('fabClearSel')}" style="display:none">× ${t('fabClear')}</button>
+          <button class="d3d-launch" id="d3d-launch" style="flex:1;display:none">${t('diceLaunch')} !</button>
         </div>
       </div>
       <div class="d3d-hist-list" id="d3d-hist"></div>
-      <button class="d3d-fab" id="d3d-fab-btn" title="Lanceur de dés" aria-label="Lanceur de dés">
+      <button class="d3d-fab" id="d3d-fab-btn" title="${t('fabLauncher')}" aria-label="${t('fabLauncher')}">
         ${D12('#f59e0b', 'rgba(250,204,21,.9)')}${D12('#2e1065', 'rgba(147,197,253,.5)')}
       </button>
     </div>
@@ -63,7 +63,7 @@ export function initFab() {
     });
     launch.style.display = total ? 'block' : 'none';
     clearBtn.style.display = total ? 'block' : 'none';
-    if (total) launch.textContent = `LANCER ${total} dé${total > 1 ? 's' : ''} !`;
+    if (total) launch.textContent = `${t('diceLaunch')} ${total} ${total > 1 ? t('fabDiceMany') : t('fabDiceOne')} !`;
   };
 
   $('#d3d-fab-btn', root).addEventListener('click', () => {
@@ -99,11 +99,11 @@ export function initFab() {
     hist.innerHTML = rolls.length ? rolls.map(r => {
       const time = new Date(r.t).toLocaleTimeString(getLang() === 'en' ? 'en-US' : 'fr-FR', { hour: '2-digit', minute: '2-digit' });
       if (r.hope != null) {
-        const w = r.result === 'crit' ? '★ Critique' : r.result === 'hope' ? 'E' : 'P';
+        const w = r.result === 'crit' ? t('fabCrit') : r.result === 'hope' ? t('fabHistHope') : t('fabHistFear');
         return `<div class="d3d-hist-item">${time} · <span class="h">${r.hope}</span>/<span class="f">${r.fear}</span>${r.mod ? ` ${r.mod >= 0 ? '+' : ''}${r.mod}` : ''} = <b>${r.total}</b> ${w} · ${esc(r.label || '')}</div>`;
       }
       return `<div class="d3d-hist-item">${time} · ${esc(r.label || r.notation || '')} = <b>${r.total}</b></div>`;
-    }).join('') : '<div class="d3d-hist-item" style="color:#9a93b8">Aucun jet cette session.</div>';
+    }).join('') : `<div class="d3d-hist-item" style="color:#9a93b8">${t('fabNoRolls')}</div>`;
     hist.classList.add('open');
   });
 
@@ -112,4 +112,11 @@ export function initFab() {
     if (!root.contains(e.target)) closeAll();
   });
   refreshSel();
+}
+
+/* Reconstruit le FAB avec la langue courante (le libellé 2d12 est ensuite
+   mémorisé par la couche i18n : le reconstruire évite de le figer en EN). */
+export function refreshFab() {
+  if (root) { root.remove(); root = null; }
+  initFab();
 }

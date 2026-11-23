@@ -1,5 +1,5 @@
 /* App bootstrap: router + shell + service worker + IndexedDB hydration */
-import { $, $$, go, parseHash, registerRoute, T, initStorage, toast } from './core.js';
+import { $, $$, esc, go, parseHash, registerRoute, T, initStorage, toast } from './core.js';
 import { getLang, setLang } from './i18n.js';
 import { initUiTranslation } from './i18n-dom.js';
 import * as home from './views/home.js';
@@ -10,7 +10,7 @@ import * as dice from './views/dice.js';
 import * as compendium from './views/compendium.js';
 import * as gm from './views/gm.js';
 import * as settings from './views/settings.js';
-import { initFab } from './fab.js';
+import { initFab, refreshFab } from './fab.js';
 
 registerRoute('home', home.render);
 registerRoute('chars', chars.render);
@@ -39,7 +39,10 @@ function buildShell() {
     <header class="topbar">
       <div class="brand">
         <img src="public/assets/dpcgl-community-logo-light.png" alt="Daggerborne — Daggerheart Compatible">
-        <span class="t">Daggerborne<span class="brand-badge" title="${getLang() === 'en' ? 'Daggerheart™ Compatible' : 'Compatible avec Daggerheart™'}">${getLang() === 'en' ? 'Daggerheart™ Compatible' : 'Compatible avec Daggerheart™'}</span></span>
+        <span class="brand-copy">
+          <span class="t">Daggerborne<span class="brand-badge" title="${getLang() === 'en' ? 'Daggerheart™ Compatible' : 'Compatible avec Daggerheart™'}">${getLang() === 'en' ? 'Daggerheart™ Compatible' : 'Compatible avec Daggerheart™'}</span></span>
+          <span class="brand-ver" title="Version 0.6.0-beta">v.0.6.0-beta</span>
+        </span>
       </div>
       <span class="page-title" id="top-title"></span>
       <button class="lang-btn" id="top-lang" title="Français / English" aria-label="Switch language">
@@ -71,6 +74,7 @@ function switchLanguage(l) {
   document.documentElement.lang = l;
   buildShell();
   initUiTranslation();
+  refreshFab();
   route();
   toast(l === 'en' ? 'English interface — SRD content' : 'Interface française — contenu du SRD');
 }
@@ -91,13 +95,13 @@ async function route() {
   const { path, param } = parseHash();
   const main = $('#main');
   $$('[data-nav]').forEach(b => b.classList.toggle('active', b.dataset.nav === path));
-  const t = TITLES();
-  $('#top-title').textContent = t[path] || '';
+  const titles = TITLES();
+  $('#top-title').textContent = titles[path] || '';
   try {
     await (routes[path])(main, param);
   } catch (err) {
     console.error(err);
-    main.innerHTML = `<div class="view"><div class="empty"><div class="e-title">${getLang() === 'en' ? 'Error' : 'Erreur'}</div><div class="e-sub">${String(err.message || err)}</div></div></div>`;
+    main.innerHTML = `<div class="view"><div class="empty"><div class="e-title">${getLang() === 'en' ? 'Error' : 'Erreur'}</div><div class="e-sub">${esc(String(err.message || err))}</div></div></div>`;
   }
 }
 

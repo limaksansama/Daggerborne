@@ -1,8 +1,8 @@
 {
   "name": "Peur Indigo",
-  "systemName": "fear",
+  "systemName": "fear-v2",
   "author": "Compagnon Daggerheart",
-  "version": 2.0,
+  "version": 2.1,
   "meshFile": "default.json",
   "material": {
     "type": "standard",

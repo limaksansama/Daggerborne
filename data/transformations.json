@@ -143,7 +143,7 @@
       {
         "name": "Furie hurlante",
         "nameEn": "Howling Rampage",
-        "desc": "Lorsque vous marquez votre dernier Stress en Forme de loup, vous entrez en furie : lancez un nombre de d20 égal à votre Palier et infligez autant de dégâts physiques à toutes les créatures à portée Très Courte, puis quittez la Forme de loup."
+        "desc": "Lorsque vous marquez votre dernier Stress en Forme de loup, vous entrez en furie : lancez un nombre de d20 égal à votre Palier et infligez autant de dégâts physiques à toutes les créatures à portée Très proche, puis quittez la Forme de loup."
       }
     ],
     "questions": [

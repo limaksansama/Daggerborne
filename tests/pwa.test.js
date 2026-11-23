@@ -32,6 +32,24 @@ test('DATA_VER garde un format de version valide', () => {
   assert.match(read('js/core.js'), /const DATA_VER = 'v\d+'/);
 });
 
+test('Toutes les icônes du manifeste sont précachées', () => {
+  const manifest = JSON.parse(read('manifest.webmanifest'));
+  const cached = new Set(precacheList());
+  const missing = manifest.icons.map((icon) => icon.src).filter((src) => !cached.has(src));
+  assert.deepEqual(missing, [], `Icônes du manifeste absentes du précache :\n${missing.join('\n')}`);
+});
+
+test('Les thèmes de dés sont versionnés, cohérents et précachés', () => {
+  const app = read('js/dice3d.js');
+  assert.match(app, /preloadThemes: \['nebula-gold-v2', 'hope-v2', 'fear-v2'\]/);
+  const cached = new Set(precacheList());
+  for (const theme of ['nebula-gold-v2', 'hope-v2', 'fear-v2']) {
+    const config = JSON.parse(read(`assets/dice-box/themes/${theme}/theme.config.json`));
+    assert.equal(config.systemName, theme);
+    assert.ok(cached.has(`assets/dice-box/themes/${theme}/diffuse-light.png`), `Texture ${theme} absente du précache`);
+  }
+});
+
 test('Tout module local importé est précaché par le service worker', () => {
   const cached = new Set(precacheList());
   const files = [];

@@ -37,6 +37,9 @@ jobs:
       - name: Install Capacitor dependencies
         run: npm install
 
+      - name: Verify app (lint + tests)
+        run: npm run verify
+
       - name: Prepare app files
         run: |
           rm -rf www android

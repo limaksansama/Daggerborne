@@ -592,7 +592,7 @@ async function stepIdentity(body) {
           <option value="">Aucune</option>
           ${transformations.map(t => `<option value="${esc(t.fr)}" ${wiz.transformation === t.fr ? 'selected' : ''}>${esc(t.fr)} (${esc(t.en)})</option>`).join('')}
         </select>
-        <p class="page-sub" style="font-size:.72rem;margin:.3rem 0 0">Une transformation est un aspect optionnel de l'identité accordé par le MJ — elle ne compte pas dans votre kit. Consultez ses features dans le Compendium.</p>
+        <p class="page-sub" style="font-size:.72rem;margin:.3rem 0 0">Une transformation est un aspect optionnel de l'identité accordé par le MJ — elle ne compte pas dans votre kit. Consultez ses aptitudes dans le Compendium.</p>
       </div>
     </div>
     <div class="section-title">Questions de background (${esc(cl.fr)})</div>
@@ -658,6 +658,7 @@ async function finish(main) {
      Map : nom FR -> équivalent EN (SRD 2.0). */
   const ABILITY_ALIASES = {
     'Endurance': ['Endurance'],
+    'Endurance élevée': ['High Stamina'],
     'Résilience élevée': ['High Stamina'],
     'Leste': ['Nimble'],
   };
@@ -665,7 +666,7 @@ async function finish(main) {
     ab => ab.fr === frName || ABILITY_ALIASES[frName]?.includes(ab.fr)
   );
   const hpMax = cl.hp + (hasAbility('Endurance') ? 1 : 0);
-  const stressMax = 6 + (hasAbility('Résilience élevée') ? 1 : 0);
+  const stressMax = 6 + (hasAbility('Endurance élevée') ? 1 : 0);
   const evade = cl.evasion + (hasAbility('Leste') ? 1 : 0);
 
   const isBeastbound = sub?.en === 'Beastbound' || sub?.id === 'TIUsIlTS1WkK5vr2';
@@ -749,6 +750,11 @@ async function finish(main) {
     backgroundAnswers: { ...wiz.answers },
     className: cl.fr, hopeAbility: { name: cl.hopeAbility, desc: cl.hopeDesc },
   });
+  /* La carte de Fondation de sous-classe est acquise au niveau 1. */
+  if (sub?.features?.[0]) {
+    c.subcardCount = 1;
+    c.classFeature = `✦ ${sub.features[0].name} — ${sub.features[0].desc}`;
+  }
   saveChar(c);
   wiz = null;
   toast(`✦ ${c.name} est prêt pour l'aventure !`);

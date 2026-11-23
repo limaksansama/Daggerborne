@@ -8,7 +8,7 @@ import {
 import { ADVERSARY_POINT_COST, calcEncounterBudget, calcEncounterSpent, formatAtkBonus } from '../rules.js';
 import { rollDice } from '../dice3d.js';
 
-import { t } from '../i18n.js';
+import { t, getLang } from '../i18n.js';
 let gmUi = { tab: 'fear', tier: null, type: null, q: '', envTier: null, envQ: '' };
 const openEncDetails = new Set();
 let gmSeq = 0;
@@ -221,8 +221,8 @@ async function drawEncounter(body, main, st, seq = gmSeq) {
             <span class="tag">${T.tiers[activeEnv.tier]}</span>
             ${activeEnv.difficulty ? `<span class="tag">Diff. ${activeEnv.difficulty}</span>` : ''}
           </div>
-          <p class="ch-desc" style="margin-top:.35rem">${esc(activeEnv.descFr || activeEnv.desc)}</p>
-          ${activeEnv.impulsesFr || activeEnv.impulses ? `<p class="ch-desc" style="margin-top:.3rem"><b style="color:var(--golden)">Impulsions :</b> ${esc(activeEnv.impulsesFr || activeEnv.impulses)}</p>` : ''}
+          <p class="ch-desc" style="margin-top:.35rem">${esc(getLang() === 'en' ? (activeEnv.desc || activeEnv.descFr) : (activeEnv.descFr || activeEnv.desc))}</p>
+          ${(getLang() === 'en' ? activeEnv.impulses : activeEnv.impulsesFr) ? `<p class="ch-desc" style="margin-top:.3rem"><b style="color:var(--golden)">Impulsions :</b> ${esc(getLang() === 'en' ? activeEnv.impulses : (activeEnv.impulsesFr || activeEnv.impulses))}</p>` : ''}
           <details style="margin-top:.45rem"><summary style="cursor:pointer;font-size:.8rem;color:var(--golden)">Aptitudes de l'environnement (${activeEnv.features.length})</summary>
             <div style="margin-top:.45rem">${activeEnv.features.map(f => `<p class="ch-desc" style="margin-bottom:.4rem"><b>${esc(f.name)}</b> <span class="tag">${esc(f.kind)}</span> — ${esc(f.desc)}</p>`).join('')}</div>
           </details>
@@ -400,13 +400,14 @@ async function drawEncounter(body, main, st, seq = gmSeq) {
 }
 
 function addAdversaryToEncounter(a) {
+  const displayName = getLang() === 'en' ? a.en : (a.fr || a.en);
   setState(s => {
     s.encounter = s.encounter || { pcCount: 4, adj: {}, active: [], environmentId: null };
     const sameCount = s.encounter.active.filter(x => x.advId === a.id).length;
     s.encounter.active.push({
       uid: uid(),
       advId: a.id,
-      name: sameCount ? `${a.en} #${sameCount + 1}` : a.en,
+      name: sameCount ? `${displayName} #${sameCount + 1}` : displayName,
       type: a.type || 'standard',
       tier: a.tier || 1,
       difficulty: a.difficulty ?? 12,
@@ -422,7 +423,7 @@ function addAdversaryToEncounter(a) {
       conditions: [],
     });
   });
-  toast(`⚔ « ${a.en} » ajouté à l'affrontement.`);
+  toast(`⚔ « ${displayName} » ajouté à l'affrontement.`);
 }
 
 function openCustomAdversaryModal(onDone) {
@@ -480,7 +481,7 @@ function openCustomAdversaryModal(onDone) {
 
 /* ---------- Bestiaire : statblocks complets SRD 2.0 ---------- */
 async function drawBestiary(body, main, seq = gmSeq) {
-  const all = (await data('adversaries')).sort((a, b) => a.en.localeCompare(b.en));
+  const all = (await data('adversaries')).sort((a, b) => (a.fr || a.en).localeCompare(b.fr || b.en, 'fr'));
   if (seq !== gmSeq || !body.isConnected) return;
 
   body.innerHTML = `
@@ -502,14 +503,14 @@ async function drawBestiary(body, main, seq = gmSeq) {
   const renderList = () => {
     const list = all
       .filter(a => (!gmUi.tier || a.tier === gmUi.tier) && (!gmUi.type || a.type === gmUi.type))
-      .filter(a => !gmUi.q || (a.en + ' ' + a.desc).toLowerCase().includes(gmUi.q));
+      .filter(a => !gmUi.q || ((a.fr || '') + ' ' + a.en + ' ' + a.desc).toLowerCase().includes(gmUi.q));
     $('#gm-adv-count', body).textContent = `${list.length} adversaire(s) — SRD 2.0 · cliquez pour déplier ou ajouter à l'affrontement`;
     const advList = $('#gm-adv-list', body);
     advList.innerHTML = '';
     for (const a of list) {
       const atkFmt = formatAtkBonus(a.atkBonus);
       const box = el(`<details class="rules-block adv-block">
-        <summary><b>${esc(a.en)}</b> <span class="tag">${TYPE_LABELS[a.type] || a.type}</span> <span class="ms-meta" style="display:inline">${T.tiers[a.tier]} · Diff ${a.difficulty ?? '—'} · PV ${a.hp ?? '—'} · Stress ${a.stress ?? '—'}</span></summary>
+        <summary><b>${esc(getLang() === 'en' ? a.en : (a.fr || a.en))}</b> <span class="tag">${TYPE_LABELS[a.type] || a.type}</span> <span class="ms-meta" style="display:inline">${T.tiers[a.tier]} · Diff ${a.difficulty ?? '—'} · PV ${a.hp ?? '—'} · Stress ${a.stress ?? '—'}</span></summary>
         <div style="display:flex;gap:.5rem;margin-bottom:.55rem;flex-wrap:wrap">
           <button class="btn small" data-add-enc="${a.id}">${t('gmAddEnc')}</button>
           ${atkFmt ? `<button class="btn ghost small" data-adv-atk="${a.id}">🎲 ATQ ${esc(atkFmt)}</button>` : ''}
@@ -538,7 +539,7 @@ async function drawBestiary(body, main, seq = gmSeq) {
       const a = all.find(x => x.id === b.dataset.advAtk);
       if (!a) return;
       const bonus = parseInt(a.atkBonus, 10) || 0;
-      rollDice(bonus ? `1d20${bonus >= 0 ? '+' + bonus : bonus}` : '1d20', { label: `Attaque — ${a.en}` });
+      rollDice(bonus ? `1d20${bonus >= 0 ? '+' + bonus : bonus}` : '1d20', { label: `Attaque — ${getLang() === 'en' ? a.en : (a.fr || a.en)}` });
     }));
   };
   renderList();
@@ -586,8 +587,8 @@ async function drawEnvironments(body, main, seq = gmSeq) {
         <div style="margin-bottom:.55rem">
           <button class="btn small" data-set-env="${e.id}">${t('gmActivateEnv')}</button>
         </div>
-        <p class="ch-desc">${esc(e.descFr || e.desc)}</p>
-        ${(e.impulsesFr || e.impulses) ? `<p class="ch-desc"><b style="color:var(--golden)">Impulsions :</b> ${esc(e.impulsesFr || e.impulses)}</p>` : ''}
+        <p class="ch-desc">${esc(getLang() === 'en' ? (e.desc || e.descFr) : (e.descFr || e.desc))}</p>
+        ${(getLang() === 'en' ? e.impulses : e.impulsesFr) ? `<p class="ch-desc"><b style="color:var(--golden)">Impulsions :</b> ${esc(getLang() === 'en' ? e.impulses : (e.impulsesFr || e.impulses))}</p>` : ''}
         ${e.adversaries ? `<p class="ch-desc"><b style="color:var(--golden)">Adversaires potentiels :</b> ${esc(e.adversaries)}</p>` : ''}
         <div class="section-title" style="margin-top:.6rem">${t('sheetFeatures')}</div>
         ${e.features.map(f => `<p class="ch-desc" style="margin-bottom:.5rem"><b>${esc(f.name)}</b> <span class="tag">${esc(f.kind)}</span> — ${esc(f.desc)}</p>`).join('')}

@@ -12,7 +12,11 @@
     "dmgDice": "d4",
     "dmgBonus": 0,
     "dmgType": "phy",
-    "advantages": ["tromper", "repérer", "se faufiler"],
+    "advantages": [
+      "tromper",
+      "repérer",
+      "se faufiler"
+    ],
     "features": [
       {
         "name": "Agile",
@@ -37,7 +41,11 @@
     "dmgDice": "d6",
     "dmgBonus": 0,
     "dmgType": "phy",
-    "advantages": ["escalader", "repérer", "protéger"],
+    "advantages": [
+      "escalader",
+      "repérer",
+      "protéger"
+    ],
     "features": [
       {
         "name": "Compagnon",
@@ -62,7 +70,11 @@
     "dmgDice": "d6",
     "dmgBonus": 0,
     "dmgType": "phy",
-    "advantages": ["sauter", "se faufiler", "sprinter"],
+    "advantages": [
+      "sauter",
+      "se faufiler",
+      "sprinter"
+    ],
     "features": [
       {
         "name": "Proie insaisissable",
@@ -87,7 +99,11 @@
     "dmgDice": "d8",
     "dmgBonus": 2,
     "dmgType": "phy",
-    "advantages": ["attaquer", "sprinter", "pister"],
+    "advantages": [
+      "attaquer",
+      "sprinter",
+      "pister"
+    ],
     "features": [
       {
         "name": "Frappe incapacitante",
@@ -112,7 +128,11 @@
     "dmgDice": "d4",
     "dmgBonus": 0,
     "dmgType": "phy",
-    "advantages": ["s'orienter", "se faufiler", "nager"],
+    "advantages": [
+      "s'orienter",
+      "se faufiler",
+      "nager"
+    ],
     "features": [
       {
         "name": "Aquatique",
@@ -137,7 +157,11 @@
     "dmgDice": "d6",
     "dmgBonus": 1,
     "dmgType": "phy",
-    "advantages": ["attaquer", "escalader", "se faufiler"],
+    "advantages": [
+      "attaquer",
+      "escalader",
+      "se faufiler"
+    ],
     "features": [
       {
         "name": "Morsure venimeuse",
@@ -145,7 +169,7 @@
       },
       {
         "name": "Tisse-toile",
-        "desc": "Vous pouvez produire une toile robuste pour l'exploration et le combat, assez solide pour soutenir une créature. Vous pouvez Entraver temporairement une cible à portée Courte en réussissant un jet de Finesse contre elle."
+        "desc": "Vous pouvez produire une toile robuste pour l'exploration et le combat, assez solide pour soutenir une créature. Vous pouvez Entraver temporairement une cible à portée Proche en réussissant un jet de Finesse contre elle."
       }
     ]
   },
@@ -162,7 +186,11 @@
     "dmgDice": "d8",
     "dmgBonus": 2,
     "dmgType": "phy",
-    "advantages": ["creuser", "repérer", "protéger"],
+    "advantages": [
+      "creuser",
+      "repérer",
+      "protéger"
+    ],
     "features": [
       {
         "name": "Carapace blindée",
@@ -170,7 +198,7 @@
       },
       {
         "name": "Boulet de canon",
-        "desc": "Marquez 1 Stress pour permettre à un allié de vous lancer sur un adversaire. L'allié fait un jet d'attaque (Agilité ou Force) à portée Courte : en cas de succès, la cible subit d12+2 dégâts physiques avec la Maîtrise du lanceur. Dépensez 1 Espoir pour viser un adversaire supplémentaire à portée Très Courte du premier (qui subit la moitié des dégâts)."
+        "desc": "Marquez 1 Stress pour permettre à un allié de vous lancer sur un adversaire. L'allié fait un jet d'attaque (Agilité ou Force) à portée Proche : en cas de succès, la cible subit d12+2 dégâts physiques avec la Maîtrise du lanceur. Dépensez 1 Espoir pour viser un adversaire supplémentaire à portée Très proche du premier (qui subit la moitié des dégâts)."
       }
     ]
   },
@@ -187,7 +215,11 @@
     "dmgDice": "d10",
     "dmgBonus": 4,
     "dmgType": "phy",
-    "advantages": ["s'orienter", "protéger", "effrayer"],
+    "advantages": [
+      "s'orienter",
+      "protéger",
+      "effrayer"
+    ],
     "features": [
       {
         "name": "Saccage",
@@ -212,7 +244,11 @@
     "dmgDice": "d8",
     "dmgBonus": 1,
     "dmgType": "phy",
-    "advantages": ["sauter", "s'orienter", "sprinter"],
+    "advantages": [
+      "sauter",
+      "s'orienter",
+      "sprinter"
+    ],
     "features": [
       {
         "name": "Porteur",
@@ -220,7 +256,7 @@
       },
       {
         "name": "Piétinement",
-        "desc": "Marquez 1 Stress pour vous déplacer jusqu'à portée Courte en ligne droite et attaquer toutes les cibles à portée de Mêlée de cette ligne. Les cibles touchées subissent d8+1 dégâts physiques avec votre Maîtrise et sont temporairement Vulnérables."
+        "desc": "Marquez 1 Stress pour vous déplacer jusqu'à portée Proche en ligne droite et attaquer toutes les cibles à portée de Mêlée de cette ligne. Les cibles touchées subissent d8+1 dégâts physiques avec votre Maîtrise et sont temporairement Vulnérables."
       }
     ]
   },
@@ -233,19 +269,23 @@
     "trait": "finesse",
     "traitBonus": 1,
     "evasionBonus": 2,
-    "range": "Très Courte",
+    "range": "Très proche",
     "dmgDice": "d8",
     "dmgBonus": 4,
     "dmgType": "phy",
-    "advantages": ["escalader", "tromper", "sprinter"],
+    "advantages": [
+      "escalader",
+      "tromper",
+      "sprinter"
+    ],
     "features": [
       {
         "name": "Morsure venimeuse",
-        "desc": "Attaquez n'importe quel nombre de cibles à portée Très Courte. En cas de succès, la cible est temporairement Empoisonnée et subit 1d10 dégâts physiques directs chaque fois qu'elle agit."
+        "desc": "Attaquez n'importe quel nombre de cibles à portée Très proche. En cas de succès, la cible est temporairement Empoisonnée et subit 1d10 dégâts physiques directs chaque fois qu'elle agit."
       },
       {
         "name": "Sifflement d'alerte",
-        "desc": "Marquez 1 Stress pour forcer n'importe quel nombre de cibles à portée de Mêlée à reculer jusqu'à portée Très Courte."
+        "desc": "Marquez 1 Stress pour forcer n'importe quel nombre de cibles à portée de Mêlée à reculer jusqu'à portée Très proche."
       }
     ]
   },
@@ -262,7 +302,11 @@
     "dmgDice": "d8",
     "dmgBonus": 6,
     "dmgType": "phy",
-    "advantages": ["attaquer", "escalader", "se faufiler"],
+    "advantages": [
+      "attaquer",
+      "escalader",
+      "se faufiler"
+    ],
     "features": [
       {
         "name": "Véloce",
@@ -287,7 +331,11 @@
     "dmgDice": "d4",
     "dmgBonus": 2,
     "dmgType": "phy",
-    "advantages": ["tromper", "repérer", "effrayer"],
+    "advantages": [
+      "tromper",
+      "repérer",
+      "effrayer"
+    ],
     "features": [
       {
         "name": "Vue d'oiseau",
@@ -312,7 +360,11 @@
     "dmgDice": "d12",
     "dmgBonus": 8,
     "dmgType": "phy",
-    "advantages": ["attaquer", "se faufiler", "sprinter"],
+    "advantages": [
+      "attaquer",
+      "se faufiler",
+      "sprinter"
+    ],
     "features": [
       {
         "name": "Porteur",
@@ -337,7 +389,11 @@
     "dmgDice": "d10",
     "dmgBonus": 7,
     "dmgType": "phy",
-    "advantages": ["attaquer", "se faufiler", "pister"],
+    "advantages": [
+      "attaquer",
+      "se faufiler",
+      "pister"
+    ],
     "features": [
       {
         "name": "Défense physique",
@@ -362,7 +418,11 @@
     "dmgDice": "d8",
     "dmgBonus": 6,
     "dmgType": "phy",
-    "advantages": ["tromper", "distraire", "repérer"],
+    "advantages": [
+      "tromper",
+      "distraire",
+      "repérer"
+    ],
     "features": [
       {
         "name": "Vue d'oiseau",
@@ -387,7 +447,11 @@
     "dmgDice": "d10",
     "dmgBonus": 6,
     "dmgType": "phy",
-    "advantages": ["attaquer", "nager", "pister"],
+    "advantages": [
+      "attaquer",
+      "nager",
+      "pister"
+    ],
     "features": [
       {
         "name": "Aquatique",
@@ -413,11 +477,13 @@
     "dmgBonus": 6,
     "dmgType": "phy",
     "evolved": true,
-    "advantages": ["Selon la forme de Palier 1 choisie"],
+    "advantages": [
+      "Selon la forme de Palier 1 choisie"
+    ],
     "features": [
       {
         "name": "Évolué (Palier 1)",
-        "desc": "Choisissez une option de Palier 1 et prenez-en une version plus grande et puissante : vous conservez ses traits et features et gagnez +6 aux jets de dégâts, +1 au trait de la forme et +2 en Évasion."
+        "desc": "Choisissez une option de Palier 1 et prenez-en une version plus grande et puissante : vous conservez ses traits et aptitudes et gagnez +6 aux jets de dégâts, +1 au trait de la forme et +2 en Évasion."
       }
     ]
   },
@@ -435,11 +501,13 @@
     "dmgBonus": 8,
     "dmgType": "phy",
     "hybrid": true,
-    "advantages": ["4 avantages au choix parmi 2 formes (Paliers 1–2)"],
+    "advantages": [
+      "4 avantages au choix parmi 2 formes (Paliers 1–2)"
+    ],
     "features": [
       {
-        "name": "Features hybrides",
-        "desc": "Marquez 1 Stress supplémentaire pour vous transformer. Choisissez deux formes bestiales des Paliers 1–2, puis sélectionnez au total 4 avantages et 2 features parmi celles-ci."
+        "name": "Aptitudes hybrides",
+        "desc": "Marquez 1 Stress supplémentaire pour vous transformer. Choisissez deux formes bestiales des Paliers 1–2, puis sélectionnez au total 4 avantages et 2 aptitudes parmi celles-ci."
       }
     ]
   },
@@ -456,7 +524,12 @@
     "dmgDice": "d12",
     "dmgBonus": 12,
     "dmgType": "phy",
-    "advantages": ["repérer", "protéger", "effrayer", "sprinter"],
+    "advantages": [
+      "repérer",
+      "protéger",
+      "effrayer",
+      "sprinter"
+    ],
     "features": [
       {
         "name": "Porteur",
@@ -485,7 +558,12 @@
     "dmgDice": "d12",
     "dmgBonus": 10,
     "dmgType": "phy",
-    "advantages": ["attaquer", "tromper", "effrayer", "pister"],
+    "advantages": [
+      "attaquer",
+      "tromper",
+      "effrayer",
+      "pister"
+    ],
     "features": [
       {
         "name": "Frappes dévastatrices",
@@ -510,7 +588,12 @@
     "dmgDice": "d10",
     "dmgBonus": 11,
     "dmgType": "phy",
-    "advantages": ["attaquer", "tromper", "repérer", "s'orienter"],
+    "advantages": [
+      "attaquer",
+      "tromper",
+      "repérer",
+      "s'orienter"
+    ],
     "features": [
       {
         "name": "Porteur",
@@ -518,7 +601,7 @@
       },
       {
         "name": "Rapace mortel",
-        "desc": "Vous pouvez voler à volonté et vous déplacer jusqu'à portée Lointaine dans le cadre de votre action. En piqué en ligne droite d'au moins portée Courte jusqu'en Mêlée avec attaque dans la même action, relancez tous les dés de dégâts inférieurs à votre Maîtrise."
+        "desc": "Vous pouvez voler à volonté et vous déplacer jusqu'à portée Lointaine dans le cadre de votre action. En piqué en ligne droite d'au moins portée Proche jusqu'en Mêlée avec attaque dans la même action, relancez tous les dés de dégâts inférieurs à votre Maîtrise."
       }
     ]
   },
@@ -535,7 +618,12 @@
     "dmgDice": "d10",
     "dmgBonus": 10,
     "dmgType": "phy",
-    "advantages": ["repérer", "protéger", "effrayer", "pister"],
+    "advantages": [
+      "repérer",
+      "protéger",
+      "effrayer",
+      "pister"
+    ],
     "features": [
       {
         "name": "Maître des océans",
@@ -561,11 +649,13 @@
     "dmgBonus": 9,
     "dmgType": "phy",
     "evolved": true,
-    "advantages": ["Selon la forme de Palier 1 ou 2 choisie"],
+    "advantages": [
+      "Selon la forme de Palier 1 ou 2 choisie"
+    ],
     "features": [
       {
         "name": "Évolué (Paliers 1–2)",
-        "desc": "Choisissez une forme des Paliers 1 ou 2 et incarnez-en une version colossale et mythique : conservez ses traits et features, et gagnez +9 aux dégâts, +2 au trait de la forme, +3 en Évasion et votre dé de dégâts augmente d'un cran (d6→d8, d8→d10, etc.)."
+        "desc": "Choisissez une forme des Paliers 1 ou 2 et incarnez-en une version colossale et mythique : conservez ses traits et aptitudes, et gagnez +9 aux dégâts, +2 au trait de la forme, +3 en Évasion et votre dé de dégâts augmente d'un cran (d6→d8, d8→d10, etc.)."
       }
     ]
   },
@@ -583,11 +673,13 @@
     "dmgBonus": 10,
     "dmgType": "phy",
     "hybrid": true,
-    "advantages": ["5 avantages au choix parmi 3 formes (Paliers 1–3)"],
+    "advantages": [
+      "5 avantages au choix parmi 3 formes (Paliers 1–3)"
+    ],
     "features": [
       {
-        "name": "Features hybrides",
-        "desc": "Marquez 2 Stress supplémentaires pour vous transformer. Choisissez trois formes bestiales des Paliers 1–3, puis sélectionnez au total 5 avantages et 3 features parmi celles-ci."
+        "name": "Aptitudes hybrides",
+        "desc": "Marquez 2 Stress supplémentaires pour vous transformer. Choisissez trois formes bestiales des Paliers 1–3, puis sélectionnez au total 5 avantages et 3 aptitudes parmi celles-ci."
       }
     ]
   }

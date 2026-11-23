@@ -1,9 +1,9 @@
 /* Service worker — cache-first PWA for Daggerborne */
-const VERSION = 'daggerborne-v54';
+const VERSION = 'daggerborne-v61';
 const CORE = [
   './', './index.html', './manifest.webmanifest',
   './css/app.css', './css/sheet2.css', './css/dice-box.css', './js/app.js', './js/core.js',
-  './js/dice3d.js', './js/fab.js', './js/gmRules.js', './js/rules.js', './js/en-ui.js', './js/i18n-dom.js',
+  './js/dice3d.js', './js/fab.js', './js/gmRules.js', './js/rules.js', './js/feat-parse.js', './js/en-ui.js', './js/i18n-dom.js',
   './js/vendor/dice-box.es.min.js', './js/vendor/world.offscreen.min.js',
   './js/vendor/world.onscreen.min.js', './js/vendor/world.none.min.js',
   './js/views/home.js', './js/views/chars.js', './js/views/create.js', './js/views/sheet.js',
@@ -21,7 +21,9 @@ const CORE = [
   './assets/fonts/overpass-regular-latin.woff2', './assets/fonts/overpass-regular-latin-ext.woff2',
   './assets/fonts/overpass-italic-latin.woff2',
   './assets/icons/favicon-64.png',
-  './assets/icons/icon-192.png', './assets/icons/icon-512.png', './assets/icons/maskable-192.png', './assets/icons/maskable-512.png',
+  './assets/icons/icon-64.png', './assets/icons/icon-96.png', './assets/icons/icon-128.png',
+  './assets/icons/icon-192.png', './assets/icons/icon-256.png', './assets/icons/icon-384.png', './assets/icons/icon-512.png',
+  './assets/icons/maskable-192.png', './assets/icons/maskable-512.png',
   './assets/icons/domain-card/arcana.png', './assets/icons/domain-card/blade.png',
   './assets/icons/domain-card/bone.png', './assets/icons/domain-card/codex.png',
   './assets/icons/domain-card/dread.png', './assets/icons/domain-card/grace.png',
@@ -32,12 +34,12 @@ const CORE = [
   './public/assets/dpcgl-community-logo-light.png',
   /* ---- moteur de dés 3D : physique WASM + thèmes résine calligraphiés (v40) ---- */
   './assets/dice-box/ammo/ammo.wasm.wasm',
-  './assets/dice-box/themes/nebula-gold/theme.config.json', './assets/dice-box/themes/nebula-gold/default.json',
-  './assets/dice-box/themes/nebula-gold/diffuse-light.png', './assets/dice-box/themes/nebula-gold/specular.jpg',
-  './assets/dice-box/themes/hope/theme.config.json', './assets/dice-box/themes/hope/default.json',
-  './assets/dice-box/themes/hope/diffuse-light.png', './assets/dice-box/themes/hope/specular.jpg',
-  './assets/dice-box/themes/fear/theme.config.json', './assets/dice-box/themes/fear/default.json',
-  './assets/dice-box/themes/fear/diffuse-light.png', './assets/dice-box/themes/fear/specular.jpg',
+  './assets/dice-box/themes/nebula-gold-v2/theme.config.json', './assets/dice-box/themes/nebula-gold-v2/default.json',
+  './assets/dice-box/themes/nebula-gold-v2/diffuse-light.png', './assets/dice-box/themes/nebula-gold-v2/specular.jpg',
+  './assets/dice-box/themes/hope-v2/theme.config.json', './assets/dice-box/themes/hope-v2/default.json',
+  './assets/dice-box/themes/hope-v2/diffuse-light.png', './assets/dice-box/themes/hope-v2/specular.jpg',
+  './assets/dice-box/themes/fear-v2/theme.config.json', './assets/dice-box/themes/fear-v2/default.json',
+  './assets/dice-box/themes/fear-v2/diffuse-light.png', './assets/dice-box/themes/fear-v2/specular.jpg',
 ];
 
 self.addEventListener('install', (e) => {

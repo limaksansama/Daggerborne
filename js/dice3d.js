@@ -4,7 +4,7 @@
 
    - Canvas 3D en overlay plein écran, pointer-events:none au repos.
    - Dualité : 2 dés lancés séparément → d12 doré (Espoir) + d12 indigo (Peur).
-   - Dés standards : thème « nebula-gold » (marbré violet/indigo/bleu, chiffres dorés).
+   - Dés standards : thème « nebula-gold-v2 » (marbré violet/indigo/bleu, chiffres dorés).
    - Bannière de résultat interactive : statut, gain d'Espoir, enchaînement dégâts. */
 
 import { $, el, esc, getState, setState, saveChar, getChar } from './core.js';
@@ -39,7 +39,7 @@ async function ensureInit() {
       diceBox = new DiceBox({
         assetPath: 'assets/dice-box/',
         origin: siteOrigin(),
-        theme: 'nebula-gold',           /* thème par défaut : tous les jets hors Dualité */
+        theme: 'nebula-gold-v2',           /* thème par défaut : tous les jets hors Dualité */
         scale: diceScale(),
         gravity: 1.8,
         originX: 50, originY: 80,
@@ -48,7 +48,7 @@ async function ensureInit() {
         /* couleurs vives sur le fond sombre de l'app : lumière +, ombres plus douces */
         lightIntensity: 1.45,
         shadowTransparency: 0.45,
-        preloadThemes: ['nebula-gold', 'hope', 'fear'],
+        preloadThemes: ['nebula-gold-v2', 'hope-v2', 'fear-v2'],
       });
       await diceBox.init();
       /* le canvas .dice-box-canvas est stylé plein écran par app.css DÈS sa création
@@ -115,10 +115,10 @@ async function rollDuality({ mod = 0, label = '', charId = null, weaponUid = nul
       try {
         const db = await ensureInit();
         const diceReq = [
-          { sides: 12, qty: 1, theme: 'hope' },
-          { sides: 12, qty: 1, theme: 'fear' },
+          { sides: 12, qty: 1, theme: 'hope-v2' },
+          { sides: 12, qty: 1, theme: 'fear-v2' },
         ];
-        if (hasAdvDis) diceReq.push({ sides: 6, qty: 1, theme: 'nebula-gold' });
+        if (hasAdvDis) diceReq.push({ sides: 6, qty: 1, theme: 'nebula-gold-v2' });
         const rolls = await db.roll(diceReq);
         hope = safeValue(rolls[0], 12);
         fear = safeValue(rolls[1], 12);
@@ -168,7 +168,7 @@ async function rollDuality({ mod = 0, label = '', charId = null, weaponUid = nul
     });
 
     /* bannière interactive */
-    const modTxt = mod ? ` ${fmt(mod)} (${label})` : (label ? ` (${label})` : '');
+    const modTxt = mod ? ` ${fmt(mod)} (${esc(label)})` : (label ? ` (${esc(label)})` : '');
     const advTxt = advVal ? ` + ${advVal} (Avantage)` : disVal ? ` − ${disVal} (Désavantage)` : '';
     const critSummary = result === 'crit'
       ? '<div class="d3d-detail" style="color:#fde68a;margin-top:4px">' + t('d3dAutoSuccess') + '</div>'
@@ -234,20 +234,20 @@ function parseMultiDice(notation) {
       const sign = m[1] === '-' ? -1 : 1;
       const qty = Math.max(1, parseInt(m[2], 10) || 1);
       const sides = Math.max(2, parseInt(m[3], 10) || 6);
-      diceReqs.push({ sides, qty, theme: 'nebula-gold', _sign: sign });
+      diceReqs.push({ sides, qty, theme: 'nebula-gold-v2', _sign: sign });
       for (let i = 0; i < qty; i++) expectedSides.push({ sides, sign });
     } else if (/^[+-]?\d+$/.test(term)) {
       flatMod += parseInt(term, 10);
     }
   }
   if (!diceReqs.length) {
-    diceReqs.push({ sides: 6, qty: 1, theme: 'nebula-gold' });
+    diceReqs.push({ sides: 6, qty: 1, theme: 'nebula-gold-v2' });
     expectedSides.push({ sides: 6, sign: 1 });
   }
   return { clean, diceReqs, expectedSides, flatMod };
 }
 
-/* ---------- jet de dés standards (notation multi-dés ex: 1d8+2d6+3) — thème nebula-gold ---------- */
+/* ---------- jet de dés standards (notation multi-dés ex: 1d8+2d6+3) — thème nebula-gold-v2 ---------- */
 async function rollDice(notation, { label = '', critInfo = null } = {}) {
   if (busy) return null;
   busy = true;

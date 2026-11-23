@@ -62,6 +62,7 @@
 
   --bg: var(--deep-black);
   --panel: #16141f;
+  --panel-1: var(--panel);
   --panel-2: #1d1a2b;
   --panel-3: #262133;
   --text: var(--beige);
@@ -129,10 +130,19 @@ input, select, textarea { font-family: inherit; }
 }
 .topbar .brand { display: flex; align-items: center; gap: .5rem; min-width: 0; }
 .topbar .brand img { width: auto; height: 32px; flex: none; object-fit: contain; }
+.topbar .brand .brand-copy {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 1px;
+  min-width: 0;
+}
 .topbar .brand .t {
   font-family: var(--font-title); font-weight: 700; font-size: 1.02rem;
   color: var(--golden); letter-spacing: .06em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   display: inline-flex; align-items: center; gap: .45rem; min-width: 0;
+}
+.topbar .brand .brand-ver {
+  font-family: var(--font-body); font-size: .56rem; line-height: 1;
+  color: var(--text-faint); letter-spacing: .08em; text-transform: uppercase;
+  white-space: nowrap;
 }
 /* badge de compatibilité DPCGL 2.0 (section 2.5 : « Compatible » accolé à la marque) */
 .topbar .brand .brand-badge {

@@ -34,17 +34,17 @@ export function canLevelUp(c) { return c.level < 10; }
 
 /* compteur d'utilisation d'une option sur le palier en cours (affiché [n/N]) */
 function tierCounts(c, newTier) {
-  const t = c.tierUses?.[newTier] || {};
+  const used = c.tierUses?.[newTier] || {};
   return {
-    attributes: [t.attributes || 0, 3],
-    hitPointSlots: [t.hitPointSlots || 0, 2],
-    stressSlots: [t.stressSlots || 0, 2],
-    experiences: [t.experiences || 0, 2],
-    domainCard: [t.domainCard || 0, 1],
-    evasion: [t.evasion || 0, 1],
-    subclass: [t.subclass || 0, 1],
-    proficiency: [t.proficiency || 0, 1],
-    multiclass: [t.multiclass || 0, 1],
+    attributes: [used.attributes || 0, 3],
+    hitPointSlots: [used.hitPointSlots || 0, 2],
+    stressSlots: [used.stressSlots || 0, 2],
+    experiences: [used.experiences || 0, 2],
+    domainCard: [used.domainCard || 0, 1],
+    evasion: [used.evasion || 0, 1],
+    subclass: [used.subclass || 0, 1],
+    proficiency: [used.proficiency || 0, 1],
+    multiclass: [used.multiclass || 0, 1],
   };
 }
 
@@ -645,7 +645,7 @@ async function runLevelUpWizard(c, ctx) {
       else if (id === 'subclass') {
         c.subcardTaken = { ...c.subcardTaken, [newTier]: true };
         const sub = subclasses.find(s => s.id === c.subclassId);
-        const nextIdx = (c.subcardCount || 0);
+        const nextIdx = Math.max(1, c.subcardCount || 0);
         if (sub?.features?.[nextIdx]) {
           c.classFeature = (c.classFeature ? c.classFeature + '\n\n' : '') + `✦ ${sub.features[nextIdx].name} — ${sub.features[nextIdx].desc}`;
           c.subcardCount = nextIdx + 1;

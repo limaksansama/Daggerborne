@@ -284,12 +284,12 @@ async function listResults(main, seq = renderSeq) {
   } else if (ui.tab === 'adversaries') {
     const list = (await data('adversaries')).filter(a => (!ui.tier || a.tier === ui.tier));
     if (stale()) return;
-    const f = q ? list.filter(a => (a.en + ' ' + a.desc).toLowerCase().includes(q)) : list;
-    const sorted = f.sort((a, b) => a.en.localeCompare(b.en));
+    const f = q ? list.filter(a => ((a.fr || '') + ' ' + a.en + ' ' + a.desc).toLowerCase().includes(q)) : list;
+    const sorted = f.sort((a, b) => (a.fr || a.en).localeCompare(b.fr || b.en, 'fr'));
     const shown = sorted.slice(0, advShown);
     res.insertAdjacentHTML('beforeend', `<p class="page-sub">${f.length} adversaire(s) — statblocks complets du SRD 2.0 (Paliers 1 à 4)${shown.length < f.length ? ` — ${shown.length} affiché(s)` : ''}</p>`);
     for (const a of shown) {
-      mk({ key: a.id, type: 'adversary', raw: a, name: a.en, sub: `${T.tiers[a.tier]} · ${a.typeFr || ''}${a.difficulty ? ' · Difficulté ' + a.difficulty : ''} · PV ${a.hp ?? '—'} · Stress ${a.stress ?? '—'}` });
+      mk({ key: a.id, type: 'adversary', raw: a, name: getLang() === 'en' ? a.en : (a.fr || a.en), sub: `${T.tiers[a.tier]} · ${a.typeFr || ''}${a.difficulty ? ' · Difficulté ' + a.difficulty : ''} · PV ${a.hp ?? '—'} · Stress ${a.stress ?? '—'}` });
     }
     if (shown.length < f.length) {
       const more = el(`<button class="btn ghost small" id="adv-more" style="margin:.6rem auto;display:block">Afficher 60 de plus (${f.length - shown.length} restants)</button>`);
@@ -402,13 +402,13 @@ async function showDetail(main, raw, type) {
       <div class="ms-meta">${T.tiers[raw.tier]} · ${raw.secondary ? 'Arme secondaire' : 'Arme principale'} · ${T.burden[raw.burden]}${raw.campaign ? ` · ${esc(CAMPAIGN_LABELS[raw.campaign] || raw.campaign)}` : ''}</div>
       <div class="ms-body"><p>Trait : <b>${T.traits[raw.trait] || '—'}</b> · Portée : <b>${esc(raw.range)}</b></p>
       <p>Dégâts : <b>${raw.dice}${fmtBonus(raw.dmgBonus)}</b> (${raw.dmgType === 'mag' ? 'magique' : 'physique'})</p>
-      ${raw.desc ? `<p><b style="color:var(--golden)">Feature :</b> ${esc(raw.desc)}</p>` : ''}</div>`;
+      ${raw.desc ? `<p><b style="color:var(--golden)">${t('sheetFeature')}${getLang() === 'en' ? ':' : ' :'}</b> ${esc(raw.desc)}</p>` : ''}</div>`;
   } else if (type === 'armor') {
     inner = `
       <h3>${esc(raw.fr)}</h3>
       <div class="ms-meta">${T.tiers[raw.tier]}${raw.campaign ? ` · ${esc(CAMPAIGN_LABELS[raw.campaign] || raw.campaign)}` : ''}</div>
       <div class="ms-body"><p>Valeur d'armure : <b>${raw.armorScore}</b></p><p>Seuils de base : <b>${raw.major} / ${raw.severe}</b>${raw.heavy ? ' · Lourd (malus d’Évasion)' : ''}</p>
-      ${raw.desc ? `<p><b style="color:var(--golden)">Feature :</b> ${esc(raw.desc)}</p>` : ''}</div>`;
+      ${raw.desc ? `<p><b style="color:var(--golden)">${t('sheetFeature')}${getLang() === 'en' ? ':' : ' :'}</b> ${esc(raw.desc)}</p>` : ''}</div>`;
   } else if (type === 'item') {
     inner = `
       <h3>${esc(raw.fr)}</h3>
@@ -423,7 +423,7 @@ async function showDetail(main, raw, type) {
     const hordeTxt = a.horde ? ` · ${a.horde}/PV` : '';
     const atkFmt = formatAtkBonus(a.atkBonus);
     inner = `
-      <h3>${esc(a.en)}</h3>
+      <h3>${esc(getLang() === 'en' ? a.en : (a.fr || a.en))}${getLang() !== 'en' && a.fr ? ` <span class="ms-meta" style="display:inline">(${esc(a.en)})</span>` : ''}</h3>
       <div class="ms-meta">${T.tiers[a.tier]} · ${esc(a.typeFr || '')}${hordeTxt}${a.difficulty ? ' · Difficulté ' + a.difficulty : ''}</div>
       <div class="statblock">
         <div class="sb-row"><span class="sb-k">PV</span><span class="sb-v">${a.hp ?? '—'}</span><span class="sb-k">Stress</span><span class="sb-v">${a.stress ?? '—'}</span><span class="sb-k">${t('cmpThresholds')}</span><span class="sb-v">${a.major ?? '—'} / ${a.severe ?? '—'}</span></div>
@@ -455,8 +455,8 @@ async function showDetail(main, raw, type) {
     inner = `
       <h3>${esc(e.fr || e.en)}${e.fr && getLang() !== 'en' ? ` <span class="ms-meta" style="display:inline">(${esc(e.en)})</span>` : ''}</h3>
       <div class="ms-meta">${T.tiers[e.tier]} · ${esc(e.category)}${e.difficulty ? ' · Difficulté ' + e.difficulty : ''}</div>
-      <div class="ms-body"><p>${esc(e.descFr || e.desc)}</p>
-      ${(e.impulsesFr || e.impulses) ? `<p><b style="color:var(--golden)">Impulsions :</b> ${esc(e.impulsesFr || e.impulses)}</p>` : ''}
+      <div class="ms-body"><p>${esc(getLang() === 'en' ? (e.desc || e.descFr) : (e.descFr || e.desc))}</p>
+      ${(getLang() === 'en' ? e.impulses : e.impulsesFr) ? `<p><b style="color:var(--golden)">Impulsions :</b> ${esc(getLang() === 'en' ? e.impulses : e.impulsesFr)}</p>` : ''}
       ${e.adversaries ? `<p><b style="color:var(--golden)">Adversaires potentiels :</b> ${esc(e.adversaries)}</p>` : ''}
       <div class="section-title" style="margin-top:.8rem">${t('sheetFeatures')}</div>
       ${e.features.map(f => `<p><b>${esc(f.name)}</b> <span class="tag">${esc(f.kind)}</span> — ${esc(f.desc)}</p>`).join('')}

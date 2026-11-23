@@ -7,7 +7,8 @@ import { rollDuality, rollDice, rollAttack, rollDamage, rollCustomDamage, isRoll
 import { computeDamageApplication, calcDamageSpec, tierOf, nextDieStep, armorThresholdBonus, equipmentPenalty } from '../rules.js';
 import { openLevelUp } from './levelup.js';
 
-import { t, getLang } from '../i18n.js';
+import { t, getLang, L } from '../i18n.js';
+import { featParse } from '../feat-parse.js';
 const TRAIT_KEYS = ['agility', 'strength', 'finesse', 'instinct', 'presence', 'knowledge'];
 const DICE = ['d4', 'd6', 'd8', 'd10', 'd12', 'd20'];
 const CONDITIONS = ['Vulnérable', 'Entravé', 'Caché', 'Empoisonné', 'Inconscient'];
@@ -33,7 +34,7 @@ const fmtBonus = (b) => {
 };
 
 /* ============ migration vers le modèle « feuille officielle » ============ */
-function migrate(c, weapons, armors, subclasses, classes) {
+function migrate(c, weapons, armors, subclasses, classes, generalItems = [], ancestries = [], communities = []) {
   let dirty = false;
   if (!c.className && c.classId && classes) {
     const cl = classes.find(x => x.id === c.classId);
@@ -86,6 +87,15 @@ function migrate(c, weapons, armors, subclasses, classes) {
     dirty = true;
   }
   if (c.classFeature === undefined) { c.classFeature = ''; dirty = true; }
+  /* La carte de Fondation de sous-classe est acquise dès le niveau 1. */
+  if (subMatch?.features?.length) {
+    if (!c.subcardCount) { c.subcardCount = 1; dirty = true; }
+    const foundationName = subMatch.features[0].name;
+    if (!c.classFeature.includes(foundationName)) {
+      c.classFeature = (c.classFeature ? c.classFeature + '\n\n' : '') + `✦ ${foundationName} — ${subMatch.features[0].desc}`;
+      dirty = true;
+    }
+  }
   if (!Array.isArray(c.weapons)) {
     const mk = (id, extra) => {
       const w = weapons.find(x => x.id === id);
@@ -122,7 +132,7 @@ function migrate(c, weapons, armors, subclasses, classes) {
       ? { compendiumId: ar.id, name: ar.fr, baseScore: ar.armorScore, baseMajor: ar.major, baseSevere: ar.severe, feature: ar.desc || '' }
       : { compendiumId: null, name: '', baseScore: 0, baseMajor: 0, baseSevere: 0, feature: '' };
     dirty = true;
-  } else if (c.armorCard.compendiumId && !c.armorCard.feature) {
+  } else if (c.armorCard.compendiumId && !c.armorCard.feature && !c.armorCard.customFeature) {
     const ar = armors.find(a => a.id === c.armorCard.compendiumId);
     if (ar?.desc) { c.armorCard.feature = ar.desc; dirty = true; }
   }
@@ -143,6 +153,93 @@ function migrate(c, weapons, armors, subclasses, classes) {
   if (c.hp.max !== hpMax) { c.hp.max = hpMax; c.hp.current = Math.min(c.hp.current, hpMax); dirty = true; }
   const stMax = c.stress.active + c.stress.unlocked;
   if (c.stress.max !== stMax) { c.stress.max = stMax; c.stress.current = Math.min(c.stress.current, stMax); dirty = true; }
+
+  /* Re-localisation des libellés standards après un changement de langue.
+     Les noms saisis par le joueur (armes/armures personnalisées, notes) ne sont jamais touchés. */
+  const clDef = classes?.find(x => x.id === c.classId);
+  if (clDef) {
+    if (c.className !== clDef.fr) { c.className = clDef.fr; dirty = true; }
+    if (clDef.hopeAbility) {
+      const hope = { name: clDef.hopeAbility, desc: clDef.hopeDesc || '' };
+      if (c.hopeAbility?.name !== hope.name || c.hopeAbility?.desc !== hope.desc) { c.hopeAbility = hope; dirty = true; }
+    }
+  }
+  const subDef = subclasses?.find(x => x.id === c.subclassId);
+  if (subDef?.fr) {
+    const defaultSubclass = !c.subclassText || c.subclassText === c.subclassName;
+    if (defaultSubclass && c.subclassText !== subDef.fr) { c.subclassText = subDef.fr; dirty = true; }
+    if (c.subclassName !== subDef.fr) { c.subclassName = subDef.fr; dirty = true; }
+  }
+  const ancDef = ancestries?.find(x => x.id === c.ancestry?.id);
+  if (ancDef && !c.mixedAncestry) {
+    const sameAbilities = JSON.stringify(c.ancestry?.abilities || []) === JSON.stringify(ancDef.abilities || []);
+    if (c.ancestry?.fr !== ancDef.fr || !sameAbilities) {
+      const defaultHeritage = !c.heritage || c.heritage === c.ancestry?.fr;
+      c.ancestry = { ...c.ancestry, fr: ancDef.fr, abilities: ancDef.abilities };
+      if (defaultHeritage) c.heritage = ancDef.fr;
+      dirty = true;
+    }
+  }
+  const comDef = communities?.find(x => x.id === c.community?.id);
+  if (comDef && (c.community?.fr !== comDef.fr || c.community?.ability !== comDef.ability)) {
+    c.community = { ...c.community, fr: comDef.fr, ability: comDef.ability };
+    dirty = true;
+  }
+  if (c.armorCard?.compendiumId) {
+    const ar = armors.find(x => x.id === c.armorCard.compendiumId);
+    if (ar) {
+      /* Les champs modifiés par le joueur priment sur les valeurs SRD. */
+      const next = {
+        compendiumId: ar.id,
+        name: c.armorCard.customName ? c.armorCard.name : ar.fr,
+        baseScore: c.armorCard.customStats ? c.armorCard.baseScore : ar.armorScore,
+        baseMajor: c.armorCard.customStats ? c.armorCard.baseMajor : ar.major,
+        baseSevere: c.armorCard.customStats ? c.armorCard.baseSevere : ar.severe,
+        feature: c.armorCard.customFeature ? c.armorCard.feature : (ar.desc || ''),
+        customName: !!c.armorCard.customName,
+        customStats: !!c.armorCard.customStats,
+        customFeature: !!c.armorCard.customFeature,
+      };
+      if (JSON.stringify(c.armorCard) !== JSON.stringify(next)) { c.armorCard = next; dirty = true; }
+    }
+  }
+  for (const w of c.weapons || []) {
+    if (!w.compendiumId) {
+      const range = L(w.range || '');
+      if (range !== w.range) { w.range = range; dirty = true; }
+      continue;
+    }
+    const def = weapons.find(x => x.id === w.compendiumId);
+    if (!def) continue;
+    const next = { name: def.fr, trait: def.trait, range: def.range, dice: def.dice, dmgBonus: def.dmgBonus || 0, feature: def.desc || '' };
+    for (const [k, v] of Object.entries(next)) {
+      if ((k === 'name' && w.customName) || (k === 'feature' && w.customFeature)) continue;
+      if (w.customStats && k !== 'name' && k !== 'feature') continue;
+      if (w[k] !== v) { w[k] = v; dirty = true; }
+    }
+  }
+  for (const it of c.inventory || []) {
+    if (!it.itemId) continue;
+    const g = generalItems?.find(x => x.id === it.itemId);
+    if (!g) continue;
+    const name = g.fr;
+    const desc = g.descFr || g.desc || g.descEn || it.desc;
+    if (it.name !== name || it.desc !== desc) { it.name = name; it.desc = desc; dirty = true; }
+  }
+  if (c.companion) {
+    const setDefault = (key, fr, en) => {
+      if (c.companion[key] === fr || c.companion[key] === en) c.companion[key] = getLang() === 'en' ? en : fr;
+    };
+    setDefault('name', 'Compagnon animal', 'Animal Companion');
+    setDefault('species', 'Louveteau / Faucon / Lynx…', 'Wolfling / Falcon / Lynx…');
+    setDefault('attackName', 'Attaque coordonnée', 'Coordinated Attack');
+    setDefault('range', 'Mêlée', 'Melee');
+    const expDefaults = [['Pistage', 'Tracking'], ['Protection', 'Protection']];
+    (c.companion.experiences || []).forEach((e, i) => {
+      const [fr, en] = expDefaults[i] || [];
+      if (fr && (e.name === fr || e.name === en)) e.name = getLang() === 'en' ? en : fr;
+    });
+  }
   if (dirty) saveChar(c);
 }
 
@@ -222,10 +319,10 @@ export async function render(main, params) {
   const focusKey = active?.dataset?.f || active?.dataset?.ef || active?.dataset?.wf || active?.dataset?.af || null;
   const focusSel = focusKey ? `[data-f="${focusKey}"],[data-ef="${focusKey}"],[data-wf="${focusKey}"],[data-af="${focusKey}"]` : null;
   const scrollY = window.scrollY;
-  const [classes, subclasses, weapons, armors, cards, domains, generalItems, transformations, beastforms] = await Promise.all([
-    data('classes'), data('subclasses'), data('weapons'), data('armors'), data('domainCards'), data('domains'), data('generalItems'), data('transformations'), data('beastforms'),
+  const [classes, subclasses, weapons, armors, cards, domains, generalItems, transformations, beastforms, ancestries, communities] = await Promise.all([
+    data('classes'), data('subclasses'), data('weapons'), data('armors'), data('domainCards'), data('domains'), data('generalItems'), data('transformations'), data('beastforms'), data('ancestries'), data('communities'),
   ]);
-  migrate(c, weapons, armors, subclasses, classes);
+  migrate(c, weapons, armors, subclasses, classes, generalItems, ancestries, communities);
   const cl = classes.find(x => x.id === c.classId);
   const sub = subclasses.find(x => x.id === c.subclassId);
   const bfMeta = c.beastform?.id ? beastforms.find(b => b.id === c.beastform.id) : null;
@@ -430,7 +527,7 @@ export async function render(main, params) {
           </div>
           <p class="dh-help">${t('sheetHopeHint')}</p>
           <label class="dh-fl dh-fl-hope"><span>${t('sheetHopeFeature')}</span>
-            <textarea data-f="hopeFeature" rows="4" placeholder="Feature d'Espoir de votre classe…">${esc(c.hopeFeature)}</textarea></label>
+            <textarea data-f="hopeFeature" rows="4" placeholder="${t('sheetFeatureHope')}">${esc(c.hopeFeature)}</textarea></label>
         </section>
 
         <!-- EXPÉRIENCES -->
@@ -474,7 +571,7 @@ export async function render(main, params) {
         <section class="dh-panel s-stats">
           <div class="dh-banner"><i></i><span>${t('sheetClassAbility')}</span><i></i></div>
           <div class="dh-cf">
-            <textarea data-f="classFeature" rows="6" placeholder="Capacités de classe, features de sous-classe…">${esc(c.classFeature)}</textarea>
+            <textarea data-f="classFeature" rows="6" placeholder="${t('sheetClassFeatures')}">${esc(c.classFeature)}</textarea>
           </div>
         </section>
       </div>
@@ -508,9 +605,9 @@ export async function render(main, params) {
               <span class="dha-icon" title="Forme bestiale">🐾</span>
               <span class="dha-name">
                 <b>${esc(activeBf.fr)} (naturel)</b>
-                <small>${T.traits[activeBf.trait] || ''} · ${esc(activeBf.range)}</small>
+                <small>${T.traits[activeBf.trait] || ''} · ${esc(L(activeBf.range))}</small>
               </span>
-              <span class="dha-range">${esc(activeBf.range)}</span>
+              <span class="dha-range">${esc(L(activeBf.range))}</span>
               <button class="dha-btn atk" data-bf-atk title="Jet d'attaque en Forme bestiale">${signed(effTrait(activeBf.trait))}</button>
               <button class="dha-btn dmg" data-bf-dmg title="${ui.atkCrit ? `Dégâts critiques : ${bfSpec.critMax} + ${bfSpec.normalNotation}` : 'Dégâts naturels en Forme bestiale'}">${bfLabel}</button>
             </div>`;
@@ -523,9 +620,9 @@ export async function render(main, params) {
                 <span class="dha-icon" title="${w.dmgType === 'mag' ? 'Magique' : 'Physique'}">${w.dmgType === 'mag' ? '✦' : '⚔'}</span>
                 <span class="dha-name">
                   <b>${esc(w.name || 'Arme')}</b>
-                  <small>${T.traits[w.trait] || ''} · ${w.hands === 'two' ? t('sheet2Hands') : t('sheet1Hand')} · ${esc(w.range || '')}</small>
+                  <small>${T.traits[w.trait] || ''} · ${w.hands === 'two' ? t('sheet2Hands') : t('sheet1Hand')} · ${esc(L(w.range || ''))}</small>
                 </span>
-                <span class="dha-range">${esc(w.range || '—')}</span>
+                <span class="dha-range">${esc(L(w.range || '—'))}</span>
                 <button class="dha-btn atk" data-dha-atk="${w.uid}" title="Jet de Dualité + ${T.traits[w.trait] || ''}">${mod >= 0 ? '+' + mod : mod}</button>
                 <button class="dha-btn dmg" data-dha-dmg="${w.uid}" title="${ui.atkCrit ? `Dégâts critiques : ${spec.critMax} + ${spec.normalNotation}` : `Dégâts : ${spec.qty} × ${w.dice}${spec.flatBonus ? ' ' + fmtBonus(spec.flatBonus) : ''}`}">${dmgLabel}</button>
               </div>`;
@@ -538,9 +635,9 @@ export async function render(main, params) {
               <span class="dha-icon" title="${t('sheetCompanion')}">🐺</span>
               <span class="dha-name">
                 <b>${esc(c.companion.name || 'Compagnon')}</b>
-                <small>${esc(c.companion.attackName || t('sheetAttack'))} · ${esc(c.companion.range || 'Mêlée')} · Éva ${c.companion.evasion || 10}</small>
+                <small>${esc(c.companion.attackName || t('sheetAttack'))} · ${esc(L(c.companion.range || 'Mêlée'))} · Éva ${c.companion.evasion || 10}</small>
               </span>
-              <span class="dha-range">${esc(c.companion.range || 'Mêlée')}</span>
+              <span class="dha-range">${esc(L(c.companion.range || 'Mêlée'))}</span>
               <button class="dha-btn atk" data-comp-atk title="Jet d'attaque du compagnon (Instinct)">${signed(effTrait('instinct'))}</button>
               <button class="dha-btn dmg" data-comp-dmg title="${ui.atkCrit ? `Dégâts critiques : ${compSpec.critMax} + ${compSpec.normalNotation}` : 'Dégâts du compagnon'}">${compLabel}</button>
             </div>`;
@@ -570,7 +667,7 @@ export async function render(main, params) {
             <label class="dh-fl"><span>${t('sheetBaseSevere')}</span><input type="number" data-af="baseSevere" value="${c.armorCard.baseSevere}" min="0" max="60"></label>
           </div>
           <p class="dh-help">${t('sheetArmorFeedHint')}</p>
-          <label class="dh-fl"><span>${t('sheetFeature')}</span><input data-af="feature" value="${esc(c.armorCard.feature)}" placeholder="Feature d'armure…"></label>
+          <label class="dh-fl"><span>${t('sheetFeature')}</span><input data-af="feature" value="${esc(c.armorCard.feature)}" placeholder="${t('sheetFeatureArmor')}"></label>
           <button class="dh-wadd" data-aadd>${t('sheetAddArmor')}</button>
         </section>
 
@@ -598,7 +695,7 @@ export async function render(main, params) {
                   ${desc ? `<span class="ii-desc" title="${esc(desc)}">${esc(desc)}</span>` : ''}
                   <span class="ii-sub">Score ${armorDef.armorScore} · Seuils ${armorDef.major}/${armorDef.severe}${armorDef.heavy ? ' · Lourd' : ''}</span>
                   <div class="ii-actions">
-                    <button class="btn small ${equipped ? 'ghost' : ''}" data-inv-eq-armor="${armorDef.id}">${equipped ? 'Ranger' : t('sheetEquip')}</button>
+                    <button class="btn small ${equipped ? 'ghost' : ''}" data-inv-eq-armor="${armorDef.id}">${equipped ? t('sheetStow') : t('sheetEquip')}</button>
                     <div class="ii-qty">
                       <button class="qbtn" data-qty="${i}:-1">−</button>
                       <span class="qval">${it.qty ?? 1}</span>
@@ -617,10 +714,10 @@ export async function render(main, params) {
                 return `<div class="inv-item ${equipped ? 'equipped' : ''}">
                   <span class="ii-name">${esc(it.name)} <span class="tag" style="margin-left:4px">Arme</span></span>
                   ${desc ? `<span class="ii-desc" title="${esc(desc)}">${esc(desc)}</span>` : ''}
-                  <span class="ii-sub">${T.traits[weaponDef.trait] || ''} · ${esc(weaponDef.range)} · ${weaponDef.dice}${fmtBonus(weaponDef.dmgBonus)}${weaponDef.burden === 'twoHanded' ? ' · 2 mains' : ''}</span>
+                  <span class="ii-sub">${T.traits[weaponDef.trait] || ''} · ${esc(L(weaponDef.range))} · ${weaponDef.dice}${fmtBonus(weaponDef.dmgBonus)}${weaponDef.burden === 'twoHanded' ? ' · 2 mains' : ''}</span>
                   <div class="ii-actions">
                     ${owned
-                      ? `<button class="btn small ghost" data-inv-eq-weapon="${weaponDef.id}" data-owned-uid="${owned.uid}">${equipped ? 'Ranger' : 'Équiper'}</button>`
+                      ? `<button class="btn small ghost" data-inv-eq-weapon="${weaponDef.id}" data-owned-uid="${owned.uid}">${equipped ? t('sheetStow') : t('sheetEquip')}</button>`
                       : `<button class="btn small" data-inv-eq-weapon="${weaponDef.id}">${t('sheetEquip')}</button>`}
                     <div class="ii-qty">
                       <button class="qbtn" data-qty="${i}:-1">−</button>
@@ -727,7 +824,7 @@ function weaponCardHTML(w, i, c) {
       <label class="dh-fl w2"><span>Nom</span><input data-wf="${i}:name" value="${esc(w.name)}" placeholder="Nom de l'arme"></label>
       <label class="dh-fl"><span>${t('sheetTrait')}</span>
         <select data-wf="${i}:trait">${TRAIT_KEYS.map(k => `<option value="${k}" ${w.trait === k ? 'selected' : ''}>${T.traits[k]}</option>`).join('')}</select></label>
-      <label class="dh-fl"><span>${t('sheetRange')}</span><input data-wf="${i}:range" value="${esc(w.range)}" placeholder="Mêlée · Distance…"></label>
+      <label class="dh-fl"><span>${t('sheetRange')}</span><input data-wf="${i}:range" value="${esc(L(w.range))}" placeholder="Mêlée · Distance…"></label>
       <label class="dh-fl"><span>${t('sheetDiceBonus')}</span>
         <div class="dh-wdice-row">
           <select data-wf="${i}:dice">${DICE.map(d => `<option ${w.dice === d ? 'selected' : ''}>${d}</option>`).join('')}</select>
@@ -744,7 +841,7 @@ function weaponCardHTML(w, i, c) {
         return `<button class="btn small dh-wdmg" data-wroll="${i}" title="${ui.atkCrit ? `Dégâts critiques : ${wSpec.critMax} + ${wSpec.normalNotation}` : `Lancer les dégâts : ${wSpec.qty} × ${w.dice}${wSpec.flatBonus ? ' ' + fmtBonus(wSpec.flatBonus) : ''}`}">${ui.atkCrit ? `💥 ${wSpec.critMax}+${wSpec.normalNotation}` : `🎲 ${wSpec.normalNotation}`}</button>`;
       })()}
     </div>
-    <label class="dh-fl"><span>${t('sheetFeature')}</span><input data-wf="${i}:feature" value="${esc(w.feature)}" placeholder="Feature d'arme…"></label>
+    <label class="dh-fl"><span>${t('sheetFeature')}</span><input data-wf="${i}:feature" value="${esc(w.feature)}" placeholder="${t('sheetFeatureWeapon')}"></label>
   </div>`;
 }
 
@@ -1023,7 +1120,11 @@ function bindAll(root, c, ctx) {
   }));
   $$('[data-wf]', root).forEach(inp => inp.addEventListener('change', () => {
     const [i, k] = inp.dataset.wf.split(':');
-    c.weapons[+i][k] = k === 'dmgBonus' ? (parseInt(inp.value, 10) || 0) : inp.value;
+    const weapon = c.weapons[+i];
+    if (k === 'name') weapon.customName = true;
+    else if (k === 'feature') weapon.customFeature = true;
+    else weapon.customStats = true;
+    weapon[k] = k === 'dmgBonus' ? (parseInt(inp.value, 10) || 0) : inp.value;
     saveChar(c);
     if (k === 'dice' || k === 'dmgBonus' || k === 'trait' || k === 'range' || k === 'dmgType') render(main, params);
   }));
@@ -1047,6 +1148,9 @@ function bindAll(root, c, ctx) {
   /* --- armure active --- */
   $$('[data-af]', root).forEach(inp => inp.addEventListener('change', () => {
     const k = inp.dataset.af;
+    if (k === 'name') c.armorCard.customName = true;
+    else if (k === 'feature') c.armorCard.customFeature = true;
+    else c.armorCard.customStats = true;
     if (k === 'name' || k === 'feature') c.armorCard[k] = inp.value;
     else c.armorCard[k] = Math.max(0, parseInt(inp.value, 10) || 0);
     saveChar(c);
@@ -1244,7 +1348,7 @@ function bindAll(root, c, ctx) {
     const itemHits = ctx.generalItems.filter(g => (g.fr + ' ' + g.en + ' ' + (g.descFr || '')).toLowerCase().includes(s)).slice(0, 6)
       .map(g => ({ kind: 'item', itemType: g.type, id: g.id, fr: g.fr, icon: g.type === 'consumable' ? '🧪' : '🎁', sub: `${g.type === 'consumable' ? 'Consommable' : 'Butin'}${g.rarity ? ' · ' + g.rarity : ''}${g.campaign ? ' · ' + (CAMPAIGN_LABELS[g.campaign] || g.campaign) : ''}`, desc: g.descFr || g.descEn || '' }));
     const weaponHits = ctx.weapons.filter(w => (w.fr + ' ' + w.en + ' ' + (w.desc || '')).toLowerCase().includes(s)).slice(0, 4)
-      .map(w => ({ kind: 'weapon', id: w.id, fr: w.fr, icon: '⚔', sub: `${T.traits[w.trait] || ''} · ${w.range} · ${w.dice}${fmtBonus(w.dmgBonus)}${w.burden === 'twoHanded' ? ' · 2 mains' : ''}${w.campaign ? ' · ' + (CAMPAIGN_LABELS[w.campaign] || w.campaign) : ''}`, desc: w.desc || '' }));
+      .map(w => ({ kind: 'weapon', id: w.id, fr: w.fr, icon: '⚔', sub: `${T.traits[w.trait] || ''} · ${L(w.range)} · ${w.dice}${fmtBonus(w.dmgBonus)}${w.burden === 'twoHanded' ? ' · 2 mains' : ''}${w.campaign ? ' · ' + (CAMPAIGN_LABELS[w.campaign] || w.campaign) : ''}`, desc: w.desc || '' }));
     const armorHits = ctx.armors.filter(a => (a.fr + ' ' + (a.en || '') + ' ' + (a.desc || '')).toLowerCase().includes(s)).slice(0, 4)
       .map(a => ({ kind: 'armor', id: a.id, fr: a.fr, icon: '🛡', sub: `Armure · Score ${a.armorScore} · Seuils ${a.major}/${a.severe}${a.heavy ? ' · Lourd' : ''}${a.campaign ? ' · ' + (CAMPAIGN_LABELS[a.campaign] || a.campaign) : ''}`, desc: a.desc || '' }));
     const hits = [...itemHits, ...weaponHits, ...armorHits].slice(0, 12);
@@ -1571,7 +1675,7 @@ function askRiskSplit(c, amount, onDone) {
     const hp = Math.max(0, Math.min(amount, parseInt(hpInp.value, 10) || 0));
     const st = Math.max(0, Math.min(amount, parseInt(stInp.value, 10) || 0));
     const total = Math.min(amount, hp + st);
-    $('#risk-preview', sheet).innerHTML = `Réparti : <b>${total}</b> / ${amount} — PV marqués : <b>${c.hp.current}</b>/${c.hp.max} · Stress : <b>${c.stress.current}</b>/${c.stress.max}`;
+    $('#risk-preview', sheet).innerHTML = `Réparti : <b>${total}</b> / ${amount} — ${t('sheetHpRemaining')} : <b>${c.hp.current}</b>/${c.hp.max} · Stress : <b>${c.stress.current}</b>/${c.stress.max}`;
   };
   preview();
   hpInp.addEventListener('input', preview);
@@ -1706,7 +1810,7 @@ function openRestModal(c, mode, onDone) {
     }
     /* SRD 2.0 : le MJ gagne 1d4 Peur sur un repos court, 1d4 + nombre de PJ sur un repos long. */
     const fearRoll = 1 + Math.floor(Math.random() * 4);
-    const pcCount = Math.max(1, (getState().characters || []).length);
+    const pcCount = Math.max(1, getState().encounter?.pcCount || (getState().characters || []).length || 1);
     const fearGain = isLong ? fearRoll + pcCount : fearRoll;
     setState(s => { s.fear = Math.min(30, (s.fear || 0) + fearGain); });
     logs.push(`+${fearGain} Peur (MJ)`);
@@ -1735,7 +1839,7 @@ function editThresholds(c, ctx, onDone) {
         <b style="color:#ff9d6f">${t('sheetDmgMajor')}</b> : ≥ seuil Majeur (et &lt; Grave) → <b>2 PV</b><br>
         <b style="color:#ff6b6b">${t('sheetDmgSevere')}</b> : ≥ seuil Grave → <b>3 PV</b>
       </p>
-      <p class="dh-help">Seuils = base de votre armure (${c.armorCard.baseMajor}/${c.armorCard.baseSevere}, modifiable dans « Armure active ») + Niveau ${c.level} + bonus d'aptitudes${th.autoBonus ? ` + ${signed(t.autoBonus)} (feature d'armure : ${th.autoParts.join(' + ')})` : ''}.</p>
+      <p class="dh-help">Seuils = base de votre armure (${c.armorCard.baseMajor}/${c.armorCard.baseSevere}, modifiable dans « Armure active ») + Niveau ${c.level} + bonus d'aptitudes${th.autoBonus ? ` + ${signed(th.autoBonus)} (feature d'armure : ${th.autoParts.join(' + ')})` : ''}.</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin:.8rem 0">
         <div class="field" style="margin:0"><label>${t('sheetMajorThreshCalc')}</label>
           <div class="dh-thr-live" id="lv-major">${th.major}</div></div>
@@ -1761,7 +1865,7 @@ function editThresholds(c, ctx, onDone) {
     c.thresholds.bonus = Math.max(-9, Math.min(20, parseInt($('#thr-bonus', sheet).value, 10) || 0));
     saveChar(c);
     back.remove();
-    toast(`Seuils : ${thresholds(c).major} / ${thresholds(c).severe}`);
+    toast(`Seuils : ${thresholds(c, ctx).major} / ${thresholds(c, ctx).severe}`);
     onDone();
   });
 }
@@ -1809,7 +1913,7 @@ function weaponPicker(c, ctx, onDone) {
       <button class="inv-sug" data-pickid="${w.id}">
         <span class="is-body">
           <span class="is-name">${esc(w.fr)} <span class="tag" style="margin-left:4px">P${w.tier}</span>${w.campaign ? ` <span class="tag">${esc(CAMPAIGN_LABELS[w.campaign] || w.campaign)}</span>` : ''}</span>
-          <span class="is-sub">${T.traits[w.trait] || ''} · ${esc(w.range)} · ${w.dice}${fmtBonus(w.dmgBonus)} (${w.dmgType === 'mag' ? 'mag' : 'phy'}) · ${w.burden === 'twoHanded' ? '2 mains' : '1 main'}${w.secondary ? ' · Sec.' : ''}</span>
+          <span class="is-sub">${T.traits[w.trait] || ''} · ${esc(L(w.range))} · ${w.dice}${fmtBonus(w.dmgBonus)} (${w.dmgType === 'mag' ? 'mag' : 'phy'}) · ${w.burden === 'twoHanded' ? '2 mains' : '1 main'}${w.secondary ? ' · Sec.' : ''}</span>
           ${w.desc ? `<span class="is-sub" style="color:var(--text-faint);margin-top:2px">${esc(w.desc)}</span>` : ''}
         </span>
         <span class="is-add">＋</span>
@@ -1953,7 +2057,7 @@ function openInventoryCatalog(c, ctx, onDone) {
     ...ctx.weapons.map(w => ({
       kind: 'weapon', itemType: 'weapon', id: w.id, fr: w.fr, en: w.en || '',
       icon: '⚔',
-      sub: `Arme P${w.tier} · ${T.traits[w.trait] || ''} · ${w.range} · ${w.dice}${fmtBonus(w.dmgBonus)} · ${w.burden === 'twoHanded' ? '2 mains' : '1 main'}${w.campaign ? ' · ' + (CAMPAIGN_LABELS[w.campaign] || w.campaign) : ''}`,
+      sub: `Arme P${w.tier} · ${T.traits[w.trait] || ''} · ${L(w.range)} · ${w.dice}${fmtBonus(w.dmgBonus)} · ${w.burden === 'twoHanded' ? '2 mains' : '1 main'}${w.campaign ? ' · ' + (CAMPAIGN_LABELS[w.campaign] || w.campaign) : ''}`,
       desc: w.desc || '',
     })),
     ...ctx.armors.map(a => ({
@@ -2167,29 +2271,6 @@ async function tabCards(body, c, ctx) {
 }
 
 /* ============ onglet APTITUDES (refonte v19 + SRD 2.0) ============ */
-const FEAT_RE = {
-  hope: /D[ée]pensez?\s+(?:(\d+)|un|une)\s*Espoirs?/i,
-  stress: /[Mm]arquez\s+(?:(\d+)|un)\s+Stress/i,
-  perRest: /une\s+fois\s+par\s+(?:long\s+)?repos/i,
-  perLong: /une\s+fois\s+par\s+long\s+repos/i,
-  dice: /\b(?:(\d+)\s*)?d(4|6|8|10|12|20)\b\s*(?:\+\s*(\d+))?/,
-};
-function featParse(desc) {
-  const d = String(desc || '');
-  const out = {};
-  const mH = d.match(FEAT_RE.hope);
-  if (mH) out.hope = mH[1] ? +mH[1] : 1;
-  const mS = d.match(FEAT_RE.stress);
-  if (mS) out.stress = mS[1] ? +mS[1] : 1;
-  if (FEAT_RE.perRest.test(d)) out.perRest = true;
-  if (FEAT_RE.perLong.test(d)) out.perLong = true;
-  const mD = d.match(FEAT_RE.dice);
-  if (mD) {
-    const qty = mD[1] ? +mD[1] : 1;
-    out.dice = `${qty}d${mD[2]}${mD[3] ? `+${mD[3]}` : ''}`;
-  }
-  return out;
-}
 function featCostBadges(cost) {
   const b = [];
   if (cost.hope) b.push(`<span class="fbadge cost">${cost.hope === 1 ? '1 Espoir' : `${cost.hope} Espoirs`}</span>`);
@@ -2235,8 +2316,9 @@ function tabFeatures(body, c, ctx) {
   const hopeFeat = hopeName ? [{ name: `✦ ${hopeName}`, desc: hopeDesc }] : [];
   const classFeats = cl?.features || [];
   const sec1 = [...hopeFeat, ...classFeats];
-  const RANKS = ['Fondation', 'Spécialisation', 'Spécialisation', t('sheetProficiency'), t('sheetProficiency'), t('sheetProficiency')];
-  const subFeats = (sub?.features || []).map((f, i) => ({ ...f, __rank: RANKS[i] || t('sheetProficiency') }));
+  const RANKS = ['Fondation', 'Spécialisation', 'Spécialisation', t('sheetMastery'), t('sheetMastery'), t('sheetMastery')];
+  const acquiredSubcards = Math.max(1, c.subcardCount || 1);
+  const subFeats = (sub?.features || []).slice(0, acquiredSubcards).map((f, i) => ({ ...f, __rank: RANKS[i] || t('sheetMastery') }));
   const ancFeats = c.ancestry?.abilities || [];
   const comFeat = c.community?.ability ? [c.community.ability] : [];
 
@@ -2272,7 +2354,7 @@ function tabFeatures(body, c, ctx) {
       <div class="p-head"><span class="rb-lbl">${t('sheetBeastformLbl')}</span><span class="tag">${activeBf ? `Active : ${esc(activeBf.fr)}` : `Palier ≤ ${maxTier}`}</span></div>
       ${activeBf ? `
         <div class="dh-bf-banner">
-          <span><b>${esc(activeBf.fr)}</b> (${esc(activeBf.examples)}) — ${T.traits[activeBf.trait] || activeBf.trait} +${activeBf.traitBonus}, Évasion +${activeBf.evasionBonus}, Dégâts ${activeBf.dmgDice}${fmtBonus(activeBf.dmgBonus)} (${esc(activeBf.range)})${activeBf.advantages?.length ? ` · Avantages : ${esc(activeBf.advantages.join(', '))}` : ''}</span>
+          <span><b>${esc(activeBf.fr)}</b> (${esc(activeBf.examples)}) — ${T.traits[activeBf.trait] || activeBf.trait} +${activeBf.traitBonus}, Évasion +${activeBf.evasionBonus}, Dégâts ${activeBf.dmgDice}${fmtBonus(activeBf.dmgBonus)} (${esc(L(activeBf.range))})${activeBf.advantages?.length ? ` · Avantages : ${esc(activeBf.advantages.join(', '))}` : ''}</span>
           <button class="btn ghost small" id="bf-exit">Quitter la forme</button>
         </div>
         ${(activeBf.features || []).map(f => featureCardHTML(f, 'Forme bestiale', null, c)).join('')}
@@ -2302,7 +2384,7 @@ function tabFeatures(body, c, ctx) {
         <label class="dh-fl"><span>${t('sheetAttack')}</span><input data-comp="attackName" value="${esc(c.companion.attackName || '')}"></label>
         <label class="dh-fl"><span>${t('sheetDamageDie')}</span>
           <select data-comp="dice">${DICE.map(d => `<option ${c.companion.dice === d ? 'selected' : ''}>${d}</option>`).join('')}</select></label>
-        <label class="dh-fl"><span>${t('sheetRange')}</span><input data-comp="range" value="${esc(c.companion.range || 'Mêlée')}"></label>
+        <label class="dh-fl"><span>${t('sheetRange')}</span><input data-comp="range" value="${esc(L(c.companion.range || 'Mêlée'))}"></label>
       </div>
       <div style="display:flex;align-items:center;gap:.45rem;margin:.6rem 0;flex-wrap:wrap">
         <span class="dh-g-lbl">${t('sheetCompanionStress')}</span>
@@ -2481,10 +2563,10 @@ function tabJournal(body, c, ctx) {
     </div>`;
   const update = () => { saveChar(c); tabJournal(body, c, ctx); };
   $('#jrn-add', body).addEventListener('click', () => {
-    const t = $('#jrn-new', body);
-    if (!t.value.trim()) return;
+    const input = $('#jrn-new', body);
+    if (!input.value.trim()) return;
     const d = new Date();
-    c.journal.unshift({ date: d.toLocaleDateString(getLang() === 'en' ? 'en-US' : 'fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }), text: t.value.trim() });
+    c.journal.unshift({ date: d.toLocaleDateString(getLang() === 'en' ? 'en-US' : 'fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }), text: input.value.trim() });
     saveChar(c); update();
   });
   $$('[data-del-jrn]', body).forEach(b => b.addEventListener('click', () => {

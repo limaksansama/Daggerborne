@@ -71,7 +71,7 @@
     "fr": "Sac de sable changeant",
     "type": "loot",
     "rarity": null,
-    "descEn": "You can convince this small bag of sand to be much heavier or lighter with a successful [[/dr trait=\"presence\" difficulty=\"10\"]] . Additionally, on a successful [[/dr trait=\"finesse\" difficulty=\"10\"]] , you can blow a bit of sand into a target's face to make them temporarily Vulnerable.",
+    "descEn": "You can convince this small bag of sand to be much heavier or lighter with a successful jet de Présence (10) . Additionally, on a successful jet de Finesse (10) , you can blow a bit of sand into a target's face to make them temporarily Vulnerable.",
     "img": "icons/containers/bags/pouch-cloth-tan.webp",
     "fan": false,
     "descFr": "Vous pouvez convaincre ce petit sac de sable d'être beaucoup plus lourd ou plus léger avec un jet de Présence (10) réussi. De plus, avec un jet de Finesse (10) réussi, vous pouvez souffler un peu de sable dans le visage d'une cible pour la rendre temporairement Vulnérable."
@@ -159,7 +159,7 @@
     "fr": "Boîte des nombreux articles",
     "type": "loot",
     "rarity": null,
-    "descEn": "Once per long rest, you can open this small box and roll a [[/r d12]]. On a result of 1–6, it's empty. On a result of 7–10, it contains one random common consumable. On a result of 11–12, it contains two random common consumables.",
+    "descEn": "Once per long rest, you can open this small box and roll a d12. On a result of 1–6, it's empty. On a result of 7–10, it contains one random common consumable. On a result of 11–12, it contains two random common consumables.",
     "img": "icons/containers/boxes/crate-heavy-yellow.webp",
     "fan": false,
     "descFr": "Une fois par repos long, vous pouvez ouvrir cette petite boîte et lancer un d12. Sur un résultat de 1 à 6, elle est vide. Sur un résultat de 7 à 10, elle contient un consommable courant au hasard. Sur un résultat de 11 à 12, elle contient deux consommables courants au hasard."
@@ -181,7 +181,7 @@
     "fr": "Pendentif apaisant",
     "type": "loot",
     "rarity": null,
-    "descEn": "When you would mark your last Stress, roll a [[/r d6]]. On a result of 5 or higher, don't mark it.",
+    "descEn": "When you would mark your last Stress, roll a d6. On a result of 5 or higher, don't mark it.",
     "img": "icons/equipment/neck/amulet-round-blue.webp",
     "fan": false,
     "descFr": "Lorsque vous devriez marquer votre dernier Stress, lancez un d6. Sur un résultat de 5 ou plus, ne le marquez pas."
@@ -346,7 +346,7 @@
     "fr": "Pièce d'éclipse",
     "type": "loot",
     "rarity": null,
-    "descEn": "Once per rest, [[/r 1d2]]{flip a coin.} On heads, you gain a +1 bonus to attack rolls until your next successful attack. On tails, you gain +1 to your Evasion until an attack fails against you.",
+    "descEn": "Once per rest, 1d2{flip a coin.} On heads, you gain a +1 bonus to attack rolls until your next successful attack. On tails, you gain +1 to your Evasion until an attack fails against you.",
     "img": "icons/commodities/currency/coin-engraved-waves-copper.webp",
     "fan": true,
     "descFr": "Une fois par repos, lancez une pièce. Pile, vous obtenez un bonus de +1 aux jets d'attaque jusqu'à votre prochaine attaque réussie. Face, vous obtenez +1 à votre Évasion jusqu'à ce qu'une attaque rate contre vous."
@@ -456,7 +456,7 @@
     "fr": "Sac de boule de poils",
     "type": "loot",
     "rarity": null,
-    "descEn": "Once per rest, you can produce [[/r 2d20]] harmless, cat-sized fur creatures of indeterminate origin and species from this bag.",
+    "descEn": "Once per rest, you can produce 2d20 harmless, cat-sized fur creatures of indeterminate origin and species from this bag.",
     "img": "icons/containers/bags/pouch-leather-pink.webp",
     "fan": true,
     "descFr": "Une fois par repos, vous pouvez produire 2d20 créatures de fourrure inoffensives, de la taille d'un chat, d'origine et d'espèces indéterminées, à partir de ce sac."
@@ -1238,7 +1238,7 @@
     "type": "loot",
     "rarity": null,
     "descFr": "Une fois par repos, lancez une pièce. Pile, vous devenez immunisé contre les prochains dégâts physiques que vous subissez. Face, vous devenez immunisé contre les prochains dégâts magiques que vous subissez.",
-    "descEn": "Once per rest, [[/r 1d2]]{flip a coin}. On heads, you become immune to the next physical damage you take. On tails, you become immune to the next magic damage you take.",
+    "descEn": "Once per rest, 1d2{flip a coin}. On heads, you become immune to the next physical damage you take. On tails, you become immune to the next magic damage you take.",
     "img": "icons/commodities/currency/coin-engraved-moon-silver.webp",
     "fan": true
   },
@@ -2285,7 +2285,7 @@
     "descEn": "You can drink this potion to gain a +1 bonus to your Evasion until you mark a Hit Point.",
     "img": "icons/consumables/potions/potion-flask-corked-cyan.webp",
     "fan": false,
-    "descFr": "Vous pouvez boire cette potion pour obtenir un bonus de +1 à votre Évitement jusqu'à ce que vous cochiez un PV."
+    "descFr": "Vous pouvez boire cette potion pour obtenir un bonus de +1 à votre Évasion jusqu'à ce que vous marquiez un PV."
   },
   {
     "id": "06jHWdf2bSKNU7Gj",
@@ -2417,7 +2417,7 @@
     "descEn": "Mark a Stress and clear a HP.",
     "img": "icons/commodities/materials/bowl-powder-gold.webp",
     "fan": false,
-    "descFr": "Cocher un Stress et réduire un PV."
+    "descFr": "Marquer un Stress et réduire un PV."
   },
   {
     "id": "hHLAEbVkLJeOA9qz",
@@ -2436,7 +2436,7 @@
     "fr": "Bouteille de farfadet",
     "type": "consumable",
     "rarity": null,
-    "descFr": "Lorsque vous cochez votre dernier PV, cette bouteille se brise pour libérer le Farfadet qu'elle contient. Le Farfadet rétablit tous vos PV avant de s'évanouir du Royaume Mortel.",
+    "descFr": "Lorsque vous marquez votre dernier PV, cette bouteille se brise pour libérer le Farfadet qu'elle contient. Le Farfadet rétablit tous vos PV avant de s'évanouir du Royaume Mortel.",
     "descEn": "When you mark your last Hit Point, this bottle shatters to release the Sprite inside. The Sprite clears all your Hit Points before fading from the Mortal Realm.",
     "img": "icons/consumables/drinks/alcohol-spirits-bottle-green.webp",
     "fan": true
@@ -2458,7 +2458,7 @@
     "fr": "Pieu d’abjuration",
     "type": "consumable",
     "rarity": null,
-    "descFr": "Vous pouvez enfoncer ce pieu dans le sol et faire une proclamation. Jusqu'à votre prochain repos, une créature à portée Éloignée du pieu qui transgresse cette proclamation doit cocher un Stress. Le pieu dure jusqu'à votre prochain repos, puis il se brise.",
+    "descFr": "Vous pouvez enfoncer ce pieu dans le sol et faire une proclamation. Jusqu'à votre prochain repos, une créature à portée Éloignée du pieu qui transgresse cette proclamation doit marquer un Stress. Le pieu dure jusqu'à votre prochain repos, puis il se brise.",
     "descEn": "You can hammer this stake into the ground and make a proclamation. Until your next rest, a creature within Far range of the stake who transgresses that proclamation must mark a Stress. The stake lasts until your next rest, then it shatters.",
     "img": "icons/sundries/survival/stake-rough-heavy-brown.webp",
     "fan": true
@@ -2524,7 +2524,7 @@
     "fr": "Sève d'arbre solaire",
     "type": "consumable",
     "rarity": "Rare",
-    "descEn": "Consume this sap to roll a [[/r d6]]. On a result of 5–6, clear 2 HP. On a result of 2–4, clear 3 Stress. On a result of 1, see through the veil of death and return changed, gaining one scar.",
+    "descEn": "Consume this sap to roll a d6. On a result of 5–6, clear 2 HP. On a result of 2–4, clear 3 Stress. On a result of 1, see through the veil of death and return changed, gaining one scar.",
     "img": "icons/consumables/drinks/wine-amphora-clay-pink.webp",
     "fan": false,
     "descFr": "Consommez cette sève pour effectuer un jet de d6. Sur un résultat de 5–6, vous effacez 2 PV. Sur un résultat de 2–4, vous effacez 3 Stress. Sur un résultat de 1, vous percez le voile de la mort et revenez transformé, gagnant une cicatrice."
@@ -2604,7 +2604,7 @@
     "descEn": "When an adversary attacks you, use this vial and roll a number of d6s equal to your Agility. Add the highest result to your Evasion against the attack.",
     "img": "icons/consumables/potions/bottle-bulb-empty-glass.webp",
     "fan": false,
-    "descFr": "Lorsqu'un adversaire vous attaque, utilisez cette fiole et effectuez un nombre de d6 égal à votre Agilité. Ajoutez le résultat le plus élevé à votre Évitement face à l'attaque."
+    "descFr": "Lorsqu'un adversaire vous attaque, utilisez cette fiole et effectuez un nombre de d6 égal à votre Agilité. Ajoutez le résultat le plus élevé à votre Évasion face à l'attaque."
   },
   {
     "id": "pT5amnkvObOegrJr",

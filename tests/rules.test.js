@@ -20,6 +20,7 @@ import {
   calcEncounterSpent,
   sanitizeCharacter,
 } from '../js/rules.js';
+import { newCharacter } from '../js/core.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const readJson = (rel) => JSON.parse(fs.readFileSync(path.join(ROOT, rel), 'utf8'));
@@ -326,4 +327,43 @@ test('armorThresholdBonus: armure sans feature de seuils → 0', () => {
   const r = armorThresholdBonus({ feature: 'Protégée : Réduisez les dégâts magiques subis de votre Score d\'armure.', spellcastValue: 5, tier: 4, armorMax: 6, armorUsed: 0 });
   assert.equal(r.bonus, 0);
   assert.deepEqual(r.parts, []);
+});
+
+test('sanitizeCharacter: préserve les anciens PV max sans active/unlocked', () => {
+  const out = sanitizeCharacter({ hp: { max: 8, current: 8 } }, newCharacter());
+  assert.equal(out.hp.active, 8);
+  assert.equal(out.hp.unlocked, 0);
+  assert.equal(out.hp.current, 8);
+});
+
+test('sanitizeCharacter: neutralise les types invalides d’un import', () => {
+  const out = sanitizeCharacter({
+    name: 42,
+    level: '99',
+    proficiency: 'x',
+    evasion: 'x',
+    scars: '99',
+    hp: { max: 'x', current: -1, active: 99, unlocked: '4' },
+    stress: { current: 'x', max: 0 },
+    hope: { current: 99 },
+    traits: { agility: '2' },
+    experiences: [null, { name: 42, mod: 'x' }],
+    weapons: [null, 'oops'],
+    inventory: [null],
+    domainCards: [null, { cardId: 'card' }],
+    journal: [null],
+    conditions: [null, 'Caché'],
+    cardUses: [],
+  }, newCharacter());
+  assert.equal(out.name, '42');
+  assert.equal(out.level, 10);
+  assert.equal(out.proficiency, 1);
+  assert.equal(out.evasion, 10);
+  assert.equal(out.scars, 6);
+  assert.equal(out.weapons.length, 0);
+  assert.equal(out.inventory.length, 0);
+  assert.deepEqual(out.domainCards, [{ cardId: 'card' }]);
+  assert.deepEqual(out.conditions, ['Caché']);
+  assert.deepEqual(out.cardUses, {});
+  assert.ok(out.hp.current >= 0 && out.hp.current <= 12);
 });

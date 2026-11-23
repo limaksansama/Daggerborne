@@ -5,7 +5,10 @@
    - Sources EN : SRD 2.0 officiel (mot pour mot) */
 
 const LS_LANG = 'daggerborne-lang';
-let lang = localStorage.getItem(LS_LANG) || 'fr';
+function readStoredLang() {
+  try { return localStorage.getItem(LS_LANG) || 'fr'; } catch (e) { return 'fr'; }
+}
+let lang = readStoredLang();
 
 export function getLang() { return lang; }
 export function isEN() { return lang === 'en'; }
@@ -13,7 +16,7 @@ export function isEN() { return lang === 'en'; }
 export function setLang(l) {
   if (l !== 'fr' && l !== 'en') return;
   lang = l;
-  localStorage.setItem(LS_LANG, l);
+  try { localStorage.setItem(LS_LANG, l); } catch (e) { /* stockage indisponible */ }
 }
 
 /* ---------- dictionnaire UI ---------- */
@@ -154,7 +157,7 @@ const STRINGS = {
   compEveryday: ['Quotidien', 'Everyday'],
   compWestern: ['Western', 'Western'],
   compMonster: ['Chasse', 'Monster Hunting'],
-  compBaseAndCampaign: ['Base &amp; Cadres de campagne', 'Base &amp; Campaign Frames'],
+  compBaseAndCampaign: ['Base & Cadres de campagne', 'Base & Campaign Frames'],
   compAdversariesSub: ['adversaire(s) — statblocks complets du SRD 2.0 (Paliers 1 à 4)',
                        'adversaries — full statblocks from the SRD 2.0 (Tiers 1 to 4)'],
   compBeastformsSub: ['forme(s) bestiale(s) de Druide — SRD 2.0 (Paliers 1 à 4)',
@@ -166,9 +169,9 @@ const STRINGS = {
   compCardsSub: ['carte(s)', 'card(s)'],
   compItemsSub: ['objet(s) — matériel de base, butin magique et consommables du SRD 2.0',
                  'item(s) — basic gear, magic loot and consumables from the SRD 2.0'],
-  compWeaponsSub: ['arme(s) — Base &amp; Cadres de campagne', 'weapon(s) — Base &amp; Campaign Frames'],
-  compArmorsSub: ['armure(s) — Base &amp; Cadres de campagne', 'armor(s) — Base &amp; Campaign Frames'],
-  compHopeFear: ['+ Hope &amp; Fear', '+ Hope &amp; Fear'],
+  compWeaponsSub: ['arme(s) — Base & Cadres de campagne', 'weapon(s) — Base & Campaign Frames'],
+  compArmorsSub: ['armure(s) — Base & Cadres de campagne', 'armor(s) — Base & Campaign Frames'],
+  compHopeFear: ['+ Hope & Fear', '+ Hope & Fear'],
   compAddToHand: ['Ajouter à la main', 'Add to hand'],
   compInHand: ['Dans la main', 'In hand'],
 
@@ -210,8 +213,8 @@ const STRINGS = {
   sheetConnections: ['Liens', 'Connections'],
   sheetArmorSlots: ['Emplacements d\'armure', 'Armor Slots'],
   sheetDamageThresholds: ['Seuils de dégâts', 'Damage Thresholds'],
-  sheetMajor: ['Grave', 'Major'],
-  sheetSevere: ['Critique', 'Severe'],
+  sheetMajor: ['Majeur', 'Major'],
+  sheetSevere: ['Grave', 'Severe'],
   sheetEvasion: ['Évasion', 'Evasion'],
   sheetArmorScore: ['Score d\'armure', 'Armor Score'],
   sheetWeapons: ['Armes', 'Weapons'],
@@ -232,8 +235,8 @@ const STRINGS = {
   sheetTrait: ['Trait', 'Trait'],
   sheetBurden: ['Mains', 'Hands'],
   sheetRarity: ['Rareté', 'Rarity'],
-  sheetFeatures: ['Traits spéciaux', 'Features'],
-  sheetMotives: ['Motivations &amp; tactiques', 'Motives &amp; Tactics'],
+  sheetFeatures: ['Aptitudes', 'Features'],
+  sheetMotives: ['Motivations & tactiques', 'Motives & Tactics'],
   sheetDifficulty: ['Difficulté', 'Difficulty'],
   sheetThresholds: ['Seuils', 'Thresholds'],
   sheetExperience: ['Expérience', 'Experience'],
@@ -274,7 +277,7 @@ const STRINGS = {
 
   /* réglages */
   settingsTitle: ['Réglages', 'Settings'],
-  settingsData: ['Données &amp; Sauvegarde locale', 'Data &amp; Local Backup'],
+  settingsData: ['Données & Sauvegarde locale', 'Data & Local Backup'],
   settingsDataDesc: ['Vos données sont enregistrées localement sur cet appareil', 'Your data is saved locally on this device'],
   settingsIdb: ['IndexedDB haute capacité + repli localStorage', 'High-capacity IndexedDB + localStorage fallback'],
   settingsChars: ['personnage(s)', 'character(s)'],
@@ -289,7 +292,7 @@ const STRINGS = {
   settingsProSoon: ['Option Pro (à venir)', 'Pro option (coming soon)'],
   settingsCloudDesc: ['La synchronisation automatique vers Google Drive sera proposée en option payante. Exportez vos sauvegardes JSON gratuitement à tout moment.',
                       'Automatic Google Drive sync will be offered as a paid option. Export your JSON backups for free at any time.'],
-  settingsRules: ['Règles &amp; Préférences', 'Rules &amp; Preferences'],
+  settingsRules: ['Règles & Préférences', 'Rules & Preferences'],
   settingsLang: ['Langue / Language', 'Language / Langue'],
   settingsLangDesc: ['Basculez l\'interface et le contenu du jeu (SRD officiel en anglais).',
                      'Switch the interface and game content (official English SRD).'],
@@ -297,17 +300,17 @@ const STRINGS = {
   settingsAboutDesc: ['Application PWA non officielle — français', 'Unofficial PWA — international'],
   settingsMassiveDamage: ['Dégâts Massifs (SRD 2.0, p. 50)', 'Massive Damage (SRD 2.0, p. 50)'],
   settingsMassiveDamageDesc: ['Si un personnage subit des dégâts ≥ 2 × son seuil Grave, il marque 4 PV au lieu de 3.',
-                              'If a character takes damage ≥ 2 × their Major threshold, they mark 4 HP instead of 3.'],
+                              'If a character takes damage ≥ 2 × their Severe threshold, they mark 4 HP instead of 3.'],
   settingsDice3d: ['Animations des dés 3D', '3D Dice Animations'],
   settingsDice3dDesc: ['Affiche les lancers physiques 3D à l\'écran (désactivez pour des jets instantanés sur tablette ancienne).',
                        'Show physical 3D dice rolls on screen (disable for instant rolls on older tablets).'],
   settingsStorageInfo: ['utilisé(s)', 'used'],
 
   sheetBeastformPick: ["— Choisir une Forme bestiale —", "— Choose a Beastform —"],
-  sheetFeatureHope: ["Feature d'Espoir de votre classe…", "Your class Hope feature…"],
-  sheetFeatureWeapon: ["Feature d'arme…", "Weapon feature…"],
-  sheetFeatureArmor: ["Feature d'armure…", "Armor feature…"],
-  sheetClassFeatures: ["Capacités de classe, features de sous-classe…", "Class features, subclass features…"],
+  sheetFeatureHope: ["Aptitude d'Espoir de votre classe…", "Your class Hope feature…"],
+  sheetFeatureWeapon: ["Aptitude d'arme…", "Weapon feature…"],
+  sheetFeatureArmor: ["Aptitude d'armure…", "Armor feature…"],
+  sheetClassFeatures: ["Capacités de classe, aptitudes de sous-classe…", "Class features, subclass features…"],
   sheetAddPortrait: ["Ajouter un portrait", "Add a portrait"],
   sheetChangePortrait: ["Changer le portrait du personnage", "Change portrait"],
   sheetTraitImproved: ["Trait amélioré ce palier", "Trait improved this tier"],
@@ -340,6 +343,17 @@ const STRINGS = {
   d3dDisadv: ['Désavantage', 'Disadvantage'],
   fab2d12: ['Jet de Dualité 2d12', 'Duality Roll 2d12'],
   fabMax12: ['Maximum 12 dés', '12 dice max'],
+  fabHistoryTitle: ['Historique des jets', 'Roll history'],
+  fabAddDie: ['Ajouter un dé', 'Add a die'],
+  fabClear: ['vider', 'clear'],
+  fabClearSel: ['Vider la sélection', 'Clear selection'],
+  fabLauncher: ['Lanceur de dés', 'Dice launcher'],
+  fabHistHope: ['E', 'H'],
+  fabHistFear: ['P', 'F'],
+  fabCrit: ['★ Critique', '★ Critical'],
+  fabNoRolls: ['Aucun jet cette session.', 'No rolls this session.'],
+  fabDiceOne: ['dé', 'die'],
+  fabDiceMany: ['dés', 'dice'],
   gmActivateEnv: ['Activer', 'Activate'],
   gmActiveEnv: ['Environnement actif', 'Active environment'],
   gmAddEnc: ["Ajouter à l'affrontement", 'Add to encounter'],
@@ -445,13 +459,13 @@ const STRINGS = {
   sheetEquipHint: ["Aucune arme — ajoutez-en une depuis l'inventaire ou le catalogue.", 'No weapon — add one from inventory or catalog.'],
   sheetFallsTo0: ['⚠ Vous tombez à 0 PV — mouvements de mort !', '⚠ You fall to 0 HP — death moves!'],
   sheetFanSupp: ['Supplément amateur', 'Fan supplement'],
-  sheetFeature: ['Feature', 'Feature'],
+  sheetFeature: ['Aptitude', 'Feature'],
   sheetHandEmpty: ['Main vide', 'Empty hand'],
   sheetHandFull: ['Main complète', 'Hand full'],
   sheetHandfuls: ['Poignées', 'Handfuls'],
   sheetHeritage: ['Héritage', 'Heritage'],
   sheetHopeFear: ['H&F', 'H&F'],
-  sheetHopeFeature: ["Feature d'Espoir", 'Hope feature'],
+  sheetHopeFeature: ["Aptitude d'Espoir", 'Hope feature'],
   sheetHopeHint: ["L'Espoir se dépense pour activer des aptitudes ; il se régit par les règles de votre classe.", 'Hope powers features; see your class rules.'],
   sheetInvEmpty: ['Inventaire vide — parcourez le catalogue pour ajouter des objets.', 'Empty inventory — browse the catalog to add items.'],
   sheetLastStand: ['Dernière ligne droite', 'Last stand'],
@@ -475,6 +489,9 @@ const STRINGS = {
   sheetPickTrait: ['— Trait —', '— Trait —'],
   sheetPlusSlot: ['+1 emplacement', '+1 slot'],
   sheetProficiency: ['Maîtrise', 'Proficiency'],
+  sheetMastery: ['Maîtrise', 'Mastery'],
+  sheetHpRemaining: ['PV restants', 'HP remaining'],
+  sheetStow: ['Ranger', 'Unequip'],
   sheetRangeIcon: ['Portée', 'Range'],
   sheetRawDamage: ['Dégâts bruts reçus', 'Raw damage taken'],
   sheetRollDice: ['LANCER', 'ROLL'],
@@ -518,7 +535,8 @@ export const T = new Proxy({}, {
 
 /* ---------- libellés dynamiques ---------- */
 const RANGE_EN = { 'Mêlée': 'Melee', 'Très courte': 'Very Close', 'Très proche': 'Very Close', 'Courte': 'Close', 'Proche': 'Close', 'Longue': 'Far', 'Éloignée': 'Far', 'Très longue': 'Very Far', 'Très éloignée': 'Very Far', 'Mêlée/Très courte': 'Melee/Very Close' };
+const RANGE_FR = Object.fromEntries(Object.entries(RANGE_EN).map(([fr, en]) => [en, fr]));
 export function L(s) {
-  if (lang !== 'en') return s;
-  return RANGE_EN[s] || s;
+  if (lang === 'en') return RANGE_EN[s] || s;
+  return RANGE_FR[s] || s;
 }

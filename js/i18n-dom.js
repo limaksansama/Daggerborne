@@ -11,6 +11,15 @@ import { getLang } from './i18n.js';
 import { EN_UI, EN_UI_EXACT, EN_PATTERNS } from './en-ui.js';
 
 const PAIRS = Object.entries(EN_UI).sort((a, b) => b[0].length - a[0].length);
+/* Remplacements avec frontières de mots : « Ko » ne doit pas casser « Korvax »,
+   « Sac » ne doit pas casser « Sacred », etc. Les clés ambiguës courtes sont
+   gérées uniquement par EN_UI_EXACT (texte entier). */
+const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const BOUNDARY_PAIRS = PAIRS.map(([fr, en]) => {
+  const lead = /^[\p{L}\p{N}]/u.test(fr) ? '(?<![\\p{L}\\p{N}])' : '';
+  const tail = /[\p{L}\p{N}]$/u.test(fr) ? '(?![\\p{L}\\p{N}])' : '';
+  return [new RegExp(lead + escapeRe(fr) + tail, 'gu'), en];
+});
 /* .jrn-text / .jrn-date : contenu saisi par l'utilisateur, jamais traduit */
 const SKIP_TEXT = 'textarea, input, script, style, code, pre, .jrn-text, .jrn-date, [data-no-i18n]';
 const ATTRS = ['title', 'placeholder', 'aria-label', 'alt'];
@@ -26,9 +35,7 @@ export function trUi(value) {
   if (Object.prototype.hasOwnProperty.call(EN_UI_EXACT, trimmed)) {
     return out.replace(trimmed, EN_UI_EXACT[trimmed]);
   }
-  for (const [fr, en] of PAIRS) {
-    if (out.includes(fr)) out = out.split(fr).join(en);
-  }
+  for (const [re, en] of BOUNDARY_PAIRS) out = out.replace(re, en);
   for (const [re, rep] of EN_PATTERNS) out = out.replace(re, rep);
   return out;
 }
