@@ -244,7 +244,7 @@ export function importFullBackupFromText(rawText, mode = 'merge') {
 
 // ---------- data cache ----------
 const cache = {};
-const DATA_VER = 'v36';
+const DATA_VER = 'v37';
 export async function data(name, lang = getLang()) {
   const dir = lang === 'en' ? 'data/en' : 'data';
   const key = lang + ':' + name;

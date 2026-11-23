@@ -45,6 +45,27 @@ test('les objets de départ existent dans les données FR et EN', () => {
   }
 });
 
+test('les objets généraux n’ont plus de balises Foundry ni de raretés FR en mode EN', () => {
+  for (const rel of ['data/generalItems.json', 'data/en/generalItems.json']) {
+    const raw = fs.readFileSync(path.join(ROOT, rel), 'utf8');
+    assert.ok(!/@Template\[/.test(raw), `Balise Foundry restante dans ${rel}`);
+  }
+  const en = readJson('data/en/generalItems.json');
+  const allowed = new Set(['Common', 'Uncommon', 'Rare', 'Legendary']);
+  const invalid = en.filter((i) => i.rarity && !allowed.has(i.rarity)).map((i) => `${i.en}: ${i.rarity}`);
+  assert.deepEqual(invalid, []);
+});
+
+test('le bestiaire ne contient plus de remplacement cassé de @Lookup', () => {
+  const raw = fs.readFileSync(path.join(ROOT, 'data/adversaries.json'), 'utf8');
+  assert.ok(!raw.includes('Les créatures autres que les créatures'));
+  assert.ok(!raw.includes('@Lookup'));
+  const bad = [...raw.matchAll(/(?:Cette|cette) créature (?:est|peut être) (?:vaincu|mis|résistant|immunisé)(?![A-Za-z])/g)].map((m) => m[0]);
+  assert.deepEqual(bad, []);
+  assert.ok(!/(vaincuee|misee|résistantee)/.test(raw));
+  assert.ok(!/Cette créature meurt s’il n’a pas réuni/.test(raw));
+});
+
 test('les exemples de formes bestiales EN sont traduits et les portées FR normalisées', () => {
   const beastforms = readJson('data/en/beastforms.json');
   assert.equal(beastforms.find((b) => b.id === 'agile-scout').examples, 'Fox, Mouse, Weasel, etc.');

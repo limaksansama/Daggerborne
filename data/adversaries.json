@@ -4277,7 +4277,7 @@
         "name": "Rien qu’une rumeur",
         "nameEn": "Only a Rumor",
         "kind": "Passif",
-        "desc": "Tant qu’il se trouve en eau profonde, cette créature ne peut être ni localisé ni ciblé."
+        "desc": "Tant qu’elle se trouve en eau profonde, cette créature ne peut être ni localisée ni ciblée."
       },
       {
         "name": "Mur d’eau",
@@ -4336,7 +4336,7 @@
         "name": "Démasqué ! (changement de phase)",
         "nameEn": "Exposed! (Phase Change)",
         "kind": "Réaction",
-        "desc": "Lorsque le Démon est vaincu ou que les PJ découvrent sa véritable identité, remplacez le Démon par cette créature révélé et mettez-le aussitôt en avant."
+        "desc": "Lorsque le Démon est vaincu ou que les PJ découvrent sa véritable identité, remplacez le Démon par cette créature révélée et mettez-la aussitôt en avant."
       }
     ],
     "fr": "Démon métamorphe"
@@ -5647,7 +5647,7 @@
         "name": "Sbire (13)",
         "nameEn": "Minion (13)",
         "kind": "Passif",
-        "desc": "Cette créature est vaincu dès qu’il subit des dégâts. Pour chaque tranche de 13 dégâts infligés à cette créature, les PJ éliminent un Sbire de plus (qui doit se trouver à portée de l’attaque)."
+        "desc": "Cette créature est vaincue dès qu’elle subit des dégâts. Pour chaque tranche de 13 dégâts infligés à cette créature, les PJ éliminent un Sbire de plus (qui doit se trouver à portée de l’attaque)."
       },
       {
         "name": "Morsure venimeuse",
@@ -5735,7 +5735,7 @@
         "name": "Seigneur des vents",
         "nameEn": "Wind Lord",
         "kind": "Passif",
-        "desc": "Tant que cette créature vole, les attaques contre lui subissent un désavantage."
+        "desc": "Tant que cette créature vole, les attaques contre elle subissent un désavantage."
       },
       {
         "name": "Pierre des présages",
@@ -6320,7 +6320,7 @@
         "name": "Métamorphe",
         "nameEn": "Shapeshifter",
         "kind": "Action",
-        "desc": "Marquez un Stress pour que cette créature prenne la forme de n’importe quelle créature ou de n’importe quel objet plus petit qu’un chariot. Une créature subit un désavantage sur ses jets contre cette créature tant que celui-ci a une forme que la créature trouve plaisante ou séduisante."
+        "desc": "Marquez un Stress pour que cette créature prenne la forme de n’importe quelle créature ou de n’importe quel objet plus petit qu’un chariot. Une créature subit un désavantage sur ses jets contre cette créature tant que celle-ci a une forme que la créature trouve plaisante ou séduisante."
       },
       {
         "name": "Enchanter",
@@ -6373,7 +6373,7 @@
         "name": "La mort démasquée",
         "nameEn": "Unmasking Death",
         "kind": "Action",
-        "desc": "Dépensez une Peur pour que cette créature ôte un instant son masque et révèle le visage effroyable qu’il dissimule. Chaque PJ à portée proche doit réussir un jet de réaction de Présence, sans quoi il marque un Stress."
+        "desc": "Dépensez une Peur pour que cette créature ôte un instant son masque et révèle le visage effroyable qu’elle dissimule. Chaque PJ à portée proche doit réussir un jet de réaction de Présence, sans quoi il marque un Stress."
       },
       {
         "name": "Combat par équipe",
@@ -6666,7 +6666,7 @@
         "name": "Immatériel",
         "nameEn": "Incorporeal",
         "kind": "Passif",
-        "desc": "Cette créature est résistant aux dégâts physiques et peut traverser les objets solides."
+        "desc": "Cette créature est résistante aux dégâts physiques et peut traverser les objets solides."
       },
       {
         "name": "Aura de peur",
@@ -6678,7 +6678,7 @@
         "name": "Hantise persistante",
         "nameEn": "Lingering Haunt",
         "kind": "Réaction",
-        "desc": "Compte à rebours (1d6). Lorsque cette créature est vaincu, vous pouvez dépenser une Peur pour lancer le compte à rebours. Celui-ci progresse lorsqu’un PJ fait un jet avec Peur. Lorsqu’il arrive à terme, effacez les PV de cette créature et mettez-le aussitôt en avant."
+        "desc": "Compte à rebours (1d6). Lorsque cette créature est vaincue, vous pouvez dépenser une Peur pour lancer le compte à rebours. Celui-ci progresse lorsqu’un PJ fait un jet avec Peur. Lorsqu’il arrive à terme, effacez les PV de cette créature et mettez-la aussitôt en avant."
       }
     ],
     "fr": "Fantôme"
@@ -6707,13 +6707,13 @@
         "name": "Spectre",
         "nameEn": "Specter",
         "kind": "Passif",
-        "desc": "Cette créature est résistant aux dégâts physiques. Marquez un Stress pour le déplacer jusqu’à portée proche à travers les objets solides."
+        "desc": "Cette créature est résistante aux dégâts physiques. Marquez un Stress pour le déplacer jusqu’à portée proche à travers les objets solides."
       },
       {
         "name": "Possesseur",
         "nameEn": "Possessor",
         "kind": "Action",
-        "desc": "Marquez un Stress pour que cette créature investisse un objet non magique entièrement situé à portée proche, qui s’emplit d’une lueur fantomatique. La prochaine fois que cette créature devrait subir des dégâts, c’est l’objet qui est détruit à la place, et cette créature en est expulsé."
+        "desc": "Marquez un Stress pour que cette créature investisse un objet non magique entièrement situé à portée proche, qui s’emplit d’une lueur fantomatique. La prochaine fois que cette créature devrait subir des dégâts, c’est l’objet qui est détruit à la place, et cette créature en est expulsée."
       },
       {
         "name": "Tempête spectrale",
@@ -6859,7 +6859,7 @@
         "name": "Impitoyable (3)",
         "nameEn": "Relentless (3)",
         "kind": "Passif",
-        "desc": "Cette créature peut être mis en avant jusqu’à 3 fois par tour de MJ. Vous devez dépenser de la Peur normalement pour chaque mise en avant."
+        "desc": "Cette créature peut être mise en avant jusqu’à 3 fois par tour de MJ. Vous devez dépenser de la Peur normalement pour chaque mise en avant."
       },
       {
         "name": "Enfant de la nuit",
@@ -7234,7 +7234,7 @@
         "name": "Coffre-fort psychique",
         "nameEn": "Psychic Strongbox",
         "kind": "Passif",
-        "desc": "Cette créature est immunisé contre les capacités et aptitudes qui affecteraient ou altéreraient ses pensées ou ses émotions."
+        "desc": "Cette créature est immunisée contre les capacités et aptitudes qui affecteraient ou altéreraient ses pensées ou ses émotions."
       },
       {
         "name": "Onde de distorsion",
@@ -7714,7 +7714,7 @@
         "name": "Bête clignotante",
         "nameEn": "Blink Beast",
         "kind": "Passif",
-        "desc": "Au début du combat, placez un double à portée proche de cette créature. Cette créature occupe à la fois sa place et celle de son double. Le double peut se déplacer lorsque cette créature est mis en avant, et cette créature peut viser ses ennemis comme s’il se trouvait à la place de son double. Lorsque cette créature ou son double est attaqué, l’attaquant lance un d6. Sur un résultat pair, il vise cette créature. Sur un résultat impair, il vise le double, et l’attaque échoue. Si une attaque réussit contre cette créature, le double se dissipe jusqu’à ce que vous dépensiez une Peur pour le faire réapparaître."
+        "desc": "Au début du combat, placez un double à portée proche de cette créature. Cette créature occupe à la fois sa place et celle de son double. Le double peut se déplacer lorsque cette créature est mise en avant, et cette créature peut viser ses ennemis comme si elle se trouvait à la place de son double. Lorsque cette créature ou son double est attaquée, l’attaquant lance un d6. Sur un résultat pair, il vise cette créature. Sur un résultat impair, il vise le double, et l’attaque échoue. Si une attaque réussit contre cette créature, le double se dissipe jusqu’à ce que vous dépensiez une Peur pour le faire réapparaître."
       },
       {
         "name": "Double frappe",
@@ -8136,7 +8136,7 @@
         "name": "Impitoyable (3)",
         "nameEn": "Relentless (3)",
         "kind": "Passif",
-        "desc": "Cette créature peut être mis en avant jusqu’à 3 fois par tour de MJ. Vous devez dépenser de la Peur normalement pour chaque mise en avant."
+        "desc": "Cette créature peut être mise en avant jusqu’à 3 fois par tour de MJ. Vous devez dépenser de la Peur normalement pour chaque mise en avant."
       },
       {
         "name": "Halitose antimagique",
@@ -8394,7 +8394,7 @@
         "name": "Fouisseur",
         "nameEn": "Burrowing",
         "kind": "Passif",
-        "desc": "Cette créature se déplace à travers le sol aussi aisément qu’à sa surface. Lorsque cette créature se déplace, il peut choisir de s’enfouir ou de remonter à la surface. Tant qu’il est sous terre, cette créature est résistant à tous les dégâts, mais il ne peut pas attaquer."
+        "desc": "Cette créature se déplace à travers le sol aussi aisément qu’à sa surface. Lorsque cette créature se déplace, elle peut choisir de s’enfouir ou de remonter à la surface. Tant qu’elle est sous terre, cette créature est résistante à tous les dégâts, mais elle ne peut pas attaquer."
       },
       {
         "name": "Peau épaisse",
@@ -8570,7 +8570,7 @@
         "name": "Homme de paille",
         "nameEn": "Made of Straw",
         "kind": "Passif",
-        "desc": "Cette créature est résistant aux dégâts physiques, mais subit le double des dégâts de feu."
+        "desc": "Cette créature est résistante aux dégâts physiques, mais subit le double des dégâts de feu."
       },
       {
         "name": "Vision de terreur",
@@ -8728,7 +8728,7 @@
         "name": "Sbire (5)",
         "nameEn": "Minion (5)",
         "kind": "Passif",
-        "desc": "Cette créature est vaincu dès qu’il subit des dégâts. Pour chaque tranche de 5 dégâts infligés à cette créature, les PJ éliminent un Sbire de plus (qui doit se trouver à portée de l’attaque)."
+        "desc": "Cette créature est vaincue dès qu’elle subit des dégâts. Pour chaque tranche de 5 dégâts infligés à cette créature, les PJ éliminent un Sbire de plus (qui doit se trouver à portée de l’attaque)."
       },
       {
         "name": "Art de l’invisibilité",
@@ -8939,13 +8939,13 @@
         "name": "Impitoyable (3)",
         "nameEn": "Relentless (3)",
         "kind": "Passif",
-        "desc": "Cette créature peut être mis en avant jusqu’à 3 fois par tour de MJ. Vous devez dépenser de la Peur normalement pour chaque mise en avant."
+        "desc": "Cette créature peut être mise en avant jusqu’à 3 fois par tour de MJ. Vous devez dépenser de la Peur normalement pour chaque mise en avant."
       },
       {
         "name": "Égide orbitale",
         "nameEn": "Orbiting Aegis",
         "kind": "Passif",
-        "desc": "Lorsque cette créature apparaît, il fait naître six disques d’énergie magique qui tournent autour de lui. Placez un d6, le dé d’Égide, sur ce bloc de statistiques, face 6 visible. Lorsqu’un PJ réussit une attaque contre cette créature, lancez un d6. Si le résultat est inférieur ou égal à la valeur du dé d’Égide, diminuez celle-ci de 1 et ignorez les dégâts. Un PJ peut effectuer un jet de Savoir pour diminuer la valeur du dé d’Égide de 1 sur un succès, ou de 2 sur un succès avec Espoir."
+        "desc": "Lorsque cette créature apparaît, elle fait naître six disques d’énergie magique qui tournent autour d’elle. Placez un d6, le dé d’Égide, sur ce bloc de statistiques, face 6 visible. Lorsqu’un PJ réussit une attaque contre cette créature, lancez un d6. Si le résultat est inférieur ou égal à la valeur du dé d’Égide, diminuez celle-ci de 1 et ignorez les dégâts. Un PJ peut effectuer un jet de Savoir pour diminuer la valeur du dé d’Égide de 1 sur un succès, ou de 2 sur un succès avec Espoir."
       },
       {
         "name": "Salve de force",
@@ -9045,7 +9045,7 @@
         "name": "Nuée d’ombres",
         "nameEn": "Shadow Swarm",
         "kind": "Action",
-        "desc": "Dépensez une Peur pour que cette créature fasse apparaître à portée éloignée une nuée de créatures d’ombre semblables à des papillons de nuit. La nuée emplit une zone à portée proche et bloque la ligne de vue. Les créatures autres que les créatures sont Vulnérables tant qu’elles se trouvent dans cette zone et doivent marquer un Stress pour la traverser. Un PJ peut dissiper la nuée en réussissant un jet d’Incantation (12)."
+        "desc": "Dépensez une Peur pour que cette créature fasse apparaître à portée éloignée une nuée de créatures d’ombre semblables à des papillons de nuit. La nuée emplit une zone à portée proche et bloque la ligne de vue. Les créatures autres que les Cryptimites sont Vulnérables tant qu’elles se trouvent dans cette zone et doivent marquer un Stress pour la traverser. Un PJ peut dissiper la nuée en réussissant un jet d’Incantation (12)."
       },
       {
         "name": "Regard paranoïaque",
@@ -9262,7 +9262,7 @@
         "name": "Impitoyable (2)",
         "nameEn": "Relentless (2)",
         "kind": "Passif",
-        "desc": "Cette créature peut être mis en avant jusqu’à 2 fois par tour de MJ. Vous devez dépenser de la Peur normalement pour chaque mise en avant."
+        "desc": "Cette créature peut être mise en avant jusqu’à 2 fois par tour de MJ. Vous devez dépenser de la Peur normalement pour chaque mise en avant."
       },
       {
         "name": "Chien de garde",
@@ -9702,7 +9702,7 @@
         "name": "Impitoyable (3)",
         "nameEn": "Relentless (3)",
         "kind": "Passif",
-        "desc": "Cette créature peut être mis en avant jusqu’à 3 fois par tour de MJ. Vous devez dépenser de la Peur normalement pour chaque mise en avant."
+        "desc": "Cette créature peut être mise en avant jusqu’à 3 fois par tour de MJ. Vous devez dépenser de la Peur normalement pour chaque mise en avant."
       },
       {
         "name": "Oiseau de proie",
@@ -9720,7 +9720,7 @@
         "name": "Étreinte broyeuse",
         "nameEn": "Crushing Grasp",
         "kind": "Réaction",
-        "desc": "Lorsque cette créature réussit une attaque standard, vous pouvez marquer un Stress pour qu’il broie la cible dans ses serres, ce qui l’oblige à marquer 1d4 Stress et la Bloque jusqu’à ce qu’elle réussisse un jet de Force (20)."
+        "desc": "Lorsque cette créature réussit une attaque standard, vous pouvez marquer un Stress pour qu’elle broie la cible dans ses serres, ce qui l’oblige à marquer 1d4 Stress et la Bloque jusqu’à ce qu’elle réussisse un jet de Force (20)."
       },
       {
         "name": "Courroucé",
@@ -9767,7 +9767,7 @@
         "name": "Dévorer",
         "nameEn": "Devour",
         "kind": "Action",
-        "desc": "Effectuez une attaque contre une cible en Mêlée. Sur un succès, cette créature Avale la cible. Tant qu’elle est Avalée, la cible est Bloquée et marque un PV lorsque cette créature est mis en avant. Cette créature recrache toutes les créatures Avalées lorsqu’il subit des dégâts Majeurs ou plus."
+        "desc": "Effectuez une attaque contre une cible en Mêlée. Sur un succès, cette créature Avale la cible. Tant qu’elle est Avalée, la cible est Bloquée et marque un PV lorsque cette créature est mise en avant. Cette créature recrache toutes les créatures Avalées lorsqu’elle subit des dégâts Majeurs ou plus."
       },
       {
         "name": "Affamé, pas stupide",
@@ -9996,13 +9996,13 @@
         "name": "Impitoyable (3)",
         "nameEn": "Relentless (3)",
         "kind": "Passif",
-        "desc": "Cette créature peut être mis en avant jusqu’à 3 fois par tour de MJ. Vous devez dépenser de la Peur normalement pour chaque mise en avant."
+        "desc": "Cette créature peut être mise en avant jusqu’à 3 fois par tour de MJ. Vous devez dépenser de la Peur normalement pour chaque mise en avant."
       },
       {
         "name": "Cœur de minuit",
         "nameEn": "Midnight Heart",
         "kind": "Passif",
-        "desc": "Compte à rebours à long terme (6). Cette créature garde son cœur caché en lieu sûr. Si celui-ci est détruit, cette créature meurt. Sinon, lorsque cette créature est vaincu, activez le compte à rebours. Celui-ci progresse chaque fois que les PJ terminent un repos long. Lorsqu’il arrive à terme, cette créature revient à la vie à portée proche de son cœur, avec tous ses PV et son Stress effacés."
+        "desc": "Compte à rebours à long terme (6). Cette créature garde son cœur caché en lieu sûr. Si celui-ci est détruit, cette créature meurt. Sinon, lorsque cette créature est vaincue, activez le compte à rebours. Celui-ci progresse chaque fois que les PJ terminent un repos long. Lorsqu’il arrive à terme, cette créature revient à la vie à portée proche de son cœur, avec tous ses PV et son Stress effacés."
       },
       {
         "name": "Terrifiant",
@@ -10102,7 +10102,7 @@
         "name": "S’unir ou mourir",
         "nameEn": "Join or Die",
         "kind": "Passif",
-        "desc": "Cette créature meurt s’il n’a pas réuni ses deux moitiés avant l’aube."
+        "desc": "Cette créature meurt si elle n’a pas réuni ses deux moitiés avant l’aube."
       },
       {
         "name": "Entrailles enserrantes",
@@ -10396,7 +10396,7 @@
         "name": "Impitoyable (3)",
         "nameEn": "Relentless (3)",
         "kind": "Passif",
-        "desc": "Cette créature peut être mis en avant jusqu’à 3 fois par tour de MJ. Vous devez dépenser de la Peur normalement pour chaque mise en avant."
+        "desc": "Cette créature peut être mise en avant jusqu’à 3 fois par tour de MJ. Vous devez dépenser de la Peur normalement pour chaque mise en avant."
       },
       {
         "name": "Mille gueules",

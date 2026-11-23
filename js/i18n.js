@@ -484,6 +484,7 @@ const STRINGS = {
   sheetOnAdv: ['Avantages :', 'Advantages:'],
   sheetPhysical: ['Physique', 'Physical'],
   sheetPickBaseBeastform: ["Choisissez d'abord la forme de base.", 'Pick the base form first.'],
+  sheetBaseBeastform: ['— Forme de base (Palier {tier}) —', '— Base form (Tier {tier}) —'],
   sheetPickBeastform: ['— Choisir une forme bestiale —', '— Pick a beastform —'],
   sheetPickExp: ['— Expérience —', '— Experience —'],
   sheetPickTrait: ['— Trait —', '— Trait —'],

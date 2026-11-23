@@ -62,3 +62,11 @@ test('les libellés FR des aptitudes ne fuient pas en anglais', () => {
   assert.ok(!/features?/i.test(t('sheetClassFeatures')));
   setLang('en');
 });
+
+test('le menu de forme de base est traduit avec son palier', () => {
+  setLang('en');
+  assert.equal(t('sheetBaseBeastform', { tier: '1–2' }), '— Base form (Tier 1–2) —');
+  setLang('fr');
+  assert.equal(t('sheetBaseBeastform', { tier: '1' }), '— Forme de base (Palier 1) —');
+  setLang('en');
+});

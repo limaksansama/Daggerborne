@@ -1391,7 +1391,7 @@
     "fr": "Orbe aveuglant",
     "type": "consumable",
     "rarity": null,
-    "descEn": "You can activate this orb to create a flash of bright light. All targets within Close range become Vulnerable until they mark HP. @Template[type:emanation|range:c]",
+    "descEn": "You can activate this orb to create a flash of bright light. All targets within Close range become Vulnerable until they mark HP.",
     "img": "icons/magic/light/explosion-star-large-blue-yellow.webp",
     "fan": false,
     "descFr": "Vous pouvez activer cet orbe pour créer un éclair de lumière vive. Toutes les cibles à portée Proche deviennent Vulnérables jusqu'à ce qu'elles marquent des PV."
@@ -1842,7 +1842,7 @@
     "fr": "Flamboiement d’espérance",
     "type": "consumable",
     "rarity": null,
-    "descEn": "When you use this flare, allies within Close range roll a d6 when they spend a Hope. On a result of 6, they gain the effect of that Hope without spending it. The flare lasts until the end of the scene. @Template[type:emanation|range:c]",
+    "descEn": "When you use this flare, allies within Close range roll a d6 when they spend a Hope. On a result of 6, they gain the effect of that Hope without spending it. The flare lasts until the end of the scene.",
     "img": "icons/commodities/tech/smoke-bomb-purple.webp",
     "fan": false,
     "descFr": "Lorsque vous utilisez ce signal, les alliés à portée Proche lancent un d6 lorsqu'ils dépensent un Espoir. Sur un résultat de 6, ils obtiennent l'effet de cet Espoir sans le dépenser. Le signal dure jusqu'à la fin de la scène."
@@ -1908,7 +1908,7 @@
     "fr": "Jarre des voix perdues",
     "type": "consumable",
     "rarity": null,
-    "descEn": "You can open this jar to release a deafening echo of voices for a number of minutes equal to your Instinct. Creatures within Far range unprepared for the sound take 6d8 magic damage. @Template[type:emanation|range:f]",
+    "descEn": "You can open this jar to release a deafening echo of voices for a number of minutes equal to your Instinct. Creatures within Far range unprepared for the sound take 6d8 magic damage.",
     "img": "icons/containers/kitchenware/jug-wrapped-red.webp",
     "fan": false,
     "descFr": "Vous pouvez ouvrir ce pot pour libérer un écho assourdissant de voix pendant un nombre de minutes égal à votre Instinct. Les créatures à portée Éloignée non préparées au son subissent 6d8 dégâts magiques."

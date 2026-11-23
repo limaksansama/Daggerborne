@@ -3,7 +3,19 @@
 Toutes les modifications notables de **Daggerborne** sont documentées dans ce fichier.
 
 Le format s'inspire de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
-La version de référence du projet est celle de `package.json` (`0.6.1-beta`).
+La version de référence du projet est celle de `package.json` (`0.6.2-beta`).
+
+## [0.6.2-beta] — 23 novembre 2026
+
+### Corrigé — retours de validation 0.6.1
+
+- Objets généraux : suppression des 9 dernières balises `@Template[...]` (3 objets, champs `desc`/`descEn`).
+- Mode EN : raretés d’objets traduites (`Courant` et `Ordinaire` → `Common`, `Inhabituel` → `Uncommon`).
+- Bestiaire : correction de la phrase Cryptimite et des accords de genre/pronoms issus du remplacement de `@Lookup[@name]`.
+- Forme bestiale : menu « Forme de base » traduit avec le palier dynamique.
+- Compagnon : les libellés par défaut traduits sont désormais persistés (`dirty`).
+- Version : `v.0.6.2-beta` ; `DATA_VER` v37, cache `daggerborne-v64`.
+- Vérifications : lint OK, **54/54 tests**.
 
 ## [0.6.1-beta] — 23 novembre 2026
 

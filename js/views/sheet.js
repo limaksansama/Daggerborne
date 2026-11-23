@@ -245,7 +245,10 @@ function migrate(c, weapons, armors, subclasses, classes, generalItems = [], anc
   }
   if (c.companion) {
     const setDefault = (key, fr, en) => {
-      if (c.companion[key] === fr || c.companion[key] === en) c.companion[key] = getLang() === 'en' ? en : fr;
+      if (c.companion[key] === fr || c.companion[key] === en) {
+        const next = getLang() === 'en' ? en : fr;
+        if (c.companion[key] !== next) { c.companion[key] = next; dirty = true; }
+      }
     };
     setDefault('name', 'Compagnon animal', 'Animal Companion');
     setDefault('species', 'Louveteau / Faucon / Lynx…', 'Wolfling / Falcon / Lynx…');
@@ -254,7 +257,10 @@ function migrate(c, weapons, armors, subclasses, classes, generalItems = [], anc
     const expDefaults = [['Pistage', 'Tracking'], ['Protection', 'Protection']];
     (c.companion.experiences || []).forEach((e, i) => {
       const [fr, en] = expDefaults[i] || [];
-      if (fr && (e.name === fr || e.name === en)) e.name = getLang() === 'en' ? en : fr;
+      if (fr && (e.name === fr || e.name === en)) {
+        const next = getLang() === 'en' ? en : fr;
+        if (e.name !== next) { e.name = next; dirty = true; }
+      }
     });
   }
   if (dirty) saveChar(c);
@@ -2394,7 +2400,7 @@ function tabFeatures(body, c, ctx) {
           ${availBf.map(b => `<option value="${b.id}" ${c.beastform?.id === b.id ? 'selected' : ''}>${bfOptLabel(b)}</option>`).join('')}
         </select>
         <select id="bf-base" style="flex:1;min-width:190px;background:var(--panel-3);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:.4rem .5rem;font-size:.8rem;display:${isVarPicked ? '' : 'none'}">
-          <option value="">— Forme de base (Palier ${pickedMeta?.tier >= 4 ? '1–2' : '1'}) —</option>
+          <option value="">${t('sheetBaseBeastform', { tier: pickedMeta?.tier >= 4 ? '1–2' : '1' })}</option>
           ${baseCandidates(pickedMeta?.tier >= 4 ? 2 : 1).map(b => `<option value="${b.id}" ${c.beastform?.baseId === b.id ? 'selected' : ''}>P${b.tier} · ${esc(b.fr)} (${T.traits[b.trait]} +${b.traitBonus}, ${b.dmgDice}${fmtBonus(b.dmgBonus)})</option>`).join('')}
         </select>
         <label class="dhr-hopespend" style="margin:0"><input type="checkbox" id="bf-stress" checked> −1 Stress</label>
@@ -2460,7 +2466,7 @@ function tabFeatures(body, c, ctx) {
     if (bf?.trait === 'variable') {
       const cap = bf.tier >= 4 ? 2 : 1;
       baseSel.style.display = '';
-      baseSel.innerHTML = `<option value="">— Forme de base (Palier ${cap === 2 ? '1–2' : '1'}) —</option>`
+      baseSel.innerHTML = `<option value="">${t('sheetBaseBeastform', { tier: cap === 2 ? '1–2' : '1' })}</option>`
         + baseCandidates(cap).map(b => `<option value="${b.id}">P${b.tier} · ${esc(b.fr)} (${T.traits[b.trait]} +${b.traitBonus}, ${b.dmgDice}${fmtBonus(b.dmgBonus)})</option>`).join('');
     } else {
       baseSel.style.display = 'none';
