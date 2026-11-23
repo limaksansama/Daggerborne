@@ -173,7 +173,7 @@ async function listResults(main, seq = renderSeq) {
       <span class="li-icon">${item.icon || ''}</span>
       <span class="li-body">
         <span class="li-name">${esc(item.name)} ${item.fanTag || ''}</span>
-        <span class="li-sub">${item.sub || ''}</span>
+        <span class="li-sub">${esc(item.sub || '')}</span>
       </span>
     </button>`);
     d.addEventListener('click', () => showDetail(main, item.raw, item.type));
@@ -410,13 +410,17 @@ async function showDetail(main, raw, type) {
       <div class="ms-body"><p>Valeur d'armure : <b>${raw.armorScore}</b></p><p>Seuils de base : <b>${raw.major} / ${raw.severe}</b>${raw.heavy ? ' · Lourd (malus d’Évasion)' : ''}</p>
       ${raw.desc ? `<p><b style="color:var(--golden)">${t('sheetFeature')}${getLang() === 'en' ? ':' : ' :'}</b> ${esc(raw.desc)}</p>` : ''}</div>`;
   } else if (type === 'item') {
+    const primaryDesc = getLang() === 'en'
+      ? (raw.descEn || raw.descFr || raw.desc || '')
+      : (raw.descFr || raw.descEn || raw.desc || '');
+    const secondaryDesc = getLang() !== 'en' && raw.descEn && raw.descEn !== primaryDesc ? raw.descEn : '';
     inner = `
       <h3>${esc(raw.fr)}</h3>
       <div class="ms-meta">${raw.type === 'consumable' ? 'Consommable' : 'Butin'}${raw.rarity ? ' · ' + raw.rarity : ''}${raw.campaign ? ` · ${esc(CAMPAIGN_LABELS[raw.campaign] || raw.campaign)}` : ''}${raw.fan ? ' · <span style="color:#c9a3d3">' + t('sheetFanSupp') + '</span>' : ''}</div>
       <div class="ms-body">
-        ${raw.descFr ? `<p>${esc(raw.descFr)}</p>` : ''}
-        ${!raw.descFr && raw.descEn ? `<p style="color:var(--text-faint)">${esc(raw.descEn)}</p>${getLang() === 'en' ? '' : '<p style="font-size:.75rem;color:var(--text-faint)">(Description originale en anglais — traduction à venir)</p>'}` : ''}
-        ${raw.descFr && raw.descEn && getLang() !== 'en' ? `<details style="margin-top:.6rem"><summary style="cursor:pointer;font-size:.78rem;color:var(--text-faint)">Version originale (EN)</summary><p style="font-size:.8rem;color:var(--text-faint);margin-top:.4rem">${esc(raw.descEn)}</p></details>` : ''}
+        ${primaryDesc ? `<p>${esc(primaryDesc)}</p>` : ''}
+        ${!raw.descFr && primaryDesc && getLang() !== 'en' ? '<p style="font-size:.75rem;color:var(--text-faint)">(Description originale en anglais — traduction à venir)</p>' : ''}
+        ${secondaryDesc ? `<details style="margin-top:.6rem"><summary style="cursor:pointer;font-size:.78rem;color:var(--text-faint)">Version originale (EN)</summary><p style="font-size:.8rem;color:var(--text-faint);margin-top:.4rem">${esc(secondaryDesc)}</p></details>` : ''}
       </div>`;
   } else if (type === 'adversary') {
     const a = raw;
@@ -511,7 +515,9 @@ async function showDetail(main, raw, type) {
     const existing = (c.inventory || []).find(x => x.itemId === item.id || x.name === item.fr);
     if (existing) existing.qty = (existing.qty ?? 1) + 1;
     else {
-      const desc = entryType === 'item' ? (item.descFr || item.descEn || '') : (item.desc || '');
+      const desc = entryType === 'item'
+        ? (getLang() === 'en' ? (item.descEn || item.descFr || item.desc || '') : (item.descFr || item.descEn || item.desc || ''))
+        : (item.desc || '');
       (c.inventory = c.inventory || []).push({
         name: item.fr, qty: 1, desc, itemId: item.id,
         ...(entryType === 'item' ? { type: item.type } : {}),

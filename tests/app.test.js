@@ -320,6 +320,7 @@ globalThis.fetch = async (url) => {
 
 /* Dynamic imports AFTER globals are configured */
 const core = await import('../js/core.js');
+const i18n = await import('../js/i18n.js');
 const dice3d = await import('../js/dice3d.js');
 const { openLevelUp } = await import('../js/views/levelup.js');
 const views = {
@@ -587,6 +588,37 @@ test('all views render cleanly with real SRD data and expose no formatting artif
   const opt3d = main.querySelector('#opt-dice3d');
   assert.ok(opt3d, 'Settings should render #opt-dice3d toggle');
   assert.ok(beastforms.length === 24);
+});
+
+test('sheet: remplace la Fondation FR par EN sans doublon lors du changement de langue', async () => {
+  resetTestState();
+  const classes = await core.data('classes', 'fr');
+  const subFr = (await core.data('subclasses', 'fr'))[0];
+  const subEn = (await core.data('subclasses', 'en'))[0];
+  const cl = classes.find(x => x.id === subFr.classId);
+  const c = core.newCharacter({
+    id: 'lang-pc',
+    name: 'Lang',
+    classId: subFr.classId,
+    className: cl?.fr || '',
+    subclassId: subFr.id,
+    subclassText: subFr.fr,
+    subcardCount: 1,
+    classFeature: `✦ ${subFr.features[0].name} — ${subFr.features[0].desc}`,
+  });
+  core.saveChar(c);
+  const main = new MockElement('main');
+  globalThis.document.body.appendChild(main);
+  try {
+    i18n.setLang('en');
+    await views.sheet.render(main, 'lang-pc');
+    assert.ok(c.classFeature.includes(subEn.features[0].name), 'Fondation EN attendue');
+    assert.ok(!c.classFeature.includes(subFr.features[0].name), 'Fondation FR encore présente');
+    assert.equal((c.classFeature.match(/✦/g) || []).length, 1, 'Une seule carte de Fondation attendue');
+  } finally {
+    i18n.setLang('fr');
+    main.remove();
+  }
 });
 
 /* ==================== Level-Up Wizard Tests ==================== */

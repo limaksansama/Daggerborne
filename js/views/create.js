@@ -1,7 +1,7 @@
 /* Assistant de création de personnage — 9 étapes guidées */
 import { $, $$, el, esc, go, T, data, toast, uid, newCharacter, saveChar, getState, setState } from '../core.js';
 
-import { t } from '../i18n.js';
+import { t, getLang } from '../i18n.js';
 import { openCodexDetail } from './compendium.js';
 /* fonction (et non constante) : les titres doivent suivre la langue courante */
 const STEPS = () => [
@@ -590,7 +590,10 @@ async function stepIdentity(body) {
       <div class="field"><label>Transformation (optionnelle — SRD 2.0)</label>
         <select id="f-transformation" style="background:var(--panel-3);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:.55rem .7rem;width:100%">
           <option value="">Aucune</option>
-          ${transformations.map(t => `<option value="${esc(t.fr)}" ${wiz.transformation === t.fr ? 'selected' : ''}>${esc(t.fr)} (${esc(t.en)})</option>`).join('')}
+          ${transformations.map(tr => {
+            const label = getLang() === 'en' ? tr.en : `${tr.fr} (${tr.en})`;
+            return `<option value="${esc(tr.fr)}" ${wiz.transformation === tr.fr ? 'selected' : ''}>${esc(label)}</option>`;
+          }).join('')}
         </select>
         <p class="page-sub" style="font-size:.72rem;margin:.3rem 0 0">Une transformation est un aspect optionnel de l'identité accordé par le MJ — elle ne compte pas dans votre kit. Consultez ses aptitudes dans le Compendium.</p>
       </div>
@@ -636,6 +639,7 @@ async function finish(main) {
   const communities = await data('communities');
   const com = communities.find(c => c.id === wiz.communityId);
   const subclasses = await data('subclasses');
+  const generalItems = await data('generalItems');
   const sub = subclasses.find(s => s.id === wiz.subclassId);
   const armor = armors.find(a => a.id === wiz.armorId);
   const anc2 = wiz.mixedAncestry ? ancestries.find(a => a.id === wiz.ancestry2Id) : null;
@@ -682,6 +686,25 @@ async function finish(main) {
     experiences: [{ name: 'Pistage', mod: 2 }, { name: 'Protection', mod: 2 }],
     upgrades: [],
   } : null;
+
+  const startingItem = (id, qty, type, fallbackName, fallbackDesc) => {
+    const def = generalItems.find(x => x.id === id);
+    return {
+      name: def?.fr || fallbackName,
+      qty,
+      type,
+      desc: def ? (def.descFr || def.desc || def.descEn || '') : fallbackDesc,
+      itemId: id,
+    };
+  };
+  const startingInventory = [
+    startingItem('z3qzQoThgcZafEZr', 1, 'loot', 'Torche', "Torche d'aventure classique permettant d'éclairer les lieux sombres."),
+    startingItem('ocBTBdfvjTqIehtf', 1, 'loot', 'Corde (15 m)', '15 mètres de corde robuste, utile pour escalader une paroi ou descendre une falaise en rappel.'),
+    startingItem('jga6tUNjZjTpK6td', 1, 'loot', 'Fournitures de base', 'Nécessaire de voyage standard : couverture, boîte à amadou, rations, outre et matériel courant.'),
+    wiz.startingPotion === 'stamina'
+      ? startingItem('b6vGSPFWOlzZZDLO', 1, 'consumable', 'Potion de résilience mineure', 'Effacez 1d4 Stress.')
+      : startingItem('tPfKtKRRjv8qdSqy', 1, 'consumable', 'Potion de santé mineure', 'Effacez 1d4 PV.'),
+  ];
 
   const c = newCharacter({
     name: wiz.name.trim(),
@@ -739,14 +762,7 @@ async function finish(main) {
     domainCards: wiz.cardIds.map((id, i) => ({ cardId: id, inHand: i < 5 })),
     goldTrack: { handfuls: 1, bags: 0, chests: 0 },
     journal: [],
-    inventory: [
-      { name: 'Torche', qty: 1, type: 'loot', desc: "Torche d'aventure classique permettant d'éclairer les lieux sombres.", itemId: 'z3qzQoThgcZafEZr' },
-      { name: 'Corde (15 m)', qty: 1, type: 'loot', desc: '15 mètres de corde robuste, utile pour escalader une paroi ou descendre une falaise en rappel.', itemId: 'ocBTBdfvjTqIehtf' },
-      { name: 'Fournitures de base', qty: 1, type: 'loot', desc: 'Nécessaire de voyage standard : couverture, boîte à amadou, rations, outre et matériel courant.', itemId: 'jga6tUNjZjTpK6td' },
-      wiz.startingPotion === 'stamina'
-        ? { name: 'Potion de résilience mineure', qty: 1, type: 'consumable', desc: 'Effacez 1d4 Stress.', itemId: 'b6vGSPFWOlzZZDLO' }
-        : { name: 'Potion de santé mineure', qty: 1, type: 'consumable', desc: 'Effacez 1d4 PV.', itemId: 'tPfKtKRRjv8qdSqy' },
-    ],
+    inventory: startingInventory,
     backgroundAnswers: { ...wiz.answers },
     className: cl.fr, hopeAbility: { name: cl.hopeAbility, desc: cl.hopeDesc },
   });

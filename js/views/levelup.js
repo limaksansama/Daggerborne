@@ -371,8 +371,9 @@ async function runLevelUpWizard(c, ctx) {
     const exclude = new Set([...ownedIds(), ...wiz.cardPicks]);
     const list = cards.filter(cd => myDomains().includes(cd.domain) && cd.level <= domainLevelCap(cd.domain) && !exclude.has(cd.id))
       .sort((a, b) => a.level - b.level || a.fr.localeCompare(b.fr, 'fr'));
+    const cap = old ? domainLevelCap(old.domain) : newLevel;
     return `<div class="lu-sub lu-swapbox">
-      <div class="lu-sub-lbl">Remplacer « ${esc(old?.fr || '')} » par (niveau ≤ ${newLevel})</div>
+      <div class="lu-sub-lbl">Remplacer « ${esc(old?.fr || '')} » par (niveau ≤ ${cap})</div>
       <div class="lu-swaplist">
         ${list.map(cd => `<button class="lu-tp ${wiz.swapPick === cd.id ? 'sel' : ''}" data-lunew="${cd.id}">Niv. ${cd.level} · ${esc(cd.fr)}</button>`).join('') || '<div class="dh-help">' + t('lvlNoCards') + '</div>'}
       </div>

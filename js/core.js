@@ -244,10 +244,10 @@ export function importFullBackupFromText(rawText, mode = 'merge') {
 
 // ---------- data cache ----------
 const cache = {};
-const DATA_VER = 'v35';
-export async function data(name) {
-  const dir = getLang() === 'en' ? 'data/en' : 'data';
-  const key = getLang() + ':' + name;
+const DATA_VER = 'v36';
+export async function data(name, lang = getLang()) {
+  const dir = lang === 'en' ? 'data/en' : 'data';
+  const key = lang + ':' + name;
   if (!cache[key]) {
     const r = await fetch(`${dir}/${name}.json?${DATA_VER}`);
     if (!r.ok) throw new Error(`data ${name}: ${r.status}`);

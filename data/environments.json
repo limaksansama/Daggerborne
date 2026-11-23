@@ -25,13 +25,13 @@
         "name": "Vous n’êtes pas les bienvenus",
         "nameEn": "You Are Not Welcome Here",
         "kind": "Action",
-        "desc": "Une @UUID[Compendium.daggerheart.adversaries.Actor.8yUj2Mzvnifhxegm]{Jeune dryade}, deux @UUID[Compendium.daggerheart.adversaries.Actor.VtFBt9XBE0WrGGxP]{Soldats sylvestres} et autant de @UUID[Compendium.daggerheart.adversaries.Actor.G62k4oSkhkoXEs2D]{Tréants mineurs} qu’il y a de PJ apparaissent pour s’opposer à l’intrusion du groupe. Que cachent les gardiens du bosquet ? Quelle menace pesant sur la forêt les PJ pourraient-ils affronter pour apaiser la Dryade ?"
+        "desc": "Une Jeune dryade, deux Soldats sylvestres et autant de Tréants mineurs qu’il y a de PJ apparaissent pour s’opposer à l’intrusion du groupe. Que cachent les gardiens du bosquet ? Quelle menace pesant sur la forêt les PJ pourraient-ils affronter pour apaiser la Dryade ?"
       },
       {
         "name": "Profanateur",
         "nameEn": "Defiler",
         "kind": "Action",
-        "desc": "Dépensez une Peur pour invoquer un @UUID[Compendium.daggerheart.adversaries.Actor.sRn4bqerfARvhgSV]{Élémentaire du chaos mineur} attiré par les échos de violence et de discorde. Il apparaît à portée éloignée du PJ de votre choix et il est immédiatement mis en avant. De quelle couleur devient l’herbe quand l’élémentaire apparaît ? Comment le chaos déforme-t-il les insectes et les petits animaux du bosquet ?"
+        "desc": "Dépensez une Peur pour invoquer un Élémentaire du chaos mineur attiré par les échos de violence et de discorde. Il apparaît à portée éloignée du PJ de votre choix et il est immédiatement mis en avant. De quelle couleur devient l’herbe quand l’élémentaire apparaît ? Comment le chaos déforme-t-il les insectes et les petits animaux du bosquet ?"
       }
     ],
     "fr": "Bosquet abandonné",
@@ -235,7 +235,7 @@
         "name": "Chanter pour manger",
         "nameEn": "Sing For Your Supper",
         "kind": "Passif",
-        "desc": "Un PJ peut donner une représentation pour les clients avec un jet de Présence. Sur un succès, il gagne [[/r 1d4]] poignées d’or ([[/r 2d4]] pour un succès critique). Sur un échec, il marque un Stress. Qu’interprétez-vous ? Qu’est-ce que ce morceau signifie pour vous ? Quand est-ce que vous l’avez interprété devant un public pour la dernière fois ?"
+        "desc": "Un PJ peut donner une représentation pour les clients avec un jet de Présence. Sur un succès, il gagne 1d4 poignées d’or (2d4 pour un succès critique). Sur un échec, il marque un Stress. Qu’interprétez-vous ? Qu’est-ce que ce morceau signifie pour vous ? Quand est-ce que vous l’avez interprété devant un public pour la dernière fois ?"
       },
       {
         "name": "Mystérieux étranger",
@@ -286,7 +286,7 @@
         "name": "Chasseur patient",
         "nameEn": "Patient Hunter",
         "kind": "Action",
-        "desc": "Dépensez une Peur pour invoquer un @UUID[Compendium.daggerheart.adversaries.Actor.8KWVLWXFhlY2kYx0]{Serpent de verre} à portée proche d’un PJ de votre choix. Il apparaît dans la rivière ou à côté, et il est immédiatement mis en avant pour utiliser l’action « Serpent tourbillonnant ». Quels trésors la bête cache-t-elle dans son terrier ? Quels voyageurs ont déjà succombé à ses assauts ?"
+        "desc": "Dépensez une Peur pour invoquer un Serpent de verre à portée proche d’un PJ de votre choix. Il apparaît dans la rivière ou à côté, et il est immédiatement mis en avant pour utiliser l’action « Serpent tourbillonnant ». Quels trésors la bête cache-t-elle dans son terrier ? Quels voyageurs ont déjà succombé à ses assauts ?"
       }
     ],
     "fr": "Rivière déchaînée",
@@ -352,13 +352,13 @@
         "name": "Poches profondes",
         "nameEn": "Deep Pockets",
         "kind": "Passif",
-        "desc": "Une fois par repos, les PJ peuvent trouver une cache de trésors dans le donjon, sur les cadavres de précédents explorateurs ou derrière des portes dérobées. Sur un jet réussi pour se diriger dans le donjon, un PJ peut dépenser jusqu’à 5 Espoirs pour lancer autant de [[/r d6]]{d6}. Chaque résultat obtenu rapporte au groupe le butin ou l’équipement suivant : • Des gemmes, bijoux, babioles ou pièces en vrac équivalant à une poignée d’or • Un objet ou consommable ordinaire • Un objet ou consommable inhabituel • Un objet ou consommable rare • Un objet ou consommable légendaire • Une arme ou une armure du palier du groupe À quoi ressemblaient les anciens propriétaires ? Comment les PJ comptent-ils sortir du donjon les objets qu’ils ont dérobés ?"
+        "desc": "Une fois par repos, les PJ peuvent trouver une cache de trésors dans le donjon, sur les cadavres de précédents explorateurs ou derrière des portes dérobées. Sur un jet réussi pour se diriger dans le donjon, un PJ peut dépenser jusqu’à 5 Espoirs pour lancer autant de d6. Chaque résultat obtenu rapporte au groupe le butin ou l’équipement suivant : • Des gemmes, bijoux, babioles ou pièces en vrac équivalant à une poignée d’or • Un objet ou consommable ordinaire • Un objet ou consommable inhabituel • Un objet ou consommable rare • Un objet ou consommable légendaire • Une arme ou une armure du palier du groupe À quoi ressemblaient les anciens propriétaires ? Comment les PJ comptent-ils sortir du donjon les objets qu’ils ont dérobés ?"
       },
       {
         "name": "Monstre errant",
         "nameEn": "Wandering Monster",
         "kind": "Réaction",
-        "desc": "Lorsque le groupe entre dans une nouvelle zone du donjon, vous pouvez dépenser une Peur pour invoquer 1d4 adversaires d’un palier inférieur ou égal à celui du groupe à portée éloignée, et lancer un [[/r d6]]. Sur un résultat de 1 ou 2, les PJ remarquent des signes avant-coureurs et peuvent se préparer à la rencontre ; le premier PJ à effectuer un jet d’action bénéficie d’un avantage. Sur un résultat de 3 ou 4, le combat se déroule normalement. Sur un résultat de 5 ou 6, les adversaires prennent les PJ par surprise et sont aussitôt mis en avant, et vous gagnez une Peur. Comment ces créatures sont-elles arrivées ici ? Que faisaient-elles quand les PJ les ont rencontrées ?"
+        "desc": "Lorsque le groupe entre dans une nouvelle zone du donjon, vous pouvez dépenser une Peur pour invoquer 1d4 adversaires d’un palier inférieur ou égal à celui du groupe à portée éloignée, et lancer un d6. Sur un résultat de 1 ou 2, les PJ remarquent des signes avant-coureurs et peuvent se préparer à la rencontre ; le premier PJ à effectuer un jet d’action bénéficie d’un avantage. Sur un résultat de 3 ou 4, le combat se déroule normalement. Sur un résultat de 5 ou 6, les adversaires prennent les PJ par surprise et sont aussitôt mis en avant, et vous gagnez une Peur. Comment ces créatures sont-elles arrivées ici ? Que faisaient-elles quand les PJ les ont rencontrées ?"
       },
       {
         "name": "Pièges",
@@ -391,7 +391,7 @@
         "name": "Conseil divin",
         "nameEn": "Divine Guidance",
         "kind": "Passif",
-        "desc": "Un PJ qui prie une divinité dans le Temple saint peut faire un jet d’Instinct pour recevoir des réponses. Si le dieu auquel il s’adresse n’est pas le bienvenu dans ce temple, son jet s’accompagne d’un désavantage. • Succès critique. Le PJ obtient une information claire. De plus, il gagne [[/r 1d4]] Espoirs qu’il peut répartir entre les membres de son groupe s’ils ont partagé sa vision et le conseil reçu. • Succès avec Espoir. Le PJ reçoit une information claire. • Succès avec Peur. Le PJ reçoit de brefs aperçus et des impressions émotionnelles qui traduisent une réponse. • Tout échec. Le PJ reçoit uniquement de vagues flashs. Il peut marquer un Stress pour recevoir une unique image claire sans contexte. Quelle impression cela fait-il d’être touché par cette vision ? Quel sentiment persiste une fois les images disparues ?"
+        "desc": "Un PJ qui prie une divinité dans le Temple saint peut faire un jet d’Instinct pour recevoir des réponses. Si le dieu auquel il s’adresse n’est pas le bienvenu dans ce temple, son jet s’accompagne d’un désavantage. • Succès critique. Le PJ obtient une information claire. De plus, il gagne 1d4 Espoirs qu’il peut répartir entre les membres de son groupe s’ils ont partagé sa vision et le conseil reçu. • Succès avec Espoir. Le PJ reçoit une information claire. • Succès avec Peur. Le PJ reçoit de brefs aperçus et des impressions émotionnelles qui traduisent une réponse. • Tout échec. Le PJ reçoit uniquement de vagues flashs. Il peut marquer un Stress pour recevoir une unique image claire sans contexte. Quelle impression cela fait-il d’être touché par cette vision ? Quel sentiment persiste une fois les images disparues ?"
       },
       {
         "name": "Espoir continu",
@@ -403,7 +403,7 @@
         "name": "Censure divine",
         "nameEn": "Divine Censure",
         "kind": "Réaction",
-        "desc": "Lorsque les PJ sont entrés sans autorisation, ont blasphémé ou offensé le clergé, vous pouvez dépenser une Peur pour invoquer un @UUID[Compendium.daggerheart.adversaries.Actor.r1mbfSSwKWdcFdAU]{Grand séraphin} et [[/r 1d4]] @UUID[Compendium.daggerheart.adversaries.Actor.B4LZcGuBAHzyVdzy]{Gardes épéistes} à portée proche du prêtre en charge pour faire respecter sa volonté. Quels symboles ou icônes portent-ils pour indiquer qu’ils sont les agents oints du divin ? Qui mène ce groupe et qu’est-ce qui l’a poussé sur cette voie ?"
+        "desc": "Lorsque les PJ sont entrés sans autorisation, ont blasphémé ou offensé le clergé, vous pouvez dépenser une Peur pour invoquer un Grand séraphin et 1d4 Gardes épéistes à portée proche du prêtre en charge pour faire respecter sa volonté. Quels symboles ou icônes portent-ils pour indiquer qu’ils sont les agents oints du divin ? Qui mène ce groupe et qu’est-ce qui l’a poussé sur cette voie ?"
       }
     ],
     "fr": "Temple consacré",
@@ -481,7 +481,7 @@
         "name": "Nid de rapace",
         "nameEn": "Raptor Nest",
         "kind": "Réaction",
-        "desc": "Quand les PJ pénètrent sur le terrain de chasse des rapaces, deux @UUID[Compendium.daggerheart.adversaries.Actor.OMQ0v6PE8s1mSU0K]{Aigles géants} apparaissent à portée très éloignée d’un PJ de votre choix et identifient le groupe comme des proies. Combien de temps s’est-il écoulé depuis la dernière fois que les aigles ont trouvé une proie ? Ont-ils des œufs dans leur nid ou des petits à nourrir ?"
+        "desc": "Quand les PJ pénètrent sur le terrain de chasse des rapaces, deux Aigles géants apparaissent à portée très éloignée d’un PJ de votre choix et identifient le groupe comme des proies. Combien de temps s’est-il écoulé depuis la dernière fois que les aigles ont trouvé une proie ? Ont-ils des œufs dans leur nid ou des petits à nourrir ?"
       },
       {
         "name": "Vents glacés",
@@ -856,7 +856,7 @@
         "name": "Décret impérial",
         "nameEn": "Imperial Decree",
         "kind": "Action",
-        "desc": "Dépensez une Peur pour faire avancer de [[/r 1d4]] un compte à rebours sur le long terme lié aux objectifs de l’empire. Si cela le mène à terme, une proclamation liée à cet objectif est lue devant la cour et le plan est exécuté. Quelle démonstration de puissance ou transfert de richesse était nécessaire pour lancer ce plan ? Quelles vies ont été détruites ou bouleversées pour que cela devienne possible ?"
+        "desc": "Dépensez une Peur pour faire avancer de 1d4 un compte à rebours sur le long terme lié aux objectifs de l’empire. Si cela le mène à terme, une proclamation liée à cet objectif est lue devant la cour et le plan est exécuté. Quelle démonstration de puissance ou transfert de richesse était nécessaire pour lancer ce plan ? Quelles vies ont été détruites ou bouleversées pour que cela devienne possible ?"
       },
       {
         "name": "Des yeux partout",
@@ -907,7 +907,7 @@
         "name": "Il en arrive encore !",
         "nameEn": "They Just Keep Coming!",
         "kind": "Action",
-        "desc": "Dépensez une Peur pour invoquer [[/r 1d6]] @UUID[Compendium.daggerheart.adversaries.Actor.gP3fWTLzSFnpA8EJ]{Zombis pourrissants}, deux @UUID[Compendium.daggerheart.adversaries.Actor.CP6iRfHdyFWniTHY]{Zombis perfectionnés} ou une @UUID[Compendium.daggerheart.adversaries.Actor.YhJrP7rTBiRdX5Fp]{Légion de zombis}, qui apparaissent à portée proche d’un PJ choisi. Qui étaient ces gens avant de devenir les pions du nécromancien ? Quels vestiges de leur ancienne vie les héros remarquent-ils encore sur eux ?"
+        "desc": "Dépensez une Peur pour invoquer 1d6 Zombis pourrissants, deux Zombis perfectionnés ou une Légion de zombis, qui apparaissent à portée proche d’un PJ choisi. Qui étaient ces gens avant de devenir les pions du nécromancien ? Quels vestiges de leur ancienne vie les héros remarquent-ils encore sur eux ?"
       }
     ],
     "fr": "Ossuaire du nécromancien",
@@ -1174,7 +1174,7 @@
         "name": "Figure légendaire",
         "nameEn": "Legendary Local",
         "kind": "Action",
-        "desc": "La fête culmine avec l’arrivée d’une figure du folklore local, qui remplit des fonctions particulières au service de la communauté, comme offrir des friandises aux enfants, railler la noblesse ou bénir les récoltes de l’année suivante. Si les PJ témoignent à cette figure la déférence et le respect qui lui sont dus, ils reçoivent une bénédiction appropriée, comme une prophétie énigmatique ou un colifichet magique, et gagnent [[/r d4]] Espoirs à répartir au sein du groupe. S’ils insultent la figure, ils subissent [[/r 1d6+2]] dégâts magiques lorsqu’elle les maudit, et vous gagnez une Peur. S’agit-il d’une entité unique ou d’un rôle transmis de personne en personne ? Quelle forme singulière possède-t-elle ? D’où tire-t-elle le pouvoir d’accorder bienfaits et malédictions ?"
+        "desc": "La fête culmine avec l’arrivée d’une figure du folklore local, qui remplit des fonctions particulières au service de la communauté, comme offrir des friandises aux enfants, railler la noblesse ou bénir les récoltes de l’année suivante. Si les PJ témoignent à cette figure la déférence et le respect qui lui sont dus, ils reçoivent une bénédiction appropriée, comme une prophétie énigmatique ou un colifichet magique, et gagnent d4 Espoirs à répartir au sein du groupe. S’ils insultent la figure, ils subissent 1d6+2 dégâts magiques lorsqu’elle les maudit, et vous gagnez une Peur. S’agit-il d’une entité unique ou d’un rôle transmis de personne en personne ? Quelle forme singulière possède-t-elle ? D’où tire-t-elle le pouvoir d’accorder bienfaits et malédictions ?"
       }
     ],
     "fr": "Festival local",
@@ -1213,7 +1213,7 @@
         "name": "Au mauvais endroit au mauvais moment",
         "nameEn": "Wrong Place, Wrong Time",
         "kind": "Réaction",
-        "desc": "La nuit ou lorsque les PJ se trouvent seuls dans une ruelle, vous pouvez dépenser une Peur pour introduire un groupe de voleurs qui tente de les détrousser. Ils apparaissent à portée proche d’un PJ de votre choix et comptent un @UUID[Compendium.daggerheart.adversaries.Actor.CBKixLH3yhivZZuL]{Brisegenoux du Couteau sinueux}, autant de @UUID[Compendium.daggerheart.adversaries.Actor.C0OMQqV7pN6t7ouR]{Laquais} qu’il y a de PJ et un @UUID[Compendium.daggerheart.adversaries.Actor.aTljstqteGoLpCBq]{Lieutenant}. Si le groupe est de grande taille, ajoutez un @UUID[Compendium.daggerheart.adversaries.Actor.MbBPIOxaxXYNApXz]{Maudisseur} ou un @UUID[Compendium.daggerheart.adversaries.Actor.1zuyof1XuIfi3aMG]{Tireur}. Quels détails révèlent au groupe que ces gens sont d’anciens aventuriers désespérés ?"
+        "desc": "La nuit ou lorsque les PJ se trouvent seuls dans une ruelle, vous pouvez dépenser une Peur pour introduire un groupe de voleurs qui tente de les détrousser. Ils apparaissent à portée proche d’un PJ de votre choix et comptent un Brisegenoux du Couteau sinueux, autant de Laquais qu’il y a de PJ et un Lieutenant. Si le groupe est de grande taille, ajoutez un Maudisseur ou un Tireur. Quels détails révèlent au groupe que ces gens sont d’anciens aventuriers désespérés ?"
       }
     ],
     "fr": "Ville avant-poste",
@@ -1285,7 +1285,7 @@
         "name": "L’invocation",
         "nameEn": "The Summoning",
         "kind": "Réaction",
-        "desc": "Compte à rebours (6). Activez le compte à rebours lorsque les PJ entrent dans cette scène ou lorsque le culte commence le rituel pour invoquer un démon. Désignez un adversaire pour mener le rituel. Le compte à rebours avance quand un PJ fait un jet avec Peur. Quand il arrive à terme, invoquez un @UUID[Compendium.daggerheart.adversaries.Actor.3tqCjDwJAQ7JKqMb]{Démon mineur} à portée très proche du meneur du rituel. Si le meneur est vaincu, le compte à rebours se termine sans effet et le rituel échoue. Qu’est-ce que le culte compte faire de son démon asservi s’il achève le rituel ? Qu’essaiera-t-il d’invoquer ensuite ?"
+        "desc": "Compte à rebours (6). Activez le compte à rebours lorsque les PJ entrent dans cette scène ou lorsque le culte commence le rituel pour invoquer un démon. Désignez un adversaire pour mener le rituel. Le compte à rebours avance quand un PJ fait un jet avec Peur. Quand il arrive à terme, invoquez un Démon mineur à portée très proche du meneur du rituel. Si le meneur est vaincu, le compte à rebours se termine sans effet et le rituel échoue. Qu’est-ce que le culte compte faire de son démon asservi s’il achève le rituel ? Qu’essaiera-t-il d’invoquer ensuite ?"
       },
       {
         "name": "Terminez le rituel",
@@ -1453,7 +1453,7 @@
         "name": "Ici vivent des monstres",
         "nameEn": "Here There Be Monsters",
         "kind": "Réaction",
-        "desc": "Lorsque le compte à rebours de Haute mer atteint un nombre pair, lancez un d6. Sur un résultat de 4 ou plus, invoquez [[/r 1d4]] Habitants des grands fonds. Qu’est-ce qui attire ces créatures vers le navire ? Existe-t-il un moyen de les repousser sans combattre ?"
+        "desc": "Lorsque le compte à rebours de Haute mer atteint un nombre pair, lancez un d6. Sur un résultat de 4 ou plus, invoquez 1d4 Habitants des grands fonds. Qu’est-ce qui attire ces créatures vers le navire ? Existe-t-il un moyen de les repousser sans combattre ?"
       }
     ],
     "fr": "Traversée océanique",
@@ -1564,7 +1564,7 @@
         "name": "Des renforts !",
         "nameEn": "Reinforcements!",
         "kind": "Action",
-        "desc": "En guise de renforts, invoquez un @UUID[Compendium.daggerheart.adversaries.Actor.7ai2opemrclQe3VF]{Chevalier du royaume}, un nombre de Sbires de palier 3 égal au nombre de PJ et deux adversaires de votre choix, à portée éloignée du PJ de votre choix. Le Chevalier du royaume est immédiatement mis en avant. À qui s’en prennent-ils en premier ? Quelle formation adoptent-ils ?"
+        "desc": "En guise de renforts, invoquez un Chevalier du royaume, un nombre de Sbires de palier 3 égal au nombre de PJ et deux adversaires de votre choix, à portée éloignée du PJ de votre choix. Le Chevalier du royaume est immédiatement mis en avant. À qui s’en prennent-ils en premier ? Quelle formation adoptent-ils ?"
       },
       {
         "name": "Dégâts collatéraux",
@@ -1648,7 +1648,7 @@
         "name": "Des renforts !",
         "nameEn": "Reinforcements!",
         "kind": "Action",
-        "desc": "Invoquez en renfort un @UUID[Compendium.daggerheart.adversaries.Actor.7ai2opemrclQe3VF]{Chevalier du royaume}, autant de Sbires de palier 3 qu’il y a de PJ et deux adversaires de votre choix à portée éloignée d’un PJ de votre choix. Le Chevalier du royaume est aussitôt mis en avant. À qui s’en prennent-ils en premier ? Quelle formation adoptent-ils ?"
+        "desc": "Invoquez en renfort un Chevalier du royaume, autant de Sbires de palier 3 qu’il y a de PJ et deux adversaires de votre choix à portée éloignée d’un PJ de votre choix. Le Chevalier du royaume est aussitôt mis en avant. À qui s’en prennent-ils en premier ? Quelle formation adoptent-ils ?"
       }
     ],
     "fr": "Bataille rangée",
@@ -1726,7 +1726,7 @@
         "name": "Prédateurs des royaumes extérieurs",
         "nameEn": "Outer Realms Predators",
         "kind": "Action",
-        "desc": "Dépensez une Peur pour invoquer une @UUID[Compendium.daggerheart.adversaries.Actor.A0SeeDzwjvqOsyof]{Abomination des royaumes extérieurs}, un @UUID[Compendium.daggerheart.adversaries.Actor.ms6nuOl3NFkhPj1k]{Corrupteur des royaumes extérieurs} et [[/r 2d6]] @UUID[Compendium.daggerheart.adversaries.Actor.moJhHgKqTKPS2WYS]{Serviteurs des royaumes extérieurs}. Ils apparaissent à portée proche du PJ de votre choix, en défiant la logique et la causalité. Mettez immédiatement en avant l’un de ces adversaires. Vous pouvez dépenser une Peur de plus pour réussir automatiquement son attaque standard. Quel reste à moitié dévoré d’un monde brisé ces monstruosités délaissent-elles pour poursuivre de la chair fraîche ? Quel reflet d’une ancienne personnalité apercevez-vous entre deux instants de pure malveillance ?"
+        "desc": "Dépensez une Peur pour invoquer une Abomination des royaumes extérieurs, un Corrupteur des royaumes extérieurs et 2d6 Serviteurs des royaumes extérieurs. Ils apparaissent à portée proche du PJ de votre choix, en défiant la logique et la causalité. Mettez immédiatement en avant l’un de ces adversaires. Vous pouvez dépenser une Peur de plus pour réussir automatiquement son attaque standard. Quel reste à moitié dévoré d’un monde brisé ces monstruosités délaissent-elles pour poursuivre de la chair fraîche ? Quel reflet d’une ancienne personnalité apercevez-vous entre deux instants de pure malveillance ?"
       },
       {
         "name": "Réalité déroutante",
@@ -1765,7 +1765,7 @@
         "name": "Abondance de profanateurs",
         "nameEn": "Defilers Abound",
         "kind": "Action",
-        "desc": "Dépensez 2 Peurs pour invoquer [[/r 1d4+2]] @UUID[Compendium.daggerheart.adversaries.Actor.OsLG2BjaEdTZUJU9]{Soldats de choc déchus} qui apparaissent à portée proche de l’Usurpateur pour l’aider dans son siège du divin. Mettez immédiatement ces Soldats en avant pour utiliser l’action « Attaque de groupe ». Quel Grand Déchu ces soldats servent-ils ? De la chair de quel dieu désirent-ils se repaître ?"
+        "desc": "Dépensez 2 Peurs pour invoquer 1d4+2 Soldats de choc déchus qui apparaissent à portée proche de l’Usurpateur pour l’aider dans son siège du divin. Mettez immédiatement ces Soldats en avant pour utiliser l’action « Attaque de groupe ». Quel Grand Déchu ces soldats servent-ils ? De la chair de quel dieu désirent-ils se repaître ?"
       },
       {
         "name": "Tueur de dieux",
@@ -1816,7 +1816,7 @@
         "name": "Astrologium lunaire",
         "nameEn": "Lunar Astrologium",
         "kind": "Passif",
-        "desc": "Au sommet de la plus haute tour de la capitale trône une machine à rêves de cristal capable de rejouer l’histoire. Un PJ qui réussit un jet de Savoir peut réparer la machine. Une fois la machine réparée, un PJ qui réussit un jet de Présence peut la faire fonctionner pour apprendre l’histoire de l’essor et de la chute du Royaume de la Lune. • Succès critique : le PJ reçoit des informations claires sur les événements et les figures clés de l’histoire du Royaume de la Lune et gagne [[/r 1d4]] Espoirs, qu’il peut répartir entre les PJ avec qui il partage ses visions. • Succès avec Espoir : le PJ reçoit des informations claires sur les événements et les figures clés de l’histoire du Royaume de la Lune. • Tout jet avec Peur : le PJ reçoit de brefs éclairs et sensations liés à la fin cataclysmique du royaume. Si le jet était un échec, le PJ subit 4d10+5 dégâts magiques, tandis que les visions assaillent sa psyché. À quoi ressemble cette machinerie, et comment fonctionne-t-elle ? Qu’apprennent les PJ sur l’histoire du Royaume de la Lune ?"
+        "desc": "Au sommet de la plus haute tour de la capitale trône une machine à rêves de cristal capable de rejouer l’histoire. Un PJ qui réussit un jet de Savoir peut réparer la machine. Une fois la machine réparée, un PJ qui réussit un jet de Présence peut la faire fonctionner pour apprendre l’histoire de l’essor et de la chute du Royaume de la Lune. • Succès critique : le PJ reçoit des informations claires sur les événements et les figures clés de l’histoire du Royaume de la Lune et gagne 1d4 Espoirs, qu’il peut répartir entre les PJ avec qui il partage ses visions. • Succès avec Espoir : le PJ reçoit des informations claires sur les événements et les figures clés de l’histoire du Royaume de la Lune. • Tout jet avec Peur : le PJ reçoit de brefs éclairs et sensations liés à la fin cataclysmique du royaume. Si le jet était un échec, le PJ subit 4d10+5 dégâts magiques, tandis que les visions assaillent sa psyché. À quoi ressemble cette machinerie, et comment fonctionne-t-elle ? Qu’apprennent les PJ sur l’histoire du Royaume de la Lune ?"
       },
       {
         "name": "Le tombeau de la Reine de la Lune",
@@ -1867,7 +1867,7 @@
         "name": "Abandonnez tout espoir",
         "nameEn": "Abandon All Hope",
         "kind": "Réaction",
-        "desc": "Lorsqu’un PJ dépense de l’Espoir dans le Royaume des morts, il doit lancer un [[/r d6]]. Sur un résultat impair, il doit dépenser un Espoir supplémentaire ou perdre le bénéfice de l’Espoir déjà dépensé. Quels regrets rongent les bords de votre conscience tandis que vous êtes ici ? Quels souvenirs vous rattachent encore au Royaume mortel ?"
+        "desc": "Lorsqu’un PJ dépense de l’Espoir dans le Royaume des morts, il doit lancer un d6. Sur un résultat impair, il doit dépenser un Espoir supplémentaire ou perdre le bénéfice de l’Espoir déjà dépensé. Quels regrets rongent les bords de votre conscience tandis que vous êtes ici ? Quels souvenirs vous rattachent encore au Royaume mortel ?"
       }
     ],
     "fr": "Royaume des Morts",

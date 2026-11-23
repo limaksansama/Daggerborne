@@ -34,7 +34,7 @@ const fmtBonus = (b) => {
 };
 
 /* ============ migration vers le modèle « feuille officielle » ============ */
-function migrate(c, weapons, armors, subclasses, classes, generalItems = [], ancestries = [], communities = []) {
+function migrate(c, weapons, armors, subclasses, classes, generalItems = [], ancestries = [], communities = [], subclassesFr = [], subclassesEn = []) {
   let dirty = false;
   if (!c.className && c.classId && classes) {
     const cl = classes.find(x => x.id === c.classId);
@@ -87,12 +87,29 @@ function migrate(c, weapons, armors, subclasses, classes, generalItems = [], anc
     dirty = true;
   }
   if (c.classFeature === undefined) { c.classFeature = ''; dirty = true; }
-  /* La carte de Fondation de sous-classe est acquise dès le niveau 1. */
+  /* La carte de Fondation de sous-classe est acquise dès le niveau 1.
+     Le libellé est remplacé, et non ajouté, lors d'un changement de langue. */
   if (subMatch?.features?.length) {
     if (!c.subcardCount) { c.subcardCount = 1; dirty = true; }
-    const foundationName = subMatch.features[0].name;
-    if (!c.classFeature.includes(foundationName)) {
-      c.classFeature = (c.classFeature ? c.classFeature + '\n\n' : '') + `✦ ${foundationName} — ${subMatch.features[0].desc}`;
+    const foundation = subMatch.features[0];
+    const foundationNames = new Set([
+      foundation.name,
+      subclassesFr.find(s => s.id === c.subclassId)?.features?.[0]?.name,
+      subclassesEn.find(s => s.id === c.subclassId)?.features?.[0]?.name,
+    ].filter(Boolean));
+    const foundationLine = `✦ ${foundation.name} — ${foundation.desc}`;
+    const lines = String(c.classFeature || '').split('\n');
+    const idx = lines.findIndex(line => [...foundationNames].some(name => line.startsWith(`✦ ${name} —`)));
+    if (idx >= 0) {
+      if (lines[idx] !== foundationLine) { lines[idx] = foundationLine; dirty = true; }
+      for (let i = lines.length - 1; i >= 0; i--) {
+        if (i !== idx && [...foundationNames].some(name => lines[i].startsWith(`✦ ${name} —`))) {
+          lines.splice(i, 1); dirty = true;
+        }
+      }
+      c.classFeature = lines.join('\n');
+    } else {
+      c.classFeature = (c.classFeature ? c.classFeature + '\n\n' : '') + foundationLine;
       dirty = true;
     }
   }
@@ -319,10 +336,10 @@ export async function render(main, params) {
   const focusKey = active?.dataset?.f || active?.dataset?.ef || active?.dataset?.wf || active?.dataset?.af || null;
   const focusSel = focusKey ? `[data-f="${focusKey}"],[data-ef="${focusKey}"],[data-wf="${focusKey}"],[data-af="${focusKey}"]` : null;
   const scrollY = window.scrollY;
-  const [classes, subclasses, weapons, armors, cards, domains, generalItems, transformations, beastforms, ancestries, communities] = await Promise.all([
-    data('classes'), data('subclasses'), data('weapons'), data('armors'), data('domainCards'), data('domains'), data('generalItems'), data('transformations'), data('beastforms'), data('ancestries'), data('communities'),
+  const [classes, subclasses, weapons, armors, cards, domains, generalItems, transformations, beastforms, ancestries, communities, subclassesFr, subclassesEn] = await Promise.all([
+    data('classes'), data('subclasses'), data('weapons'), data('armors'), data('domainCards'), data('domains'), data('generalItems'), data('transformations'), data('beastforms'), data('ancestries'), data('communities'), data('subclasses', 'fr'), data('subclasses', 'en'),
   ]);
-  migrate(c, weapons, armors, subclasses, classes, generalItems, ancestries, communities);
+  migrate(c, weapons, armors, subclasses, classes, generalItems, ancestries, communities, subclassesFr, subclassesEn);
   const cl = classes.find(x => x.id === c.classId);
   const sub = subclasses.find(x => x.id === c.subclassId);
   const bfMeta = c.beastform?.id ? beastforms.find(b => b.id === c.beastform.id) : null;
@@ -1420,7 +1437,12 @@ function openRoller(c, preset = {}, ctx = null) {
   document.body.appendChild(back);
   back.addEventListener('click', (e) => { if (e.target === back) back.remove(); });
 
-  const expList = c.experiences.map((e, i) => ({ i, e })).filter(x => x.e.name && x.e.name.trim());
+  const expList = [
+    ...c.experiences.map((e, i) => ({ i, e, companion: false, key: String(i) }))
+      .filter(x => x.e.name && x.e.name.trim()),
+    ...((c.companion?.experiences || []).map((e, i) => ({ i, e, companion: true, key: `comp:${i}` }))
+      .filter(x => x.e.name && x.e.name.trim())),
+  ];
   const traitVal = (k) => (ctx?.effTrait ? ctx.effTrait(k) : (c.traits[k] || 0));
   box.innerHTML = `
     <h3>Jet d'action — ${esc(c.name || 'Personnage')}</h3>
@@ -1437,7 +1459,7 @@ function openRoller(c, preset = {}, ctx = null) {
       </select>
       <select id="dhr-exp">
         <option value="">${t('sheetPickExp')}</option>
-        ${expList.map(x => `<option value="${x.i}" ${preset.expIdx === x.i ? 'selected' : ''}>✦ ${esc(x.e.name)} (${signed(x.e.mod)})</option>`).join('')}
+        ${expList.map(x => `<option value="${x.key}" ${!x.companion && preset.expIdx === x.i ? 'selected' : ''}>${x.companion ? `🐾 ${esc(c.companion?.name || 'Compagnon')} ·` : '✦'} ${esc(x.e.name)} (${signed(x.e.mod)})</option>`).join('')}
       </select>
     </div>
     <label class="dhr-hopespend"><input type="checkbox" id="dhr-spend" checked> Dépenser 1 Espoir pour l'Expérience</label>
@@ -1463,8 +1485,9 @@ function openRoller(c, preset = {}, ctx = null) {
     const unlock = () => { this.dataset.rolling = ''; this.disabled = false; };
 
     const traitK = $('#dhr-trait', box).value || null;
-    const expI = $('#dhr-exp', box).value === '' ? null : +$('#dhr-exp', box).value;
-    const spend = $('#dhr-spend', box).checked && expI !== null;
+    const expKey = $('#dhr-exp', box).value;
+    const pickedExp = expKey === '' ? null : expList.find(x => x.key === expKey) || null;
+    const spend = $('#dhr-spend', box).checked && !!pickedExp;
 
     if (isRolling()) { toast('Un lancer de dés est déjà en cours.'); unlock(); return; }
     if (spend && c.hope.current < 1) { toast("Pas assez d'Espoir pour utiliser cette Expérience."); unlock(); return; }
@@ -1477,7 +1500,13 @@ function openRoller(c, preset = {}, ctx = null) {
       const bfNote = ctx?.traitBonusOf?.(traitK) ? ` +${ctx.traitBonusOf(traitK)} Forme` : '';
       parts.push(`${T.traits[traitK]}${bfNote}`);
     }
-    if (expI !== null) { mod += c.experiences[expI].mod; parts.push(`✦ ${c.experiences[expI].name}`); }
+    if (pickedExp) {
+      const exp = pickedExp.companion ? c.companion?.experiences?.[pickedExp.i] : c.experiences[pickedExp.i];
+      if (exp) {
+        mod += exp.mod;
+        parts.push(`${pickedExp.companion ? '🐾' : '✦'} ${exp.name}`);
+      }
+    }
     const label = parts.length ? parts.join(' + ') : "Jet d'action";
 
     /* ferme la fenêtre immédiatement pour laisser voir les dés 3D rouler (y compris d6 Avantage/Désavantage) */

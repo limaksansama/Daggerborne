@@ -838,6 +838,7 @@ export const EN_UI = {
   ', modifiable dans « Armure active ») + Niveau ': ', editable in “Active armor”) + Level ',
   "Bonus d'aptitudes (ex. Peau épaisse +2)": 'Feature bonus (e.g. Thick Skin +2)',
   'Choisir une armure (': 'Choose armor (',
+  'Fondation': 'Foundation',
   'Spécialisation': 'Specialization',
   'Trait, Éva +': 'Trait, Eva +',
   ', Éva +': ', Eva +',

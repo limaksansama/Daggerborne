@@ -5,6 +5,18 @@ Toutes les modifications notables de **Daggerborne** sont documentées dans ce f
 Le format s'inspire de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 La version de référence du projet est celle de `package.json` (`0.6.0-beta`).
 
+## [Non publié] — 23 novembre 2026 — correctifs post-v61
+
+### Corrigé — audit des données et mode EN
+
+- Nettoyage des balises Foundry restantes dans le bestiaire et les environnements FR : 279 tokens, dont 207 `@Lookup` non signalés.
+- Mode EN : descriptions d’objets, Fondation remplacée sans doublon au changement de langue, libellé `Fondation`, transformations et équipement de départ.
+- Compagnon : expériences proposées dans le lanceur de Dés de Dualité.
+- Montée de niveau : plafond correct pour les cartes de domaine multiclassées.
+- Compendium : échappement de `item.sub`.
+- `DATA_VER` v36, cache `daggerborne-v62`.
+- Vérifications : lint OK, **51/51 tests**.
+
 ## [Non publié] — 23 novembre 2026
 
 ### Ajouté — traductions FR complètes (bestiaire, environnements, cartes)

@@ -30,6 +30,21 @@ test('les macros Foundry brutes ont été retirées des données utilisateur', (
   }
 });
 
+test('les balises Foundry ont été retirées du bestiaire et des environnements FR', () => {
+  for (const rel of ['data/adversaries.json', 'data/environments.json']) {
+    const raw = fs.readFileSync(path.join(ROOT, rel), 'utf8');
+    assert.ok(!/@UUID\[|@Lookup\[|\[\[\/r|\[\[\/fr/.test(raw), `Balise Foundry restante dans ${rel}`);
+  }
+});
+
+test('les objets de départ existent dans les données FR et EN', () => {
+  const ids = ['z3qzQoThgcZafEZr', 'ocBTBdfvjTqIehtf', 'jga6tUNjZjTpK6td', 'b6vGSPFWOlzZZDLO', 'tPfKtKRRjv8qdSqy'];
+  for (const rel of ['data/generalItems.json', 'data/en/generalItems.json']) {
+    const items = readJson(rel);
+    for (const id of ids) assert.ok(items.some((x) => x.id === id), `${id} manquant dans ${rel}`);
+  }
+});
+
 test('les exemples de formes bestiales EN sont traduits et les portées FR normalisées', () => {
   const beastforms = readJson('data/en/beastforms.json');
   assert.equal(beastforms.find((b) => b.id === 'agile-scout').examples, 'Fox, Mouse, Weasel, etc.');
