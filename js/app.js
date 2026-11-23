@@ -41,7 +41,7 @@ function buildShell() {
         <img src="public/assets/dpcgl-community-logo-light.png" alt="Daggerborne — Daggerheart Compatible">
         <span class="brand-copy">
           <span class="t">Daggerborne<span class="brand-badge" title="${getLang() === 'en' ? 'Daggerheart™ Compatible' : 'Compatible avec Daggerheart™'}">${getLang() === 'en' ? 'Daggerheart™ Compatible' : 'Compatible avec Daggerheart™'}</span></span>
-          <span class="brand-ver" title="Version 0.6.0-beta">v.0.6.0-beta</span>
+          <span class="brand-ver" title="Version 0.6.1-beta">v.0.6.1-beta</span>
         </span>
       </div>
       <span class="page-title" id="top-title"></span>

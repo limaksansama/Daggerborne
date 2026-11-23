@@ -3,9 +3,9 @@
 Toutes les modifications notables de **Daggerborne** sont documentées dans ce fichier.
 
 Le format s'inspire de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
-La version de référence du projet est celle de `package.json` (`0.6.0-beta`).
+La version de référence du projet est celle de `package.json` (`0.6.1-beta`).
 
-## [Non publié] — 23 novembre 2026 — correctifs post-v61
+## [0.6.1-beta] — 23 novembre 2026
 
 ### Corrigé — audit des données et mode EN
 
@@ -14,10 +14,10 @@ La version de référence du projet est celle de `package.json` (`0.6.0-beta`).
 - Compagnon : expériences proposées dans le lanceur de Dés de Dualité.
 - Montée de niveau : plafond correct pour les cartes de domaine multiclassées.
 - Compendium : échappement de `item.sub`.
-- `DATA_VER` v36, cache `daggerborne-v62`.
+- Version de l’application : `v.0.6.1-beta` ; `DATA_VER` v36, cache `daggerborne-v63`.
 - Vérifications : lint OK, **51/51 tests**.
 
-## [Non publié] — 23 novembre 2026
+## [0.6.0-beta] — 23 novembre 2026
 
 ### Ajouté — traductions FR complètes (bestiaire, environnements, cartes)
 
