@@ -1,6 +1,15 @@
 Daggerborne
 Compagnon de jeu français pour Daggerheart (PWA hors-ligne)
 Une application web tout-en-un pour créer vos personnages, lancer vos dés de Dualité et gérer vos parties de Daggerheart sur mobile, tablette ou ordinateur. Une fois ouverte une première fois, elle fonctionne 100 % hors-ligne et ne nécessite aucun compte.
+
+**Aperçu**
+
+Trois écrans de l'application en français :
+
+| Accueil | Création de personnage | Fiche interactive |
+|:---:|:---:|:---:|
+| <img src="docs/screenshots/accueil.png" alt="Écran d'accueil de Daggerborne" width="100%"> | <img src="docs/screenshots/creation-personnage.png" alt="Assistant de création de personnage, étape Classe" width="100%"> | <img src="docs/screenshots/fiche-personnage.png" alt="Fiche de personnage interactive" width="100%"> |
+
 Ce que fait l'application
 Création & Fiche de personnage
  * Assistant en 9 étapes : laissez-vous guider de l'ascendance jusqu'aux questions de background, avec suggestions automatiques selon la classe.
