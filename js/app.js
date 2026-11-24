@@ -41,7 +41,7 @@ function buildShell() {
         <img src="assets/dpcgl-community-logo-light.png" alt="Daggerborne — Daggerheart Compatible">
         <span class="brand-copy">
           <span class="t">Daggerborne<span class="brand-badge" title="${getLang() === 'en' ? 'Daggerheart™ Compatible' : 'Compatible avec Daggerheart™'}">${getLang() === 'en' ? 'Daggerheart™ Compatible' : 'Compatible avec Daggerheart™'}</span></span>
-          <span class="brand-ver" title="Version 0.6.2-beta">v.0.6.2-beta</span>
+          <span class="brand-ver" title="Version 0.7.0-beta">v.0.7.0-beta</span>
         </span>
       </div>
       <span class="page-title" id="top-title"></span>
@@ -138,12 +138,34 @@ if ('serviceWorker' in navigator) {
     window.location.reload();
   });
   navigator.serviceWorker.register('sw.js').then((reg) => {
+    reg.update?.().catch(() => {});
+    if (reg.waiting && navigator.serviceWorker.controller) {
+      reg.waiting.postMessage('SKIP_WAITING');
+      return;
+    }
+    const promptReload = (worker) => {
+      if (!worker) return;
+      const msg = getLang() === 'en'
+        ? 'Update available — tap here to reload'
+        : 'Mise à jour disponible — cliquez pour actualiser';
+      const node = document.createElement('button');
+      node.type = 'button';
+      node.className = 'toast';
+      node.style.cursor = 'pointer';
+      node.textContent = msg;
+      node.addEventListener('click', () => {
+        node.remove();
+        worker.postMessage('SKIP_WAITING');
+      });
+      document.body.appendChild(node);
+      setTimeout(() => node.remove(), 8000);
+    };
     reg.addEventListener('updatefound', () => {
       const nw = reg.installing;
       if (!nw) return;
       nw.addEventListener('statechange', () => {
         if (nw.state === 'installed' && navigator.serviceWorker.controller) {
-          toast(getLang() === 'en' ? 'Update available — ready on next load.' : 'Mise à jour disponible — prête au prochain chargement.');
+          promptReload(nw);
         }
       });
     });

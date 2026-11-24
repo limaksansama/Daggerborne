@@ -1,5 +1,5 @@
 /* Service worker — cache-first PWA for Daggerborne */
-const VERSION = 'daggerborne-v66';
+const VERSION = 'daggerborne-v67';
 const CORE = [
   './', './index.html', './manifest.webmanifest',
   './css/app.css', './css/sheet2.css', './css/dice-box.css', './js/app.js', './js/core.js',
@@ -89,17 +89,18 @@ self.addEventListener('fetch', (e) => {
         throw err;
       }
     }
-    const cached = await cache.match(e.request, { ignoreSearch: true });
-    if (cached) {
-      // revalidate in background
+    const cachedExact = await cache.match(e.request);
+    if (cachedExact) {
       fetch(e.request).then(r => { if (r.ok) cache.put(e.request, r.clone()); }).catch(() => {});
-      return cached;
+      return cachedExact;
     }
     try {
       const r = await fetch(e.request);
       if (r.ok) cache.put(e.request, r.clone());
       return r;
     } catch (err) {
+      const cachedLoose = await cache.match(e.request, { ignoreSearch: true });
+      if (cachedLoose) return cachedLoose;
       if (e.request.mode === 'navigate') {
         const fallback = await cache.match('./index.html');
         if (fallback) return fallback;
