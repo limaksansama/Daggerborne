@@ -909,6 +909,7 @@ h1.page-title {
     background: rgba(28, 22, 48, .94); box-shadow: -3px 4px 14px rgba(0, 0, 0, .5);
   }
   .d3d-fab-wrap.collapsed .d3d-dock-mini { display: inline; }
+  .d3d-fab-wrap.on-dice.collapsed .d3d-dock-mini { display: none; }
 }
 
 /* ===== Actions & Attaques (style D&D Beyond) ===== */

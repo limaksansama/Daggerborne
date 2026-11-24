@@ -56,7 +56,7 @@ export async function render(main, params) {
 
     <!-- Pied de licence DPCGL 2.0 : logo communautaire officiel (fiole) + mention obligatoire -->
     <footer class="dpcgl-footer">
-      <img src="public/assets/dpcgl-community-logo.png" alt="Daggerheart Compatible" class="dpcgl-logo">
+      <img src="assets/dpcgl-community-logo.png" alt="Daggerheart Compatible" class="dpcgl-logo">
       <p class="dpcgl-note">Daggerheart™ Compatible. Terms at Daggerheart.com</p>
     </footer>
   </div>`;

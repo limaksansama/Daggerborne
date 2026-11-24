@@ -836,3 +836,134 @@ test('ui & sheet: pre-fills class+subclass features, preserves custom edits, swi
     main.remove();
   }
 });
+
+test('regressions: levelup swap cap, mixedAncestry & subcardTaken migration, dice Hope deduction, and GM multi-dice', async () => {
+  resetTestState();
+  const classes = await core.data('classes', 'fr');
+  const subclasses = await core.data('subclasses', 'fr');
+  const cards = await core.data('domainCards', 'fr');
+  const ancestriesFr = await core.data('ancestries', 'fr');
+  const ancestriesEn = await core.data('ancestries', 'en');
+
+  const cl = classes[0];
+  const sub = subclasses.find(s => s.classId === cl.id && s.features?.length >= 2) || subclasses.find(s => s.classId === cl.id);
+  const lowCard = cards.find(cd => cl.domains.includes(cd.domain) && cd.level === 1);
+  assert.ok(cl && sub && lowCard);
+
+  const pc = core.newCharacter({
+    id: 'reg-pc',
+    name: 'Nyra',
+    classId: cl.id,
+    className: cl.fr,
+    subclassId: sub.id,
+    subclassText: sub.fr,
+    level: 2,
+    hope: { max: 6, current: 1 },
+    traits: { agility: 1, strength: 0, finesse: 2, instinct: 0, presence: 0, knowledge: 0 },
+    experiences: [{ name: 'Acrobatie', mod: 2 }, { name: '', mod: 2 }, { name: '', mod: 2 }, { name: '', mod: 2 }, { name: '', mod: 2 }],
+    subcardTaken: { 2: true },
+    mixedAncestry: {
+      primaryId: ancestriesFr[0].id,
+      secondaryId: ancestriesFr[1].id,
+      firstFrom: 1,
+    },
+    ancestry: {
+      id: `${ancestriesFr[0].id}+${ancestriesFr[1].id}`,
+      fr: `${ancestriesFr[0].fr}-${ancestriesFr[1].fr}`,
+      abilities: [ancestriesFr[0].abilities[0], ancestriesFr[1].abilities[1]],
+    },
+    domainCards: [{ cardId: lowCard.id, inHand: true }],
+  });
+  core.saveChar(pc);
+
+  const main = new MockElement('main');
+  globalThis.document.body.appendChild(main);
+  try {
+    /* 1. subcardTaken restores subcardCount & mixedAncestry re-localizes FR -> EN */
+    i18n.setLang('en');
+    await views.sheet.render(main, 'reg-pc');
+    assert.equal(pc.subcardCount, 2, 'subcardTaken should restore subcardCount=2');
+    assert.equal(pc.ancestry.fr, `${ancestriesEn[0].fr}-${ancestriesEn[1].fr}`, 'mixedAncestry name must localize to EN');
+    assert.equal(pc.ancestry.abilities[0].fr, ancestriesEn[0].abilities[0].fr, 'mixedAncestry ability 1 must localize to EN');
+    assert.equal(pc.ancestry.abilities[1].fr, ancestriesEn[1].abilities[1].fr, 'mixedAncestry ability 2 must localize to EN');
+
+    /* 2. dice.js: #roll-char selects/clears character & Experience deducts 1 Hope (and blocks at 0 Hope) */
+    i18n.setLang('fr');
+    await views.dice.render(main, 'reg-pc');
+    const charSel = main.querySelector('#roll-char');
+    assert.ok(charSel, '#roll-char selector must render');
+    const traitSel = main.querySelector('#roll-trait');
+    traitSel.value = 'exp0';
+    traitSel.dispatchEvent({ type: 'change', target: traitSel });
+    const rollBtn = main.querySelector('#btn-roll');
+    const origRand = Math.random;
+    Math.random = () => 0.1; /* hope=2, fear=2 -> tie/crit would grant +1 hope, so test different rolls via sequential values */
+    let calls = 0;
+    Math.random = () => (calls++ % 2 === 0 ? 0.1 : 0.8); /* hope=2, fear=10 -> fear roll (no hope gained back) */
+    try {
+      rollBtn.click();
+      await new Promise(r => setTimeout(r, 30));
+    } finally {
+      Math.random = origRand;
+    }
+    assert.equal(pc.hope.current, 0, 'Rolling an Experience on a Fear roll must leave 0 Hope after deducting 1');
+
+    /* Second Experience roll at 0 Hope must be blocked and leave Hope at 0 */
+    const traitSel2 = main.querySelector('#roll-trait');
+    traitSel2.value = 'exp0';
+    traitSel2.dispatchEvent({ type: 'change', target: traitSel2 });
+    const rollsBefore = core.getState().rolls.length;
+    main.querySelector('#btn-roll').click();
+    await new Promise(r => setTimeout(r, 20));
+    assert.equal(core.getState().rolls.length, rollsBefore, 'Roll must abort when Hope < 1');
+
+    /* Clearing #roll-char switches back to free roll */
+    const charSel2 = main.querySelector('#roll-char');
+    charSel2.value = '';
+    charSel2.dispatchEvent({ type: 'change', target: charSel2 });
+    assert.equal(main.querySelector('#roll-trait'), null, 'Clearing #roll-char must hide character trait selector');
+
+    /* 3. levelup step 4: replacement cards cannot exceed swapped card level */
+    await openLevelUp(pc, { onDone: () => {} });
+    const modal = globalThis.document.body.querySelector('.dh-lvlup');
+    assert.ok(modal);
+    modal.querySelector('[data-lu-main]').click(); /* step 1 -> 2 */
+    modal.querySelector('[data-luopt="evasion"]').click();
+    modal.querySelector('[data-luopt="hitPointSlots"]').click();
+    modal.querySelector('[data-lu-main]').click(); /* step 2 -> 3 */
+    modal.querySelector('[data-lupick]').click();
+    modal.querySelector('[data-lu-main]').click(); /* step 3 -> 4 */
+    modal.querySelector('[data-luswap="0"]').click();
+    const swapChoices = [...modal.querySelectorAll('[data-lunew]')];
+    assert.ok(swapChoices.length > 0, 'Swap choices should list level 1 alternatives');
+    for (const btn of swapChoices) {
+      assert.ok(btn.textContent.startsWith('Niv. 1'), `Swapping a level 1 card must not offer >1 card: ${btn.textContent}`);
+    }
+    modal.querySelector('[data-lu-prev]').click(); /* back/close cleanup */
+
+    /* 4. GM encounter rolls multi-dice damage formulas (2d8+1d4+2) */
+    core.setState(s => {
+      s.encounter.active = [{
+        uid: 'adv-multi', name: 'Golem', type: 'Solitaire', tier: 2,
+        difficulty: 14, hpMax: 8, hpMarked: 0, stressMax: 4, stressMarked: 0,
+        atkBonus: '+3', atkDamage: '2d8+1d4+2', conditions: [],
+      }];
+    });
+    await views.gm.render(main, null);
+    main.querySelector('[data-gmtab="encounter"]').click();
+    await new Promise(r => setTimeout(r, 20));
+    const dmgBtn = main.querySelector('[data-enc-dmg="adv-multi"]');
+    assert.ok(dmgBtn);
+    dmgBtn.click();
+    await new Promise(r => setTimeout(r, 20));
+    const lastGmRoll = core.getState().rolls[0];
+    assert.equal(lastGmRoll.notation, '2d8+1d4+2', '2d8+1d4+2 must preserve full multi-dice notation');
+    assert.ok(lastGmRoll.total >= 5 && lastGmRoll.total <= 22, `Unexpected total: ${lastGmRoll.total}`);
+    const gmBannerDetail = globalThis.document.body.querySelector('.d3d-banner .d3d-detail')?.textContent || '';
+    assert.ok(gmBannerDetail.includes('2d8+1d4+2') && gmBannerDetail.includes('(+2)'), `Expected 2d8+1d4+2 (+2) detail, got: ${gmBannerDetail}`);
+  } finally {
+    i18n.setLang('fr');
+    main.remove();
+  }
+});
+

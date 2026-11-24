@@ -157,8 +157,9 @@ async function runLevelUpWizard(c, ctx) {
     window.removeEventListener('popstate', onPop);
     window.removeEventListener('hashchange', onHash);
     lvlupOpen = false;
-    /* remonte l'historique jusqu'à l'état d'avant le wizard (une entrée par étape) */
-    if (!fromExternal && history.state?.dhLvl) { try { history.go(-wiz.step); } catch (e) { /* noop */ } }
+    /* remonte l'historique jusqu'à l'état d'avant le wizard */
+    const depth = Number.isInteger(history.state?.dhLvl) ? history.state.dhLvl : 0;
+    if (!fromExternal && depth > 0) { try { history.go(-depth); } catch (e) { /* noop */ } }
     back.remove();
   };
   back.addEventListener('click', (e) => { if (e.target === back) close(false); });
@@ -369,9 +370,10 @@ async function runLevelUpWizard(c, ctx) {
   const renderSwapChoices = (swapIdx) => {
     const old = cards.find(x => x.id === c.domainCards[swapIdx]?.cardId);
     const exclude = new Set([...ownedIds(), ...wiz.cardPicks]);
-    const list = cards.filter(cd => myDomains().includes(cd.domain) && cd.level <= domainLevelCap(cd.domain) && !exclude.has(cd.id))
+    const oldLvl = old?.level ?? newLevel;
+    const list = cards.filter(cd => myDomains().includes(cd.domain) && cd.level <= Math.min(oldLvl, domainLevelCap(cd.domain)) && !exclude.has(cd.id))
       .sort((a, b) => a.level - b.level || a.fr.localeCompare(b.fr, 'fr'));
-    const cap = old ? domainLevelCap(old.domain) : newLevel;
+    const cap = old ? Math.min(old.level, domainLevelCap(old.domain)) : newLevel;
     return `<div class="lu-sub lu-swapbox">
       <div class="lu-sub-lbl">Remplacer « ${esc(old?.fr || '')} » par (niveau ≤ ${cap})</div>
       <div class="lu-swaplist">
@@ -613,6 +615,7 @@ async function runLevelUpWizard(c, ctx) {
     c.tierUses[newTier] = c.tierUses[newTier] || {};
     const tu = c.tierUses[newTier];
     /* 1. récompense de palier */
+    const preExps = expList();
     let newExpIdx = -1;
     if (reward) {
       const free = c.experiences.findIndex(e => !e.name.trim());
@@ -634,7 +637,7 @@ async function runLevelUpWizard(c, ctx) {
       }
       else if (id === 'stressSlots') { c.stress.active = Math.min(12, (c.stress.active || 6) + 1); c.stress.max = c.stress.active + (c.stress.unlocked || 0); }
       else if (id === 'experiences') wiz.expPicks.forEach(i => {
-        const e = expList()[i];
+        const e = preExps[i];
         if (!e) return;
         const targetIdx = e.isNew ? newExpIdx : e.idx;
         if (targetIdx >= 0 && c.experiences[targetIdx]) {

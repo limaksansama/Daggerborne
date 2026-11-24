@@ -34,9 +34,7 @@
         "desc": "Spend a Fear to summon a Minor Chaos Elemental drawn to the echoes of violence and discord. They appear within Far range of a chosen PC and immediately take the spotlight. What color does the grass turn as the elemental appears? How does the chaos warp insects and small wildlife within the grove?"
       }
     ],
-    "fr": "ABANDONED GROVE",
-    "descFr": "Un ancien bosquet druidique, laissé à l’abandon où la nature a repris ses droits.",
-    "impulsesFr": "attire les curieux, écho du passé"
+    "fr": "ABANDONED GROVE"
   },
   {
     "id": "workshop",
@@ -67,9 +65,7 @@
         "desc": "Consequence Countdown (6). A thunderstorm gathers overhead, threatening to jolt the lightning rod assembly installed atop the workshop. Activate the countdown and narrate how the storm’s power increases each time it ticks down when a PC makes an action roll. When it triggers, lightning strikes the rod assembly and overloads the workshop machinery, which explodes after resurrecting one of the alchemist’s abandoned projects. Each target within Close range of the machinery must succeed on an Agility Reaction Roll or take 1d10 magic damage. Summon a Failed Experiment at a location within the workshop and gain a Fear for each PC within Very Close range of it. What was the alchemist trying to achieve with this experiment? Where did they get the materials for it?"
       }
     ],
-    "fr": "WORKSHOP",
-    "descFr": "Laboratoire alimenté par la foudre, bâti par un savant en quête du secret de l’immortalité.",
-    "impulsesFr": "abattre la barrière entre la vie et la mort, attirer la foudre des cieux, pousser les machines au-delà de leurs limites"
+    "fr": "WORKSHOP"
   },
   {
     "id": "ambushed",
@@ -94,9 +90,7 @@
         "desc": "The ambushers reveal themselves to the party, you gain 2 Fear, and the spotlight immediately shifts to one of the ambushing adversaries. What do the ambushers want from the party? How do their tactics in the ambush reflect that?"
       }
     ],
-    "fr": "AMBUSHED",
-    "descFr": "Une embuscade est mise en place pour prendre un groupe sans méfiance par surprise.",
-    "impulsesFr": "submerger, éparpiller, encercler"
+    "fr": "AMBUSHED"
   },
   {
     "id": "cliffside-ascent",
@@ -127,9 +121,7 @@
         "desc": "Spend a Fear to have a PC’s handhold fail, plummeting them toward the ground. If they aren’t saved on the next action, they hit the ground and tick up the countdown by 2. The PC takes 1d12 physical damage if the countdown is between 8 and 12, 2d12 between 4 and 7, and 3d12 at 3 or lower. How can you tell many others have fallen here before? What lives in these walls that might try to scare adventurers into falling for an easy meal?"
       }
     ],
-    "fr": "CLIFFSIDE ASCENT",
-    "descFr": "Une falaise rocheuse abrupte, assez haute pour que sa traversée soit vraiment dangereuse.",
-    "impulsesFr": "faire chuter les gens mal préparés vers une mort sur les rochers, attirer les gens par la promesse de ce qu’ils trouveront en haut"
+    "fr": "CLIFFSIDE ASCENT"
   },
   {
     "id": "cursed-graveyard",
@@ -172,9 +164,7 @@
         "desc": "When an adversary would mark their last HP, roll a d6. On a result of 5 or 6, the adversary doesn’t mark it. Who commanded this land to reject death? How do the dead come back diff erent here?"
       }
     ],
-    "fr": "CURSED GRAVEYARD",
-    "descFr": "Vaste cimetière rempli de pierres tombales croulantes, d’arbres tordus possédés par les morts et de cryptes envahies par la mousse et le lierre.",
-    "impulsesFr": "les enterrer six pieds sous terre, étouffer sous le brouillard, appâter par des promesses de trésors ensevelis, libérer les morts sans repos"
+    "fr": "CURSED GRAVEYARD"
   },
   {
     "id": "hold-the-line",
@@ -211,9 +201,7 @@
         "desc": "When there are no adversaries in the scene, summon a wave of adversaries at Far range from the Charge. Each wave comprises two Tier 1 Minions for each PC in the scene. Where do these adversaries come from? Who leads them from the shadows?"
       }
     ],
-    "fr": "HOLD THE LINE",
-    "descFr": "Le groupe doit repousser plusieurs vagues d’ennemis assez longtemps pour qu’un allié accomplisse un objectif important.",
-    "impulsesFr": "faire déferler des vagues d’ennemis sur le groupe, ne jamais le laisser souffler, cibler son protégé"
+    "fr": "HOLD THE LINE"
   },
   {
     "id": "local-tavern",
@@ -256,9 +244,7 @@
         "desc": "Spend a Fear to have a bar fight erupt in the tavern. When a PC tries to move through the tavern while the fight persists, they must succeed on an Agility or Presence Roll or take 1d6+2 physical damage from a wild swing or thrown object. A PC can try to activate this feature by succeeding on an action roll that would provoke tavern patrons. Who started the fight? What will it take to stop it?"
       }
     ],
-    "fr": "LOCAL TAVERN",
-    "descFr": "Une taverne animée qui sert de centre social pour le village.",
-    "impulsesFr": "offrir des opportunités aux aventuriers, prendre soin de la communauté"
+    "fr": "LOCAL TAVERN"
   },
   {
     "id": "raging-river",
@@ -289,9 +275,7 @@
         "desc": "Spend a Fear to summon a Glass Snake within Close range of a chosen PC. The Snake appears in or near the river and immediately takes the spotlight to use their “Spinning Serpent” action. What treasures does the beast have in their burrow? What travelers have already fallen victim to this predator?"
       }
     ],
-    "fr": "RAGING RIVER",
-    "descFr": "Une rivière au cours rapide, sans pont pour traverser et assez profonde pour emporter la plupart des gens.",
-    "impulsesFr": "empêcher de traverser, emporter les imprudents, diviser la région"
+    "fr": "RAGING RIVER"
   },
   {
     "id": "beach-day",
@@ -328,9 +312,7 @@
         "desc": "When the party prepares for their first day at the beach, have each player describe how their PC changes their attire to be more appropriate for the environment. The GM gives the PC with the freshest look a d6 Fresh Die that can be spent to add to any action or reaction roll. What’s the fashion in this area? Where do the PCs source their new beach-themed articles and accessories?"
       }
     ],
-    "fr": "BEACH DAY",
-    "descFr": "Le groupe s’accorde une pause dans son aventure pour se reposer et se détendre dans un village côtier.",
-    "impulsesFr": "évoquer le sable et les vagues, leur offrir un répit, les préparer au conflit à venir"
+    "fr": "BEACH DAY"
   },
   {
     "id": "deadly-dungeon",
@@ -367,9 +349,7 @@
         "desc": "When a PC fails an action roll to navigate the dungeon, activate a trap or hazard such as a spike pit, gauntlet of swinging blades, or locked room slowly filling with water. The party must succeed on a group action roll to deactivate, disarm, or escape it. On a failure, each PC involved in the group action roll takes 2d6+3 physical or magic damage (GM’s choice). What kinds of traps and hazards fill this dungeon? What does their construction tell you about whoever designed them? Have any of them been triggered prior to the party’s arrival?"
       }
     ],
-    "fr": "DEADLY DUNGEON",
-    "descFr": "Réseau souterrain faiblement éclairé de tunnels et de salles, rempli de monstres, de pièges et de trésors.",
-    "impulsesFr": "dévorer les ressources du groupe, déclencher le piège, les tenter avec des trésors, leur jeter des monstres à la figure, les désorienter"
+    "fr": "DEADLY DUNGEON"
   },
   {
     "id": "hallowed-temple",
@@ -406,9 +386,7 @@
         "desc": "When the PCs have trespassed, blasphemed, or off ended the clergy, you can spend a Fear to summon a High Seraph and 1d4 Bladed Guards within Close range of the senior priest to reinforce their will. What symbols or icons do they bear that signal they are anointed agents of the divinity? Who leads the group and what led them to this calling?"
       }
     ],
-    "fr": "HALLOWED TEMPLE",
-    "descFr": "Un temple grouillant d’activité, mais bien entretenu, qui propose des soins et des offices réguliers, supervisé par un prêtre ou un séraphin.",
-    "impulsesFr": "relier le Royaume mortel aux Saintes Hauteurs, montrer la puissance du divin, apporter aide et assistance aux fidèles"
+    "fr": "HALLOWED TEMPLE"
   },
   {
     "id": "heist",
@@ -451,9 +429,7 @@
         "desc": "When the Consequence Countdown triggers, the party is discovered and the location enters High Alert. Summon a number of Tier 2 adversaries equal to the number of PCs in the scene and immediately spotlight one. While this environment is on High Alert, all adversaries gain a +1 bonus to their Difficulty. What makes these adversaries uniquely suited to guard this location? What do they know about this place that gives them an edge?"
       }
     ],
-    "fr": "HEIST",
-    "descFr": "Le groupe doit accéder à un lieu caché ou bien protégé pour s’emparer des informations ou des objets qui y sont gardés.",
-    "impulsesFr": "obliger le groupe à se préparer, le diviser, dresser des obstacles, le piéger à l’intérieur, épuiser ses ressources"
+    "fr": "HEIST"
   },
   {
     "id": "mountain-pass",
@@ -490,9 +466,7 @@
         "desc": "Countdown (Loop 4). When the PCs enter the mountain pass, activate the countdown. When it triggers, all characters traveling through the pass must succeed on a Strength Reaction Roll or mark a Stress. A PC wearing clothes appropriate for extreme cold gains advantage on these rolls. What parts of the PC’s bodies go numb first? How do they try to keep warm as they press forward?"
       }
     ],
-    "fr": "MOUNTAIN PASS",
-    "descFr": "Des pics rocheux qui percent les nuages tandis qu’un sentier sinueux grimpe entre eux, en décrivant de nombreux lacets.",
-    "impulsesFr": "prélever un lourd tribut sur les provisions et l’endurance, révéler des perturbations magiques, ralentir les voyageurs"
+    "fr": "MOUNTAIN PASS"
   },
   {
     "id": "vast-desert",
@@ -535,9 +509,7 @@
         "desc": "Spend a Fear to summon a sandstorm that disorients and harries travelers. Each PC takes 2d6+3 physical damage. Until the sandstorm dissipates, a PC who makes an action roll must succeed on an Agility Reaction Roll to avoid the swirl of rocks and debris or take 2d6+3 physical damage. What do the dwellers of this desert wear to weather the sandstorms? How are the dwelling places the party finds here designed to withstand the winds?"
       }
     ],
-    "fr": "VAST DESERT",
-    "descFr": "Étendue desséchée de dunes de sable, de salines désolées et de formations rocheuses balayées par le vent.",
-    "impulsesFr": "déshydrater, montrer une beauté désolée, faire planer un danger à l’horizon"
+    "fr": "VAST DESERT"
   },
   {
     "id": "archmages-tower",
@@ -568,9 +540,7 @@
         "desc": "Spend a Fear to summon two adversaries within Close range of a PC. Each adversary can use the other’s features as if they were their own. Which creatures has the archmage chosen to combine? What do they hope to learn in doing so?"
       }
     ],
-    "fr": "ARCHMAGE’S TOWER",
-    "descFr": "Flèche d’une hauteur impossible qui perce les cieux et résonne d’un immense pouvoir.",
-    "impulsesFr": "accumuler l’énergie magique, épuiser les intrus, révéler l’inconnu, libérer des déferlements de pouvoir magique"
+    "fr": "ARCHMAGE’S TOWER"
   },
   {
     "id": "burning-heart-of-the-woods",
@@ -613,9 +583,7 @@
         "desc": "Countdown (Loop 6). When the PCs enter the Burning Heart of the Woods, activate the countdown. When it triggers, all characters must make a Strength or Instinct Reaction Roll. Targets who fail take 4d6+5 direct physical damage. Targets who succeed take half damage. Protective masks or clothes give advantage on the reaction roll. What hallucinations does the ash induce? What incongruous taste does it possess?"
       }
     ],
-    "fr": "BURNING HEART OF THE WOODS",
-    "descFr": "D’épaisses cendres de couleur indigo baignent dans l’air autour d’un gigantesque arbre couvert de mousse, qui brûle sans fin dans des flammes d’un bleu maladif.",
-    "impulsesFr": "battre un rythme mystérieux que tout le monde ressent le besoin de suivre, corrompre les bois"
+    "fr": "BURNING HEART OF THE WOODS"
   },
   {
     "id": "crystal-wasteland",
@@ -658,9 +626,7 @@
         "desc": "When the PCs take a long rest, you can spend a Fear to swap their psyches. Collect all the players’ character sheets, then shuffle and randomly redistribute them. Each character sheet comes with that PC’s Domain cards and player aids. A PC can regain their psyche with a successful Knowledge Roll, at which point they trade sheets with the player who has their original character sheet. How does it feel being in someone else’s skin? If you could choose to stay like them in one way, what would it be?"
       }
     ],
-    "fr": "CRYSTAL WASTELAND",
-    "descFr": "Paysage hostile et étranger, où étincellent des tours de cristal scintillant.",
-    "impulsesFr": "les blesser jusqu’à l’âme, fracturer leur psyché, leur montrer leur vrai reflet"
+    "fr": "CRYSTAL WASTELAND"
   },
   {
     "id": "megastorm",
@@ -703,9 +669,7 @@
         "desc": "The Megastorm is sowing fear and chaos among the locals. Describe how the storm puts an NPC in danger. If the PC who next takes the spotlight doesn’t use their action to rescue the endangered NPC, you gain a Fear. Who’s taking advantage of the situation? Who’s supposed to be in charge here, and what happened to them?"
       }
     ],
-    "fr": "MEGASTORM",
-    "descFr": "Un phénomène météorologique extrême se manifeste soudain, obligeant le groupe à mettre en balance sa propre survie et la sécurité d’autrui.",
-    "impulsesFr": "souffler des vents d’ouragan, étouffer sous des coulées de boue, faire s’effondrer les bâtiments, inonder, projeter des débris, embraser le ciel"
+    "fr": "MEGASTORM"
   },
   {
     "id": "sunken-citadel",
@@ -742,9 +706,7 @@
         "desc": "Spend a Fear to summon up to two Deep Dwellers and 1d6 Cursed Merfolk who try to bind the PCs to their will. These adversaries appear at Close range of a PC, then one immediately takes the spotlight. Why do these creatures stay here among the ruins? Are they unwilling or unable to resurrect this once-prosperous civilization?"
       }
     ],
-    "fr": "SUNKEN CITADEL",
-    "descFr": "Ruines englouties d’une civilisation perdue depuis longtemps, emplies d’une technologie ancienne et de magie noire.",
-    "impulsesFr": "les attirer dans les profondeurs, les noyer, révéler des merveilles anciennes"
+    "fr": "SUNKEN CITADEL"
   },
   {
     "id": "volcanic-eruption",
@@ -775,9 +737,7 @@
         "desc": "Spend a Fear to open a fissure that belches out toxic gas at a point of your choice, creating a cloud that blankets everything within Far range. While inside the cloud, a PC must track their air supply with an Air Supply Countdown. Its starting value is equal to 3 + their tier, and it ticks down when they take an action. If a PC fails an action roll or rolls with Fear, you can use a GM move to tick down their countdown an additional time. If the roll is a failure with Fear, you can tick it down twice instead. Once the countdown ends, a PC must mark a Stress whenever they take an action within the gas until they escape the cloud. What signs do you see to indicate the presence of toxic gas? What taste lingers in the mouths of the PCs who inhale the gas?"
       }
     ],
-    "fr": "VOLCANIC ERUPTION",
-    "descFr": "Explosion de chaleur et de roche en fusion qui ne laisse derrière elle qu’une désolation calcinée.",
-    "impulsesFr": "semer la panique alentour, couper les issues, isoler, les forcer à fuir pour se mettre à l’abri, diviser le groupe"
+    "fr": "VOLCANIC ERUPTION"
   },
   {
     "id": "city-of-portals",
@@ -820,9 +780,7 @@
         "desc": "Convergence is home to a tenuous network of rival factions. Spend a Fear to have one of them present the party with an easy solution to a difficult problem in exchange for their allegiance. If the party refuses, each PC must mark a Stress, and they can’t turn to that faction for help in the future. Which faction off ers the party their support? Who do they want the party to act against?"
       }
     ],
-    "fr": "CITY OF PORTALS",
-    "descFr": "Métropole tentaculaire au carrefour de la création, où se rassemblent des figures influentes venues de tous les royaumes.",
-    "impulsesFr": "les confronter à des coutumes étrangères, les éblouir d’une variété infinie, les tenter avec l’impossible"
+    "fr": "CITY OF PORTALS"
   },
   {
     "id": "imperial-court",
@@ -865,9 +823,7 @@
         "desc": "On a result with Fear, you can spend a Fear to have someone loyal to the empire overhear seditious talk within the court. A PC must succeed on an Instinct Reaction Roll to notice that the group has been overheard so they can try to intercept the witness before the PCs are exposed. How has the empire compromised this witness? Why is their first impulse to protect the empire, even if doesn’t treat them well?"
       }
     ],
-    "fr": "IMPERIAL COURT",
-    "descFr": "Le majestueux domaine d’un puissant empire, luxueusement décoré de trésors volés.",
-    "impulsesFr": "justifier et perpétuer le règne impérial, séduire ses rivaux avec des promesses de puissance et de confort"
+    "fr": "IMPERIAL COURT"
   },
   {
     "id": "necromancers-ossuary",
@@ -910,9 +866,7 @@
         "desc": "Spend a Fear to summon 1d6 Rotted Zombies, two Perfected Zombies, or a Zombie Legion, who appear at Close range of a chosen PC. Who were these people before they became the necromancer’s pawns? What vestiges of those lives remain for the heroes to see?"
       }
     ],
-    "fr": "NECROMANCER’S OSSUARY",
-    "descFr": "Une crypte poussiéreuse, avec une bibliothèque, des couloirs tortueux et de nombreux sarcophages, le tout aspergé du sang d’infortunés envahisseurs.",
-    "impulsesFr": "déconcerter les envahisseurs, plonger dans des secrets qu’il aurait mieux valu laisser enfouis, faire apparaître la non-vie, libérer une marée de morts-vivants"
+    "fr": "NECROMANCER’S OSSUARY"
   },
   {
     "id": "time-court",
@@ -955,9 +909,7 @@
         "desc": "When the PCs attempt to escape or end the trial through force, summon a number of Temporal Enforcers equal to the number of PCs in the scene within Close range and immediately spotlight one. Is this court’s authority worthy of respect? What besides the might of the Time Council and its enforcers justifies their control over the timeline?"
       }
     ],
-    "fr": "TIME COURT",
-    "descFr": "Un ou plusieurs PJ sont arrachés de force au cours du temps et jugés pour crimes contre la continuité.",
-    "impulsesFr": "trouver la vérité, rendre la justice, annuler leurs pouvoirs"
+    "fr": "TIME COURT"
   },
   {
     "id": "abandoned-mine",
@@ -994,9 +946,7 @@
         "desc": "Countdown (2). The first time the PCs roll with Fear, describe how the ground subtly vibrates as rocks shift overhead and activate the countdown. It ticks down when a PC rolls with Fear. When it triggers, each PC must succeed on an Agility Reaction Roll or take 1d8+3 physical damage and become temporarily Restrained by the rubble. What other signs of instability does the mine off er the party? What new dangers does the tunnel system’s new configuration expose the party to?"
       }
     ],
-    "fr": "ABANDONED MINE",
-    "descFr": "Dédale tortueux de tunnels désaffectés, creusés dans la roche par une compagnie minière vouée à sa perte.",
-    "impulsesFr": "empoisonner le groupe avec des gaz mortels, gronder et s’effondrer, diviser le groupe, le désorienter"
+    "fr": "ABANDONED MINE"
   },
   {
     "id": "ambushers",
@@ -1021,9 +971,7 @@
         "desc": "When a PC starts the ambush on unsuspecting adversaries, you lose 2 Fear and the first attack roll a PC makes has advantage. What are the adversaries in the middle of doing when the ambush starts? How does this impact their approach to the fight?"
       }
     ],
-    "fr": "AMBUSHERS",
-    "descFr": "Les PJ préparent une embuscade pour prendre des adversaires peu méfiants par surprise.",
-    "impulsesFr": "s’échapper, se regrouper, protéger les plus vulnérables"
+    "fr": "AMBUSHERS"
   },
   {
     "id": "bustling-marketplace",
@@ -1060,9 +1008,7 @@
         "desc": "When one of the PCs splits from the group, the crowds shift and cut them off from the party. Where does the crowd’s movement carry them? How do they feel about being alone but surrounded?"
       }
     ],
-    "fr": "BUSTLING MARKETPLACE",
-    "descFr": "Le cœur économique de la ville, avec des artisans locaux, des marchands itinérants et des clients issus de toutes les classes sociales.",
-    "impulsesFr": "acheter à bas prix et revendre cher, tenter et allécher avec des marchandises d’ici et d’ailleurs"
+    "fr": "BUSTLING MARKETPLACE"
   },
   {
     "id": "corrupted-swamp",
@@ -1099,9 +1045,7 @@
         "desc": "At the start of a rest, you can spend a Fear to have floating orbs enthrall the weary and lure a PC deeper into the swamp. A diff erent PC can use a downtime move to make an action roll to search for them. On a success, both PCs return to camp and can choose downtime moves as normal. On a failure—or if no one searches for them—the lost PC returns hours later, covered in mud and worse, and can’t choose downtime moves until their next rest. What does the lost PC see in the lights that draws them into the darkness? What other glimpses of surprising beauty do the PCs encounter here?"
       }
     ],
-    "fr": "CORRUPTED SWAMP",
-    "descFr": "Étendue misérable d’eaux visqueuses, de créatures toxiques et de pourriture.",
-    "impulsesFr": "corrompre, souligner la putréfaction, révéler ce qui est tordu et contre nature, rendre malade"
+    "fr": "CORRUPTED SWAMP"
   },
   {
     "id": "grand-feast",
@@ -1138,9 +1082,7 @@
         "desc": "After a long night, the partygoers start filtering out. When the feast concludes, all PCs who participated in the festivities clear all Stress and gain a Hope. Additionally, each Honored Guest clears all HP and gains an additional Hope, then clears the condition. Each PC who overindulged must succeed on a Strength Reaction Roll or become Hungover until their next rest. While Hungover, a PC gains a −1 penalty to action rolls. What crazy stories do the PCs share with one another as they leave the party? Who do the PCs see unexpectedly canoodling afterward?"
       }
     ],
-    "fr": "GRAND FEAST",
-    "descFr": "Célébration de toute la communauté, avec bien trop de boisson, de nourriture et d’amusements.",
-    "impulsesFr": "rassembler tout le monde, célébrer un événement mémorable, encourager l’abandon festif"
+    "fr": "GRAND FEAST"
   },
   {
     "id": "local-festival",
@@ -1177,9 +1119,7 @@
         "desc": "The festival culminates in the arrival of a figure from local folklore who performs special duties for the local community, such as giving treats to children, heckling the gentry, or blessing next year’s crops. If the PCs show this figure the proper deference and respect, they gain an appropriate blessing, such as a cryptic prophecy or a magical trinket, and gain 1d4 Hope to distribute among the party. If they insult the figure, they take 1d6+2 magic damage as the figure curses them, and you gain a Fear. Is this a singular entity or a mantle passed from person to person? What distinctive form do they possess? What is the source of their power to grant boons and banes?"
       }
     ],
-    "fr": "LOCAL FESTIVAL",
-    "descFr": "Roturiers et nobles des environs se rassemblent pour une semaine de célébrations.",
-    "impulsesFr": "exprimer la culture et l’histoire locales, nouer de nouvelles relations, renforcer la communauté"
+    "fr": "LOCAL FESTIVAL"
   },
   {
     "id": "outpost-town",
@@ -1216,9 +1156,7 @@
         "desc": "At night, or when the party is alone in a back alley, you can spend a Fear to introduce a group of thieves who try to rob them. The thieves appear at Close range of a chosen PC and include a Jagged Knife Kneebreaker, as many Lackeys as there are PCs, and a Lieutenant. For a larger party, add a Hexer or Sniper. What details show the party that these people are desperate former adventurers?"
       }
     ],
-    "fr": "OUTPOST TOWN",
-    "descFr": "Un village en périphérie d’un pays ou d’une région, proche de catacombes, d’une tombe ou d’un autre lieu propice aux aventures.",
-    "impulsesFr": "pousser les désespérés vers une mort certaine, tirer profit d’espoirs vains"
+    "fr": "OUTPOST TOWN"
   },
   {
     "id": "raiding-party",
@@ -1255,9 +1193,7 @@
         "desc": "When a number of pirates equal to the number of PCs in the scene are defeated, roll a d6. On a result of 5 or 6, the pirates change tactics, capturing locals and retreating to the ship so they can ransom the captives later. Activate a Consequence Countdown (4). It ticks down when a PC makes an action roll. When it triggers, the pirates sail away with their victims. Who do the pirates deem the best captives, and why? What do they want in exchange for the captives’ return? 2-4)"
       }
     ],
-    "fr": "RAIDING PARTY",
-    "descFr": "Un navire pirate déverse son équipage sur une ville portuaire ou un village côtier pour piller et mettre à sac.",
-    "impulsesFr": "y mettre le feu, submerger par la vitesse et le nombre, emporter tout ce qui n’est pas cloué au sol"
+    "fr": "RAIDING PARTY"
   },
   {
     "id": "cult-ritual",
@@ -1294,9 +1230,7 @@
         "desc": "If the ritual’s leader is targeted by an attack or spell, an ally within Very Close range of them can mark a Stress to be targeted by that attack or spell instead. What does it feel like to see such devotion turned to the pursuit of fear and domination?"
       }
     ],
-    "fr": "CULT RITUAL",
-    "descFr": "Un culte dédié aux Déchus se rassemble autour du symbole de ces dieux vaincus et d’un feu de joie aux teintes d’un vert maladif.",
-    "impulsesFr": "profaner la région, unir le Royaume mortel aux Cercles inférieurs"
+    "fr": "CULT RITUAL"
   },
   {
     "id": "duel",
@@ -1333,9 +1267,7 @@
         "desc": "Spend a Fear to have the challenging adversary or one of their allies cheat. A PC can notice their underhanded action with a successful Instinct Reaction Roll and respond in kind. What’s off -limits in this conflict? How does the adversary’s ally bend the rules without breaking them, or break the rules without getting caught? How can the PCs rebalance the scales?"
       }
     ],
-    "fr": "DUEL",
-    "descFr": "Un adversaire défie l’un des PJ en combat singulier, tandis que le reste du groupe l’aide depuis la touche.",
-    "impulsesFr": "se concentrer sur un PJ, le pousser à trop s’engager, lui infliger une défaite humiliante, mettre le reste du groupe sur la touche"
+    "fr": "DUEL"
   },
   {
     "id": "haunted-city",
@@ -1372,9 +1304,7 @@
         "desc": "Spend a Fear to manifest the echo of a past disaster that ravaged the city. Activate a Progress Countdown (5) as the disaster replays around the PCs. To complete the countdown and escape the catastrophe, the PCs must overcome threats such as rampaging fires, stampeding civilians, collapsing buildings, or crumbling streets, while recalling history and finding clues to escape the inevitable. Is this the disaster that led the city to be abandoned? What is known about this disaster, and how could that help the PCs escape?"
       }
     ],
-    "fr": "HAUNTED CITY",
-    "descFr": "Une cité abandonnée peuplée par les esprits sans repos d’époques passées.",
-    "impulsesFr": "égarer et désorienter, rejouer des apocalypses publiques et personnelles"
+    "fr": "HAUNTED CITY"
   },
   {
     "id": "masquerade-ball",
@@ -1411,9 +1341,7 @@
         "desc": "Spend a Fear to have an operative try to steal something valuable or assassinate someone important. A PC can make an Instinct Roll to try to notice them before they achieve their objective. On a success, the PC gains the opportunity to intervene. On a failure with Fear, the PC is erroneously implicated in the crime. Who does the operative work for? Why did they send them to the masquerade?"
       }
     ],
-    "fr": "MASQUERADE BALL",
-    "descFr": "Gala de la haute société où des fêtards masqués échangent secrets et faveurs.",
-    "impulsesFr": "danser toute la nuit, manger et faire la fête, conclure des marchés secrets, échanger des informations précieuses"
+    "fr": "MASQUERADE BALL"
   },
   {
     "id": "ocean-voyage",
@@ -1456,9 +1384,7 @@
         "desc": "When the Open Water Countdown ticks down to an even number, roll a d6. On a result of 4 or higher, summon 1d4 Deep Sea Denizens. What attracts these creatures to the ship? Is there any way to drive them off without combat?"
       }
     ],
-    "fr": "OCEAN VOYAGE",
-    "descFr": "Les PJ obtiennent un passage vers une destination lointaine en offrant leur travail en échange.",
-    "impulsesFr": "révéler ce qui rôde sous les vagues, les envoyer dans la mauvaise direction, couler le navire, épuiser leurs ressources"
+    "fr": "OCEAN VOYAGE"
   },
   {
     "id": "witchs-hut",
@@ -1495,9 +1421,7 @@
         "desc": "Time moves diff erently inside the Witch’s Hut. When the door to the hut is closed, roll a d6. On a result of 4 or higher, the hut moves to a diff erent—often impossibly far–location that’s only revealed to the PCs when they open the hut’s door again. Why does the hut move so often? Where does it wish to bring the PCs? Is there any way to aim it at a specific location? 5-7)"
       }
     ],
-    "fr": "WITCH’S HUT",
-    "descFr": "Cabane rustique et sans fenêtres, juchée sur deux énormes pattes de poulet.",
-    "impulsesFr": "leur donner la chair de poule, les retenir jusqu’au retour de la sorcière, les enfermer à l’intérieur, se déplacer vers un autre endroit, les tenter avec des curiosités magiques"
+    "fr": "WITCH’S HUT"
   },
   {
     "id": "astral-realm",
@@ -1534,9 +1458,7 @@
         "desc": "Adversaries in the Astral Realm are immune to physical damage, as they are psychic projections instead of flesh and blood. How does an adversary’s astral form diff er from their physical form? Why are these psychic projections drawn to the PCs?"
       }
     ],
-    "fr": "ASTRAL REALM",
-    "descFr": "Royaume psychique d’énergie et d’émotion, où les esprits forts peuvent remodeler les lois de la réalité.",
-    "impulsesFr": "attaquer leur psyché, invoquer leurs peurs inconscientes, déformer leurs perceptions"
+    "fr": "ASTRAL REALM"
   },
   {
     "id": "castle-siege",
@@ -1573,9 +1495,7 @@
         "desc": "When an adversary is defeated, you can spend a Fear to have a stray attack from a siege weapon hit a point on the battlefield. All targets within Very Close range of that point must make an Agility Reaction Roll. • Targets who fail take 3d8+3 physical or magic damage and must mark a Stress. • Targets who succeed must mark a Stress. What debris is scattered by the attack? What is broken by the strike that can’t be easily mended?"
       }
     ],
-    "fr": "CASTLE SIEGE",
-    "descFr": "Un siège avec une force d’attaque luttant pour entrer dans un château fortifié.",
-    "impulsesFr": "éroder la volonté de combattre, briser le mur, faire monter la tension"
+    "fr": "CASTLE SIEGE"
   },
   {
     "id": "dragons-lair",
@@ -1612,9 +1532,7 @@
         "desc": "When a PC fails a roll to navigate the lair, you can spend a Fear to summon 1d6 Drakes and up to two Wyverns, who appear within Close range of a PC and are immediately spotlighted. Why do these creatures serve the slumbering dragon? What signs does the party find that foreshadow their presence?"
       }
     ],
-    "fr": "DRAGON’S LAIR",
-    "descFr": "Amas d’or, de joyaux et d’artefacts au cœur d’un volcan en activité.",
-    "impulsesFr": "attirer dans les niveaux inférieurs, rendre toute fuite impossible, tenter avec des trésors, réveiller le dragon"
+    "fr": "DRAGON’S LAIR"
   },
   {
     "id": "pitched-battle",
@@ -1651,9 +1569,7 @@
         "desc": "Summon a Knight of the Realm, a number of Tier 3 Minions equal to the number of PCs, and two adversaries of your choice within Far range of a chosen PC as reinforcements. The Knight of the Realm immediately takes the spotlight. Who are they targeting first? What formation do they take?"
       }
     ],
-    "fr": "PITCHED BATTLE",
-    "descFr": "Un combat à grande échelle entre deux importants groupes de combattants.",
-    "impulsesFr": "s’emparer de terres, de gens et de richesses, verser le sang pour la gloire et la fortune"
+    "fr": "PITCHED BATTLE"
   },
   {
     "id": "upscale-casino",
@@ -1696,9 +1612,7 @@
         "desc": "If the PCs defeat the casino’s automated security or try to leave with stolen winnings, you can spend an amount of Fear equal to the number of PCs to summon the casino’s true owner, a Demon of Avarice, within Close range of a PC. The Demon is immediately spotlighted and bars the party’s exit at all costs. How did the demon mask their influence until now? How does the casino itself change to reveal its true nature? TIER 4 ENVIRONMENTS (LEVELS 8-10)"
       }
     ],
-    "fr": "UPSCALE CASINO",
-    "descFr": "Salle de jeu étincelante où marchands fortunés et nobles viennent dilapider leur fortune.",
-    "impulsesFr": "faire miroiter le gros lot juste hors de portée, les éblouir de spectacle, exploiter leurs vices"
+    "fr": "UPSCALE CASINO"
   },
   {
     "id": "chaos-realm",
@@ -1735,9 +1649,7 @@
         "desc": "On a result with Fear, you can ask the PC to describe which of their fears the Chaos Realm evokes as a vision of reality unmakes and reconstitutes itself to the PC. The PC loses a Hope. If it is their last Hope, you gain a Fear. What moment do they see? If it’s a memory, how is it warped by this place? How hard will it be to hold on to the real memory?"
       }
     ],
-    "fr": "CHAOS REALM",
-    "descFr": "Un espace appartenant à un autre monde, où les lois de la réalité sont instables et dangereuses.",
-    "impulsesFr": "annihiler les certitudes, consumer la puissance, défier la logique"
+    "fr": "CHAOS REALM"
   },
   {
     "id": "divine-usurpation",
@@ -1786,9 +1698,7 @@
         "desc": "On any failure with Fear against the Usurper, the PC must mark 1d4 Stress from the backlash of magical power. What visions of failures past torment you as your eff orts fall short? How are these memories twisted by the Usurper?"
       }
     ],
-    "fr": "DIVINE USURPATION",
-    "descFr": "Un rituel massif visant à enfoncer les portes des Saintes Hauteurs et détrôner les Nouveaux Dieux eux-mêmes.",
-    "impulsesFr": "amasser de la puissance, impressionner, réduire les dissidents au silence"
+    "fr": "DIVINE USURPATION"
   },
   {
     "id": "moon-kingdom",
@@ -1825,9 +1735,7 @@
         "desc": "The Moon Kingdom’s final ruler has been preserved in a selenite coffin deep within the citadel. On a roll with Fear to investigate her chamber, her baleful shade awakens and attacks the party. Summon the Moon Queen’s Spirit (Arch-Necromancer) next to her coffin and immediately spotlight her. Who buried her here, and why? Can she be resurrected, or is destroying her spirit the only path forward?"
       }
     ],
-    "fr": "MOON KINGDOM",
-    "descFr": "Ruines mystérieuses, lumineuses et isolées d’un royaume lunaire perdu depuis longtemps, où résonnent une magie oubliée et une technologie ancienne.",
-    "impulsesFr": "brouiller la frontière entre le rêve et la réalité, laisser la conscience fluer et refluer comme la marée, murmurer les échos d’une opulence ancienne"
+    "fr": "MOON KINGDOM"
   },
   {
     "id": "realm-of-the-dead",
@@ -1870,8 +1778,6 @@
         "desc": "When a PC spends Hope in the Realm of the Dead, they must roll a d6. On an odd result, they must spend an additional Hope or lose the benefit of the Hope they already spent. What regrets gnaw at the edge of your consciousness while you’re"
       }
     ],
-    "fr": "REALM OF THE DEAD",
-    "descFr": "Étendue en apparence infinie d’eau immobile, sans couleur ni rire.",
-    "impulsesFr": "noyer dans le désespoir, drainer la vie, inciter à un sommeil sans fin"
+    "fr": "REALM OF THE DEAD"
   }
 ]

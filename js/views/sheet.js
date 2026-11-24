@@ -2,7 +2,7 @@
    en-tête identité + badge Niveau · bande Évasion/Armure + 6 cartes de traits ·
    2 colonnes (Dégâts&Santé/Espoir/Expériences/Or/Aptitude || Armes/Armure/Inventaire).
    Thème sombre conservé, mobile = onglets Combat / Stats / Équipement / Plus. */
-import { $, $$, el, esc, go, T, data, toast, getChar, saveChar, getState, setState, uid, exportJsonFile, importCharacterFromText, MAX_CHAR_IMPORT_BYTES } from '../core.js';
+import { $, $$, el, esc, go, T, data, toast, confirmModal, getChar, saveChar, getState, setState, uid, exportJsonFile, importCharacterFromText, MAX_CHAR_IMPORT_BYTES } from '../core.js';
 import { rollDuality, rollDice, rollAttack, rollDamage, rollCustomDamage, isRolling } from '../dice3d.js';
 import { computeDamageApplication, calcDamageSpec, tierOf, nextDieStep, armorThresholdBonus, equipmentPenalty } from '../rules.js';
 import { openLevelUp } from './levelup.js';
@@ -34,7 +34,7 @@ const fmtBonus = (b) => {
 };
 
 /* ============ migration vers le modèle « feuille officielle » ============ */
-function migrate(c, weapons, armors, subclasses, classes, generalItems = [], ancestries = [], communities = [], classesFr = [], classesEn = [], subclassesFr = [], subclassesEn = []) {
+function migrate(c, weapons, armors, subclasses, classes, generalItems = [], ancestries = [], communities = [], classesFr = [], classesEn = [], subclassesFr = [], subclassesEn = [], ancestriesFr = [], ancestriesEn = [], generalItemsFr = []) {
   let dirty = false;
   if (!c.className && c.classId && classes) {
     const cl = classes.find(x => x.id === c.classId);
@@ -90,31 +90,52 @@ function migrate(c, weapons, armors, subclasses, classes, generalItems = [], anc
   /* Pré-remplissage & synchronisation SRD 2.0 : aptitudes de classe + carte de Fondation de sous-classe.
      Respecte les modifications libres du joueur (c.customClassFeature === true). */
   const clForFeat = classes?.find(x => x.id === c.classId);
-  if (subMatch?.features?.length && !c.subcardCount) { c.subcardCount = 1; dirty = true; }
-  if (!c.customClassFeature && (clForFeat?.features?.length || subMatch?.features?.length)) {
+  if (subMatch?.features?.length) {
+    const takenCount = Object.values(c.subcardTaken || {}).filter(Boolean).length;
+    const minSubcards = Math.min(subMatch.features.length, 1 + takenCount);
+    if ((c.subcardCount || 0) < minSubcards) { c.subcardCount = minSubcards; dirty = true; }
+  }
+  if (!c.customClassFeature && (clForFeat?.features?.length || subMatch?.features?.length || c.multiclassed)) {
     const classFeatNames = new Set([
       ...(clForFeat?.features || []).map(f => f.name),
       ...(classesFr?.find(x => x.id === c.classId)?.features || []).map(f => f.name),
       ...(classesEn?.find(x => x.id === c.classId)?.features || []).map(f => f.name),
     ].filter(Boolean));
-    const foundationNames = new Set([
-      subMatch?.features?.[0]?.name,
-      subclassesFr?.find(s => s.id === c.subclassId)?.features?.[0]?.name,
-      subclassesEn?.find(s => s.id === c.subclassId)?.features?.[0]?.name,
+    const subCount = Math.min(subMatch?.features?.length || 0, Math.max(1, c.subcardCount || 1));
+    const subFeatNames = new Set([
+      ...(subMatch?.features || []).map(f => f.name),
+      ...(subclassesFr?.find(s => s.id === c.subclassId)?.features || []).map(f => f.name),
+      ...(subclassesEn?.find(s => s.id === c.subclassId)?.features || []).map(f => f.name),
+    ].filter(Boolean));
+    const mcFr = c.multiclassClassId ? classesFr?.find(x => x.id === c.multiclassClassId) : null;
+    const mcEn = c.multiclassClassId ? classesEn?.find(x => x.id === c.multiclassClassId) : null;
+    const mcCur = c.multiclassClassId ? classes?.find(x => x.id === c.multiclassClassId) : null;
+    const mcHeaders = new Set([
+      mcFr ? `〔Multiclassage〕 ${mcFr.fr}` : '',
+      mcEn ? `〔Multiclassage〕 ${mcEn.fr}` : '',
+      mcEn ? `〔Multiclass〕 ${mcEn.fr}` : '',
     ].filter(Boolean));
     const blocks = String(c.classFeature || '')
-      .replace(/\n+(?=[•✦] )/g, '\n\n')
+      .replace(/\n+(?=[•✦〔] )/g, '\n\n')
+      .replace(/\n+(?=〔(?:Multiclassage|Multiclass)〕)/g, '\n\n')
       .split(/\n{2,}/)
       .map(s => s.trim())
       .filter(Boolean);
     const remaining = blocks.filter(block => {
       const isClassBlock = [...classFeatNames].some(name => block.startsWith(`• ${name} —`));
-      const isSubBlock = [...foundationNames].some(name => block.startsWith(`✦ ${name} —`));
-      return !isClassBlock && !isSubBlock;
+      const isSubBlock = [...subFeatNames].some(name => block.startsWith(`✦ ${name} —`));
+      const isMcBlock = [...mcHeaders].some(hdr => block.startsWith(hdr));
+      return !isClassBlock && !isSubBlock && !isMcBlock;
     });
     const desiredClassBlocks = (clForFeat?.features || []).map(f => `• ${f.name} — ${f.desc}`);
-    const desiredSubBlocks = subMatch?.features?.[0] ? [`✦ ${subMatch.features[0].name} — ${subMatch.features[0].desc}`] : [];
-    const nextClassFeature = [...desiredClassBlocks, ...desiredSubBlocks, ...remaining].join('\n\n');
+    const desiredSubBlocks = (subMatch?.features || []).slice(0, subCount).map(f => `✦ ${f.name} — ${f.desc}`);
+    const desiredMcBlocks = [];
+    if (c.multiclassed && mcCur) {
+      const mcPrefix = getLang() === 'en' ? '〔Multiclass〕' : '〔Multiclassage〕';
+      const mcFeats = (mcCur.features || []).map(f => `✦ ${f.name} — ${f.desc}`).join('\n');
+      desiredMcBlocks.push(`${mcPrefix} ${mcCur.fr}${mcFeats ? '\n' + mcFeats : ''}`);
+    }
+    const nextClassFeature = [...desiredClassBlocks, ...desiredSubBlocks, ...desiredMcBlocks, ...remaining].join('\n\n');
     if (nextClassFeature !== c.classFeature) {
       c.classFeature = nextClassFeature;
       dirty = true;
@@ -194,14 +215,39 @@ function migrate(c, weapons, armors, subclasses, classes, generalItems = [], anc
     if (defaultSubclass && c.subclassText !== subDef.fr) { c.subclassText = subDef.fr; dirty = true; }
     if (c.subclassName !== subDef.fr) { c.subclassName = subDef.fr; dirty = true; }
   }
-  const ancDef = ancestries?.find(x => x.id === c.ancestry?.id);
-  if (ancDef && !c.mixedAncestry) {
-    const sameAbilities = JSON.stringify(c.ancestry?.abilities || []) === JSON.stringify(ancDef.abilities || []);
-    if (c.ancestry?.fr !== ancDef.fr || !sameAbilities) {
-      const defaultHeritage = !c.heritage || c.heritage === c.ancestry?.fr;
-      c.ancestry = { ...c.ancestry, fr: ancDef.fr, abilities: ancDef.abilities };
-      if (defaultHeritage) c.heritage = ancDef.fr;
-      dirty = true;
+  if (c.mixedAncestry?.primaryId && c.mixedAncestry?.secondaryId) {
+    const a1 = ancestries?.find(x => x.id === c.mixedAncestry.primaryId);
+    const a2 = ancestries?.find(x => x.id === c.mixedAncestry.secondaryId);
+    if (a1 && a2) {
+      const primary = c.mixedAncestry.firstFrom === 2 ? a2 : a1;
+      const secondary = c.mixedAncestry.firstFrom === 2 ? a1 : a2;
+      const nextAbilities = [primary.abilities?.[0], secondary.abilities?.[1]].filter(Boolean);
+      const a1Fr = ancestriesFr?.find(x => x.id === a1.id);
+      const a2Fr = ancestriesFr?.find(x => x.id === a2.id);
+      const a1En = ancestriesEn?.find(x => x.id === a1.id);
+      const a2En = ancestriesEn?.find(x => x.id === a2.id);
+      const autoFr = a1Fr && a2Fr ? `${a1Fr.fr}-${a2Fr.fr}` : '';
+      const autoEn = a1En && a2En ? `${a1En.fr}-${a2En.fr}` : '';
+      const defaultMixedName = !c.ancestry?.fr || c.ancestry.fr === autoFr || c.ancestry.fr === autoEn;
+      const nextName = defaultMixedName ? `${a1.fr}-${a2.fr}` : c.ancestry.fr;
+      const sameAbilities = JSON.stringify(c.ancestry?.abilities || []) === JSON.stringify(nextAbilities);
+      if (c.ancestry?.fr !== nextName || !sameAbilities) {
+        const defaultHeritage = !c.heritage || c.heritage === c.ancestry?.fr || c.heritage === autoFr || c.heritage === autoEn;
+        c.ancestry = { id: `${a1.id}+${a2.id}`, fr: nextName, abilities: nextAbilities };
+        if (defaultHeritage) c.heritage = nextName;
+        dirty = true;
+      }
+    }
+  } else {
+    const ancDef = ancestries?.find(x => x.id === c.ancestry?.id);
+    if (ancDef) {
+      const sameAbilities = JSON.stringify(c.ancestry?.abilities || []) === JSON.stringify(ancDef.abilities || []);
+      if (c.ancestry?.fr !== ancDef.fr || !sameAbilities) {
+        const defaultHeritage = !c.heritage || c.heritage === c.ancestry?.fr;
+        c.ancestry = { ...c.ancestry, fr: ancDef.fr, abilities: ancDef.abilities };
+        if (defaultHeritage) c.heritage = ancDef.fr;
+        dirty = true;
+      }
     }
   }
   const comDef = communities?.find(x => x.id === c.community?.id);
@@ -243,11 +289,15 @@ function migrate(c, weapons, armors, subclasses, classes, generalItems = [], anc
     }
   }
   for (const it of c.inventory || []) {
-    if (!it.itemId) continue;
-    const g = generalItems?.find(x => x.id === it.itemId);
+    let g = it.itemId ? generalItems?.find(x => x.id === it.itemId) : null;
+    if (!g && it.name) {
+      const frMatch = generalItemsFr?.find(x => x.fr === it.name || x.en === it.name);
+      g = (frMatch ? generalItems?.find(x => x.id === frMatch.id) : null) || generalItems?.find(x => x.fr === it.name || x.en === it.name);
+      if (g && !it.itemId) { it.itemId = g.id; dirty = true; }
+    }
     if (!g) continue;
     const name = g.fr;
-    const desc = g.descFr || g.desc || g.descEn || it.desc;
+    const desc = getLang() === 'en' ? (g.descEn || g.desc || g.descFr || it.desc) : (g.descFr || g.desc || g.descEn || it.desc);
     if (it.name !== name || it.desc !== desc) { it.name = name; it.desc = desc; dirty = true; }
   }
   if (c.companion) {
@@ -349,10 +399,10 @@ export async function render(main, params) {
   const focusKey = active?.dataset?.f || active?.dataset?.ef || active?.dataset?.wf || active?.dataset?.af || null;
   const focusSel = focusKey ? `[data-f="${focusKey}"],[data-ef="${focusKey}"],[data-wf="${focusKey}"],[data-af="${focusKey}"]` : null;
   const scrollY = window.scrollY;
-  const [classes, subclasses, weapons, armors, cards, domains, generalItems, transformations, beastforms, ancestries, communities, classesFr, classesEn, subclassesFr, subclassesEn] = await Promise.all([
-    data('classes'), data('subclasses'), data('weapons'), data('armors'), data('domainCards'), data('domains'), data('generalItems'), data('transformations'), data('beastforms'), data('ancestries'), data('communities'), data('classes', 'fr'), data('classes', 'en'), data('subclasses', 'fr'), data('subclasses', 'en'),
+  const [classes, subclasses, weapons, armors, cards, domains, generalItems, transformations, beastforms, ancestries, communities, classesFr, classesEn, subclassesFr, subclassesEn, ancestriesFr, ancestriesEn, generalItemsFr] = await Promise.all([
+    data('classes'), data('subclasses'), data('weapons'), data('armors'), data('domainCards'), data('domains'), data('generalItems'), data('transformations'), data('beastforms'), data('ancestries'), data('communities'), data('classes', 'fr'), data('classes', 'en'), data('subclasses', 'fr'), data('subclasses', 'en'), data('ancestries', 'fr'), data('ancestries', 'en'), data('generalItems', 'fr'),
   ]);
-  migrate(c, weapons, armors, subclasses, classes, generalItems, ancestries, communities, classesFr, classesEn, subclassesFr, subclassesEn);
+  migrate(c, weapons, armors, subclasses, classes, generalItems, ancestries, communities, classesFr, classesEn, subclassesFr, subclassesEn, ancestriesFr, ancestriesEn, generalItemsFr);
   const cl = classes.find(x => x.id === c.classId);
   const sub = subclasses.find(x => x.id === c.subclassId);
   const bfMeta = c.beastform?.id ? beastforms.find(b => b.id === c.beastform.id) : null;
@@ -764,11 +814,14 @@ export async function render(main, params) {
               }
               const itemDef = it.itemId
                 ? generalItems.find(g => g.id === it.itemId)
-                : generalItems.find(g => g.fr === it.name);
+                : generalItems.find(g => g.fr === it.name || g.en === it.name);
               const isConsumable = it.type === 'consumable' || itemDef?.type === 'consumable';
-              const fullDesc = (itemDef?.descFr && (!it.desc || it.desc.length < itemDef.descFr.length))
-                ? itemDef.descFr
-                : (it.desc || itemDef?.descFr || itemDef?.descEn || '');
+              const defDesc = getLang() === 'en'
+                ? (itemDef?.descEn || itemDef?.desc || itemDef?.descFr || '')
+                : (itemDef?.descFr || itemDef?.desc || itemDef?.descEn || '');
+              const fullDesc = (defDesc && (!it.desc || it.desc.length < defDesc.length || getLang() === 'en'))
+                ? defDesc
+                : (it.desc || defDesc);
               return `<div class="inv-item">
               <span class="ii-name" title="${esc(fullDesc)}">${esc(it.name)}${isConsumable ? ' <span class="tag" style="margin-left:4px">' + t('sheetConsumable') + '</span>' : ''}</span>
               ${fullDesc ? `<span class="ii-desc" title="${esc(fullDesc)}">${esc(fullDesc)}</span>` : ''}
@@ -804,7 +857,7 @@ export async function render(main, params) {
 
     <!-- pied de licence DPCGL 2.0 (discret) -->
     <footer class="dpcgl-mini">
-      <img src="public/assets/dpcgl-community-logo.png" alt="Daggerheart Compatible">
+      <img src="assets/dpcgl-community-logo.png" alt="Daggerheart Compatible">
       <span>Daggerheart™ Compatible. Terms at Daggerheart.com</span>
     </footer>
   </div>`;
@@ -904,6 +957,7 @@ function bindAll(root, c, ctx) {
       e.target.value = '';
       if (!f) return;
       if (!f.type.startsWith('image/')) { toast('Fichier image invalide.'); return; }
+      if (f.size > 15 * 1024 * 1024) { toast(getLang() === 'en' ? 'Image too large (max 15 MB).' : 'Image trop volumineuse (max 15 Mo).'); return; }
       const url = URL.createObjectURL(f);
       const img = new Image();
       img.onload = () => {
@@ -953,7 +1007,9 @@ function bindAll(root, c, ctx) {
     if (k === 'evasion') {
       const bfB = ctx?.activeBf?.evasionBonus || 0;
       const gearB = ctx?.gearPenalty?.evasion || 0;
-      c.evasion = Math.max(0, Math.min(30, (parseInt(inp.value, 10) || 0) - bfB - gearB));
+      const parsed = parseInt(inp.value, 10);
+      if (!Number.isFinite(parsed)) { inp.value = String(ctx?.effEvasion ?? c.evasion); return; }
+      c.evasion = Math.max(0, Math.min(30, parsed - bfB - gearB));
     }
     else if (k === 'armorScore') {
       c.armorCard.baseScore = Math.max(0, Math.min(12, parseInt(inp.value, 10) || 0));
@@ -1445,8 +1501,8 @@ function bindAll(root, c, ctx) {
     };
     rd.readAsText(f);
   });
-  $('#btn-delete', root).addEventListener('click', () => {
-    if (!confirm(t('sheetDeleteConfirm', { name: c.name }))) return;
+  $('#btn-delete', root).addEventListener('click', async () => {
+    if (!await confirmModal(t('sheetDeleteConfirm', { name: c.name }), { danger: true })) return;
     setState(s => { s.characters = s.characters.filter(x => x.id !== c.id); });
     go('chars');
   });

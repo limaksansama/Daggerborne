@@ -1,7 +1,7 @@
 /* Réglages + Sauvegardes + Option Cloud Pro + À propos */
 import {
   $$,
-  $, esc, getState, setState, toast, exportJsonFile,
+  $, esc, getState, setState, toast, confirmModal, exportJsonFile,
   importFullBackupFromText, openPasteJsonModal, getStorageInfo, cloudSync, MAX_BACKUP_IMPORT_BYTES,
 } from '../core.js';
 import { t, getLang } from '../i18n.js';
@@ -65,7 +65,7 @@ export async function render(main, params) {
     <div class="section-title">À propos</div>
     <div class="card">
       <div class="about-logo-row">
-        <img src="public/assets/dpcgl-community-logo-light.png" alt="Daggerborne — Daggerheart Compatible">
+        <img src="assets/dpcgl-community-logo-light.png" alt="Daggerborne — Daggerheart Compatible">
         <div>
           <div style="font-family:var(--font-title);font-weight:800;color:var(--golden);font-size:1.15rem">${t('setCompanion')}</div>
           <div style="font-size:.78rem;color:var(--text-dim)">${t('setUnofficial')}</div>
@@ -82,7 +82,7 @@ export async function render(main, params) {
     <div class="section-title">${t('setCredits')}</div>
     <div class="license-box">
       <b>${t('setDiceCredit')}</b><br>
-      <span style="font-size:.8rem;color:var(--text-dim);line-height:1.6;display:inline-block;margin-top:.3rem">${t('setDiceCreditDesc')} <a href="https://github.com/3d-dice/dice-box" style="color:var(--golden)" target="_blank" rel="noopener">github.com/3d-dice/dice-box</a></span>
+      <span style="font-size:.8rem;color:var(--text-dim);line-height:1.6;display:inline-block;margin-top:.3rem">${t('setDiceCreditDesc')} <a href="https://github.com/3d-dice/dice-box" style="color:var(--golden)" target="_blank" rel="noopener noreferrer">github.com/3d-dice/dice-box</a></span>
     </div>
     <div class="license-box">
       <b>Attribution officielle — DPCGL 2.0</b><br>
@@ -90,7 +90,7 @@ export async function render(main, params) {
     </div>
     <div class="license-box">
       <div class="license-logo-row">
-        <img src="public/assets/dpcgl-community-logo.png" alt="Daggerheart Compatible">
+        <img src="assets/dpcgl-community-logo.png" alt="Daggerheart Compatible">
         <div>
           <b>${t('setCommunityLogo')}</b><br>
           <span style="font-size:.8rem;color:var(--text-dim);line-height:1.6;display:inline-block;margin-top:.3rem">Darrington Press™ and the Darrington Press authorized work logo are trademarks of Critical Role, LLC and used with permission. Daggerheart™ Compatible. Terms at Daggerheart.com</span>
@@ -100,7 +100,7 @@ export async function render(main, params) {
     <div class="license-box">
       <b>Licence Open Source (code technique)</b><br>
       <span style="font-size:.8rem;color:var(--text-dim);line-height:1.6;display:inline-block;margin-top:.3rem">Portions of the data architecture and system logic are adapted from the Foundryborne Daggerheart system, licensed under the MIT License (Copyright © Foundryborne contributors).</span>
-      <span style="font-size:.78rem;color:var(--text-faint);display:inline-block;margin-top:.4rem">Texte complet : <a href="https://github.com/Foundryborne/daggerheart/blob/main/LICENSE" style="color:var(--golden)" target="_blank" rel="noopener">github.com/Foundryborne/daggerheart/LICENSE</a></span>
+      <span style="font-size:.78rem;color:var(--text-faint);display:inline-block;margin-top:.4rem">Texte complet : <a href="https://github.com/Foundryborne/daggerheart/blob/main/LICENSE" style="color:var(--golden)" target="_blank" rel="noopener noreferrer">github.com/Foundryborne/daggerheart/LICENSE</a></span>
     </div>
     <div class="section-title" style="font-size:.9rem">Contributeurs du module (MIT)</div>
     <div class="credit-list">
@@ -111,12 +111,16 @@ export async function render(main, params) {
     </p>
   </div>`;
 
-  const applyBackupText = (rawText) => {
-    const replace = confirm(t('setImportConfirm'));
+  const applyBackupText = async (rawText) => {
+    const replace = await confirmModal(t('setImportConfirm'));
     if (!replace) return;
-    const res = importFullBackupFromText(rawText, 'merge');
-    toast(`Sauvegarde importée : ${res.added} ajouté(s), ${res.updated} mis à jour.`);
-    render(main, params);
+    try {
+      const res = importFullBackupFromText(rawText, 'merge');
+      toast(`Sauvegarde importée : ${res.added} ajouté(s), ${res.updated} mis à jour.`);
+      render(main, params);
+    } catch (err) {
+      toast(err?.message || 'Fichier de sauvegarde invalide.');
+    }
   };
 
   /* un seul écouteur : le doublon provoquait deux rendus par clic */
@@ -170,8 +174,8 @@ export async function render(main, params) {
     toast(t('setRollsCleared'));
     render(main, params);
   });
-  $('#wipe-all', main).addEventListener('click', () => {
-    if (!confirm(t('setWipeConfirm'))) return;
+  $('#wipe-all', main).addEventListener('click', async () => {
+    if (!await confirmModal(t('setWipeConfirm'), { danger: true })) return;
     setState(s => { s.characters = []; s.rolls = []; s.fear = 0; s.countdowns = []; s.encounter = { pcCount: 4, adj: {}, active: [], environmentId: null }; });
     toast(t('setWiped'));
     render(main, params);

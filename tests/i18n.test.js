@@ -36,8 +36,8 @@ test('trUi traduit les portées, les dés et les seuils', () => {
   assert.equal(trUi('Proche'), 'Close');
   assert.equal(trUi('Éloignée'), 'Far');
   assert.equal(trUi('Très éloignée'), 'Very Far');
-  assert.equal(trUi('LANCER 1 dé !'), 'ROLL 1 die !');
-  assert.equal(trUi('LANCER 3 dés !'), 'ROLL 3 dice !');
+  assert.equal(trUi('LANCER 1 dé !'), 'ROLL 1 die!');
+  assert.equal(trUi('LANCER 3 dés !'), 'ROLL 3 dice!');
   assert.equal(
     trUi('Mineurs < seuil Majeur · Majeurs ≥ seuil Majeur · Graves ≥ seuil Grave'),
     'Minor < Major threshold · Major ≥ Major threshold · Severe ≥ Severe threshold',

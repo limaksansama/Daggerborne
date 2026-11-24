@@ -19,7 +19,41 @@ export const toast = (msg) => {
   document.body.appendChild(node);
   setTimeout(() => node.remove(), 2600);
 };
+export function confirmModal(msg, { title = '', okLabel = '', cancelLabel = '', danger = false } = {}) {
+  const en = getLang() === 'en';
+  const hdr = title || (en ? 'Confirmation' : 'Confirmation');
+  const okTxt = okLabel || (en ? 'Confirm' : 'Confirmer');
+  const cancelTxt = cancelLabel || (en ? 'Cancel' : 'Annuler');
+  return new Promise((resolve) => {
+    const back = el(`<div class="modal-back"></div>`);
+    const sheet = el(`<div class="modal-sheet"></div>`);
+    back.appendChild(sheet);
+    sheet.innerHTML = `
+      <h3>${esc(hdr)}</h3>
+      <p style="font-size:.9rem;color:var(--text-dim);line-height:1.5;margin:.5rem 0 1rem">${esc(msg)}</p>
+      <div style="display:flex;gap:.5rem;justify-content:flex-end">
+        <button type="button" class="btn ghost small" id="cm-cancel">${esc(cancelTxt)}</button>
+        <button type="button" class="btn ${danger ? 'danger ' : ''}small" id="cm-ok">${esc(okTxt)}</button>
+      </div>`;
+    let settled = false;
+    const finish = (val) => {
+      if (settled) return;
+      settled = true;
+      document.removeEventListener('keydown', onKey);
+      back.remove();
+      resolve(val);
+    };
+    const onKey = (e) => { if (e.key === 'Escape') finish(false); };
+    document.addEventListener('keydown', onKey);
+    back.addEventListener('click', (e) => { if (e.target === back) finish(false); });
+    $('#cm-cancel', sheet).addEventListener('click', () => finish(false));
+    $('#cm-ok', sheet).addEventListener('click', () => finish(true));
+    document.body.appendChild(back);
+    $('#cm-ok', sheet).focus?.();
+  });
+}
 export const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const utf8ByteLength = (str) => (typeof TextEncoder !== 'undefined' ? new TextEncoder().encode(str).length : str.length);
 
 // ---------- persistence (IndexedDB principal + repli localStorage rétro-compatible) ----------
 const LS_KEY = 'dh-compagnon-v1';
@@ -214,12 +248,22 @@ export async function initStorage() {
   const fromIdb = await idbGet(IDB_KEY);
   if (fromIdb && Array.isArray(fromIdb.characters)) {
     let lsRaw = null;
-    try { lsRaw = localStorage.getItem(LS_KEY); } catch (e) { /* stockage indisponible */ }
+    let lsParsed = null;
+    try {
+      lsRaw = localStorage.getItem(LS_KEY);
+      if (lsRaw) lsParsed = safeJsonParse(lsRaw);
+    } catch (e) { /* stockage indisponible */ }
     const idbUpdated = fromIdb._savedAt || 0;
     const lsUpdated = state?._savedAt || 0;
     if (!lsRaw || idbUpdated >= lsUpdated) {
       state = normalizeState(fromIdb);
     } else {
+      if (lsParsed?._strippedPortraits) {
+        const idbPortraits = new Map(fromIdb.characters.filter(c => c?.id && c?.portrait).map(c => [c.id, c.portrait]));
+        for (const ch of state.characters) {
+          if (!ch.portrait && idbPortraits.has(ch.id)) ch.portrait = idbPortraits.get(ch.id);
+        }
+      }
       await idbSet(IDB_KEY, state);
     }
     idbReady = true;
@@ -242,6 +286,7 @@ function save() {
     try {
       const lite = {
         ...snapshot,
+        _strippedPortraits: true,
         characters: snapshot.characters.map(c => ({ ...c, portrait: '' })),
       };
       localStorage.setItem(LS_KEY, JSON.stringify(lite));
@@ -291,7 +336,7 @@ export function ensureCharacter(obj) {
 
 /* Import d'un personnage depuis un texte JSON */
 export function importCharacterFromText(rawText) {
-  if (typeof rawText !== 'string' || rawText.length > MAX_CHAR_IMPORT_BYTES) {
+  if (typeof rawText !== 'string' || utf8ByteLength(rawText) > MAX_CHAR_IMPORT_BYTES) {
     throw new Error('Fichier trop volumineux (max 2 Mo).');
   }
   const raw = safeJsonParse(rawText);
@@ -308,7 +353,7 @@ export function importCharacterFromText(rawText) {
 
 /* Import d'une sauvegarde globale (remplacement ou fusion) */
 export function importFullBackupFromText(rawText, mode = 'merge') {
-  if (typeof rawText !== 'string' || rawText.length > MAX_BACKUP_IMPORT_BYTES) {
+  if (typeof rawText !== 'string' || utf8ByteLength(rawText) > MAX_BACKUP_IMPORT_BYTES) {
     throw new Error('Sauvegarde trop volumineuse (max 10 Mo).');
   }
   const parsed = safeJsonParse(rawText);
@@ -434,40 +479,6 @@ export function saveChar(c) {
   const i = state.characters.findIndex(x => x.id === c.id);
   if (i >= 0) state.characters[i] = c; else state.characters.push(c);
   save();
-}
-
-// ---------- dice engine ----------
-export function rollD(n) { return 1 + Math.floor(Math.random() * n); }
-
-export function dualityRoll(opts = {}) {
-  // Dés de Dualité : deux d12 (Espoir + Peur) — Livre de règles p.90
-  const hopeDie = rollD(12);
-  const fearDie = rollD(12);
-  let mod = opts.mod ?? 0;
-  // Avantage : +1d6 au total ; Désavantage : −1d6 (p.100)
-  const advDice = [];
-  if (opts.advantage) advDice.push(rollD(6));
-  if (opts.extraAdv) advDice.push(rollD(6));
-  const advBest = advDice.length ? Math.max(...advDice) : null;
-  const disDie = opts.disadvantage ? rollD(6) : null;
-  let total = hopeDie + fearDie + mod + (advBest ?? 0) - (disDie ?? 0);
-  // Succès critique : les deux dés de Dualité donnent le même nombre (p.90)
-  let result;
-  if (hopeDie === fearDie) result = 'crit';
-  else if (hopeDie > fearDie) result = 'hope';
-  else result = 'fear';
-  const rec = {
-    id: uid(), t: Date.now(),
-    hope: hopeDie, fear: fearDie, mod, adv: advBest, dis: disDie,
-    total, result, label: opts.label || '',
-    charName: opts.charName || null,
-    difficulty: opts.difficulty ?? null,
-  };
-  if (rec.difficulty != null) rec.success = total >= rec.difficulty;
-  state.rolls.unshift(rec);
-  state.rolls = state.rolls.slice(0, 60);
-  save();
-  return rec;
 }
 
 /* Fix 3 — limite de 5 cartes en main : ajoute une carte en respectant la règle.

@@ -307,6 +307,9 @@ function sanitizeWeapon(w) {
     state: w.state === 'inventory' ? 'inventory' : 'active',
     primary: Boolean(w.primary),
     secondary: Boolean(w.secondary) && !Boolean(w.primary),
+    ...(w.customName ? { customName: true } : {}),
+    ...(w.customStats ? { customStats: true } : {}),
+    ...(w.customFeature ? { customFeature: true } : {}),
   };
 }
 
@@ -354,8 +357,77 @@ function sanitizeBeastform(bf) {
   return out;
 }
 
+const EXTRA_CHAR_KEYS = ['className', 'subclassName', 'hopeAbility', 'multiclassClassId', 'gold'];
+
+function sanitizeAncestry(anc) {
+  if (!isPlainObject(anc)) return null;
+  const abilities = (Array.isArray(anc.abilities) ? anc.abilities : [])
+    .filter(isPlainObject)
+    .slice(0, 6)
+    .map(ab => ({
+      ...(typeof ab.fr === 'string' ? { fr: ab.fr.slice(0, 160) } : {}),
+      ...(typeof ab.en === 'string' ? { en: ab.en.slice(0, 160) } : {}),
+      ...(typeof ab.desc === 'string' ? { desc: ab.desc.slice(0, 2000) } : {}),
+    }));
+  return {
+    id: typeof anc.id === 'string' ? anc.id.slice(0, 160) : '',
+    fr: typeof anc.fr === 'string' ? anc.fr.slice(0, 160) : '',
+    abilities,
+  };
+}
+
+function sanitizeCommunity(com) {
+  if (!isPlainObject(com)) return null;
+  let ability = '';
+  if (typeof com.ability === 'string') {
+    ability = com.ability.slice(0, 2000);
+  } else if (isPlainObject(com.ability)) {
+    ability = {
+      ...(typeof com.ability.fr === 'string' ? { fr: com.ability.fr.slice(0, 160) } : {}),
+      ...(typeof com.ability.en === 'string' ? { en: com.ability.en.slice(0, 160) } : {}),
+      ...(typeof com.ability.desc === 'string' ? { desc: com.ability.desc.slice(0, 2000) } : {}),
+    };
+  }
+  return {
+    id: typeof com.id === 'string' ? com.id.slice(0, 120) : '',
+    fr: typeof com.fr === 'string' ? com.fr.slice(0, 160) : '',
+    ability,
+  };
+}
+
+function sanitizeMixedAncestry(ma) {
+  if (!isPlainObject(ma)) return null;
+  if (typeof ma.primaryId !== 'string' || typeof ma.secondaryId !== 'string') return null;
+  return {
+    primaryId: ma.primaryId.slice(0, 120),
+    secondaryId: ma.secondaryId.slice(0, 120),
+    firstFrom: ma.firstFrom === 2 ? 2 : 1,
+  };
+}
+
+function sanitizeTierUses(tu) {
+  const out = {};
+  if (!isPlainObject(tu)) return out;
+  for (const [tierKey, opts] of Object.entries(tu)) {
+    if (!/^[1-4]$/.test(tierKey) || UNSAFE_OBJECT_KEYS.has(tierKey) || !isPlainObject(opts)) continue;
+    const cleanOpts = {};
+    for (const [optKey, cnt] of Object.entries(opts)) {
+      if (UNSAFE_OBJECT_KEYS.has(optKey)) continue;
+      const n = clampNum(cnt, 0, 0, 10);
+      if (n > 0) cleanOpts[optKey.slice(0, 60)] = Math.trunc(n);
+    }
+    if (Object.keys(cleanOpts).length) out[tierKey.slice(0, 16)] = cleanOpts;
+  }
+  return out;
+}
+
 export function sanitizeCharacter(rawObj, blankTemplate) {
-  const obj = isPlainObject(rawObj) ? stripUnsafeKeys(rawObj) : {};
+  const src = isPlainObject(rawObj) ? stripUnsafeKeys(rawObj) : {};
+  const allowedKeys = new Set([...Object.keys(blankTemplate), ...EXTRA_CHAR_KEYS]);
+  const obj = {};
+  for (const k of Object.keys(src)) {
+    if (allowedKeys.has(k)) obj[k] = src[k];
+  }
   /* Anciens modèles : hp/stress n'avaient pas encore active/unlocked. */
   const hadHpActive = isPlainObject(obj.hp) && obj.hp.active !== undefined;
   const hadStressActive = isPlainObject(obj.stress) && obj.stress.active !== undefined;
@@ -443,13 +515,20 @@ export function sanitizeCharacter(rawObj, blankTemplate) {
     obj.stress.unlocked = 0;
   }
   const armorTpl = isPlainObject(blankTemplate.armorCard) ? blankTemplate.armorCard : {};
-  obj.armorCard = { ...armorTpl, ...(isPlainObject(obj.armorCard) ? obj.armorCard : {}) };
-  obj.armorCard.compendiumId = typeof obj.armorCard.compendiumId === 'string' ? obj.armorCard.compendiumId.slice(0, 120) : null;
-  obj.armorCard.baseScore = clampNum(obj.armorCard.baseScore, 0, 0, 12);
-  obj.armorCard.baseMajor = clampNum(obj.armorCard.baseMajor, 0, 0, 40);
-  obj.armorCard.baseSevere = clampNum(obj.armorCard.baseSevere, 0, 0, 60);
-  obj.armorCard.name = typeof obj.armorCard.name === 'string' ? obj.armorCard.name : '';
-  obj.armorCard.feature = typeof obj.armorCard.feature === 'string' ? obj.armorCard.feature : '';
+  obj.armorCard = {
+    ...armorTpl,
+    ...(isPlainObject(obj.armorCard) ? {
+      compendiumId: typeof obj.armorCard.compendiumId === 'string' ? obj.armorCard.compendiumId.slice(0, 120) : null,
+      name: typeof obj.armorCard.name === 'string' ? obj.armorCard.name : '',
+      baseScore: clampNum(obj.armorCard.baseScore, 0, 0, 12),
+      baseMajor: clampNum(obj.armorCard.baseMajor, 0, 0, 40),
+      baseSevere: clampNum(obj.armorCard.baseSevere, 0, 0, 60),
+      feature: typeof obj.armorCard.feature === 'string' ? obj.armorCard.feature : '',
+      ...(obj.armorCard.customName ? { customName: true } : {}),
+      ...(obj.armorCard.customStats ? { customStats: true } : {}),
+      ...(obj.armorCard.customFeature ? { customFeature: true } : {}),
+    } : {}),
+  };
   obj.hp.unlocked = Math.min(obj.hp.unlocked, 12 - obj.hp.active);
   obj.stress.unlocked = Math.min(obj.stress.unlocked, 12 - obj.stress.active);
   obj.hp.current = Math.min(obj.hp.current, obj.hp.active + obj.hp.unlocked);
@@ -478,6 +557,9 @@ export function sanitizeCharacter(rawObj, blankTemplate) {
   obj.conditions = (Array.isArray(obj.conditions) ? obj.conditions : []).filter(x => typeof x === 'string').map(x => x.slice(0, 80));
   obj.traitMarks = (Array.isArray(obj.traitMarks) ? obj.traitMarks : []).filter(x => typeof x === 'string').map(x => x.slice(0, 40));
   obj.extraDomains = (Array.isArray(obj.extraDomains) ? obj.extraDomains : []).filter(x => typeof x === 'string').map(x => x.slice(0, 80));
+  obj.ancestry = sanitizeAncestry(obj.ancestry);
+  obj.community = sanitizeCommunity(obj.community);
+  obj.mixedAncestry = sanitizeMixedAncestry(obj.mixedAncestry);
   obj.companion = sanitizeCompanion(obj.companion);
   obj.beastform = sanitizeBeastform(obj.beastform);
 
@@ -507,7 +589,7 @@ export function sanitizeCharacter(rawObj, blankTemplate) {
   };
   obj.cardUses = cleanBoolMap(obj.cardUses);
   obj.subcardTaken = cleanBoolMap(obj.subcardTaken);
-  obj.tierUses = cleanBoolMap(obj.tierUses);
+  obj.tierUses = sanitizeTierUses(obj.tierUses);
   obj.cardTokens = cleanIntMap(obj.cardTokens, 0, 20);
   obj.backgroundAnswers = cleanStrMap(obj.backgroundAnswers);
 

@@ -76,7 +76,7 @@ function showBanner(html, { onClick, buttons = [] }) {
   bannerEl = el(`<div class="d3d-banner" role="status">
     <div class="d3d-card">
       <div class="d3d-body">${html}</div>
-      <div class="d3d-btns">${buttons.map(b => `<button class="d3d-btn ${b.cls || ''}" data-b="${b.id}">${b.label}</button>`).join('')}</div>
+      <div class="d3d-btns">${buttons.map(b => `<button class="d3d-btn ${esc(b.cls || '')}" data-b="${esc(b.id)}">${esc(b.label)}</button>`).join('')}</div>
     </div>
   </div>`);
   document.body.appendChild(bannerEl);
@@ -141,29 +141,23 @@ async function rollDuality({ mod = 0, label = '', charId = null, weaponUid = nul
     const result = hope === fear ? 'crit' : hope > fear ? 'hope' : 'fear';
     const word = result === 'crit' ? '★ Succès Critique !' : result === 'hope' ? 'Avec Espoir' : 'Avec Peur';
 
-    /* effets de jeu : gain d'Espoir (+ −1 Stress si critique) / Peur du MJ */
+    /* effets de jeu + historique en une seule écriture atomique */
     let stressCleared = false;
     const rec = { hope, fear, mod, adv: advVal || null, dis: disVal || null, total, result, label };
-    if (charId) {
-      const c = getChar(charId);
-      if (c) {
-        const effHopeMax = Math.max(0, (c.hope.max || 6) - (c.scars || 0));
-        if (result === 'hope' || result === 'crit') c.hope.current = Math.min(effHopeMax, c.hope.current + 1);
-        if (result === 'crit' && c.stress.current > 0) {
-          c.stress.current = Math.max(0, c.stress.current - 1);
-          stressCleared = true;
-        }
-        if (result === 'fear') setState(s => { s.fear = Math.min(30, s.fear + 1); });
-        saveChar(c);
-      }
-    } else if (result === 'fear') {
-      setState(s => { s.fear = Math.min(30, s.fear + 1); });
-    }
-
-    /* historique de session */
     const fullLabel = `${label || 'Jet de Dualité'}${advVal ? ` · ▲ Avantage +${advVal}` : ''}${disVal ? ` · ▼ Désavantage −${disVal}` : ''}`;
+    const c = charId ? getChar(charId) : null;
+    if (c) {
+      const effHopeMax = Math.max(0, (c.hope.max || 6) - (c.scars || 0));
+      if (result === 'hope' || result === 'crit') c.hope.current = Math.min(effHopeMax, c.hope.current + 1);
+      if (result === 'crit' && c.stress.current > 0) {
+        c.stress.current = Math.max(0, c.stress.current - 1);
+        stressCleared = true;
+      }
+      c.updatedAt = Date.now();
+    }
     setState(s => {
-      s.rolls.unshift({ id: 'r' + Date.now(), t: Date.now(), hope, fear, mod, adv: advVal || null, dis: disVal || null, total, result, label: fullLabel, charName: charId ? getChar(charId)?.name : null });
+      if (result === 'fear') s.fear = Math.min(30, s.fear + 1);
+      s.rolls.unshift({ id: 'r' + Date.now(), t: Date.now(), hope, fear, mod, adv: advVal || null, dis: disVal || null, total, result, label: fullLabel, charName: c ? c.name : null });
       s.rolls = s.rolls.slice(0, 60);
     });
 

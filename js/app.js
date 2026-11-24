@@ -38,7 +38,7 @@ function buildShell() {
   app.innerHTML = `
     <header class="topbar">
       <div class="brand">
-        <img src="public/assets/dpcgl-community-logo-light.png" alt="Daggerborne — Daggerheart Compatible">
+        <img src="assets/dpcgl-community-logo-light.png" alt="Daggerborne — Daggerheart Compatible">
         <span class="brand-copy">
           <span class="t">Daggerborne<span class="brand-badge" title="${getLang() === 'en' ? 'Daggerheart™ Compatible' : 'Compatible avec Daggerheart™'}">${getLang() === 'en' ? 'Daggerheart™ Compatible' : 'Compatible avec Daggerheart™'}</span></span>
           <span class="brand-ver" title="Version 0.6.2-beta">v.0.6.2-beta</span>

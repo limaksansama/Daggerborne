@@ -1,5 +1,5 @@
 /* Service worker — cache-first PWA for Daggerborne */
-const VERSION = 'daggerborne-v65';
+const VERSION = 'daggerborne-v66';
 const CORE = [
   './', './index.html', './manifest.webmanifest',
   './css/app.css', './css/sheet2.css', './css/dice-box.css', './js/app.js', './js/core.js',
@@ -30,9 +30,8 @@ const CORE = [
   './assets/icons/domain-card/midnight.png', './assets/icons/domain-card/sage.png',
   './assets/icons/domain-card/splendor.png', './assets/icons/domain-card/valor.png',
   /* logo communautaire officiel DPCGL (fiole d'alchimie) — requis hors-ligne */
+  './assets/dpcgl-community-logo.png',
   './assets/dpcgl-community-logo-light.png',
-  './public/assets/dpcgl-community-logo.png',
-  './public/assets/dpcgl-community-logo-light.png',
   /* ---- moteur de dés 3D : physique WASM + thèmes résine calligraphiés (v40) ---- */
   './assets/dice-box/ammo/ammo.wasm.wasm',
   './assets/dice-box/themes/nebula-gold-v2/theme.config.json', './assets/dice-box/themes/nebula-gold-v2/default.json',
@@ -55,7 +54,6 @@ self.addEventListener('install', (e) => {
       console.error(`[sw] précache incomplet (${failed.length}/${CORE.length}) — installation annulée :`, failed);
       throw new Error(`Service worker : ${failed.length} ressource(s) non précachée(s)`);
     }
-    await self.skipWaiting();
   })());
 });
 

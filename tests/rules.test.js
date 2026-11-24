@@ -390,3 +390,33 @@ test('sanitizeCharacter: bloque les portraits non sûrs, les clés prototype et 
   const validPortrait = sanitizeCharacter({ portrait: 'data:image/jpeg;base64,/9j/4AAQSkZJRg==' }, newCharacter());
   assert.equal(validPortrait.portrait, 'data:image/jpeg;base64,/9j/4AAQSkZJRg==');
 });
+
+test('sanitizeCharacter: liste blanche supprime les clés inconnues et préserve tierUses + drapeaux custom', () => {
+  const out = sanitizeCharacter({
+    name: 'Lyra',
+    arbitraryInjectedKey: 'should-be-stripped',
+    __unexpectedObj: { a: 1 },
+    className: 'Magicien',
+    tierUses: { '2': { hitPointSlots: 1, bad: -5 }, badTier: { x: 2 } },
+    weapons: [{
+      uid: 'w1', name: 'Épée forgée', dice: 'd10', trait: 'strength', dmgBonus: 3,
+      customName: true, customStats: true, customFeature: true,
+    }],
+    armorCard: {
+      id: 'chainmail', name: 'Cotte runique', score: 4, thresholds: [8, 16],
+      customName: true, customStats: true, customFeature: true,
+    },
+  }, newCharacter());
+
+  assert.equal('arbitraryInjectedKey' in out, false);
+  assert.equal('__unexpectedObj' in out, false);
+  assert.equal(out.className, 'Magicien');
+  assert.deepEqual(out.tierUses, { '2': { hitPointSlots: 1 } });
+  assert.equal(out.weapons[0].customName, true);
+  assert.equal(out.weapons[0].customStats, true);
+  assert.equal(out.weapons[0].customFeature, true);
+  assert.equal(out.armorCard.customName, true);
+  assert.equal(out.armorCard.customStats, true);
+  assert.equal(out.armorCard.customFeature, true);
+});
+

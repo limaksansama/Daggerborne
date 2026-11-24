@@ -593,7 +593,7 @@
   .dh-mtabs {
     display: flex; gap: .3rem; margin-bottom: .7rem;
     border: 1px solid var(--border); border-radius: 12px; padding: .25rem;
-    background: var(--panel); position: sticky; top: calc(var(--safe-top) + 58px); z-index: 40;
+    background: var(--panel); position: sticky; top: calc(var(--safe-top) + 52px); z-index: 40;
   }
   .dh-mtabs .mt {
     flex: 1; min-height: 44px; background: none; border: 1px solid transparent; color: var(--text-dim);
@@ -636,6 +636,7 @@
   .dh-thrval { width: 28px; height: 28px; font-size: .85rem; }
   .dh-wgrid { grid-template-columns: 1fr 1fr; }
   .dh-wgrid.armor { grid-template-columns: 1fr 1fr; }
+  .dh-wgrid .dh-fl.w2, .dh-wcard .dh-fl.w2 { grid-column: span 2; }
   .dh-gold { flex-direction: column; gap: .7rem; }
   .dh-goldgrp { flex-direction: row; justify-content: space-between; flex-wrap: wrap; }
   .dh-goldgrp .dh-gpips { justify-content: flex-start; }

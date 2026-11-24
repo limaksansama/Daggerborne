@@ -1,6 +1,6 @@
 /* Outils du MJ : pool de Peur, comptes à rebours, tracker d'affrontement actif,
    référence complète des règles SRD 2.0, bestiaire (statblocks complets) et environnements */
-import { $, $$, el, esc, go, T, data, toast, uid, getState, setState } from '../core.js';
+import { $, $$, el, esc, go, T, data, toast, confirmModal, uid, getState, setState } from '../core.js';
 import {
   RULES_CONDITIONS, RULES_REST, RULES_ENCOUNTER, RULES_MULTICLASS,
   RULES_THRESHOLDS, RULES_DEATH, RULES_TEAMWORK, RULES_HAZARDS, RULES_CAMPAIGN_FRAMES,
@@ -330,8 +330,8 @@ async function drawEncounter(body, main, st, seq = gmSeq) {
   });
   $('#enc-pick-adv', body).addEventListener('click', () => { gmUi.tab = 'bestiary'; render(main); });
   $('#enc-add-custom', body).addEventListener('click', () => openCustomAdversaryModal(() => render(main)));
-  $('#enc-clear', body)?.addEventListener('click', () => {
-    if (!confirm(t('gmClearEncConfirm'))) return;
+  $('#enc-clear', body)?.addEventListener('click', async () => {
+    if (!await confirmModal(t('gmClearEncConfirm'), { danger: true })) return;
     openEncDetails.clear();
     setState(s => { s.encounter.active = []; });
     render(main);
@@ -397,9 +397,10 @@ async function drawEncounter(body, main, st, seq = gmSeq) {
   $$('[data-enc-dmg]', body).forEach(b => b.addEventListener('click', () => {
     const it = st.encounter.active.find(x => x.uid === b.dataset.encDmg);
     if (!it || !it.atkDamage) return;
-    const m = String(it.atkDamage).match(/\d*d\d+(?:\s*[+-]\s*\d+)?/i);
-    if (!m) { toast(`Notation non lançable : ${it.atkDamage}`); return; }
-    rollDice(m[0].replace(/\s+/g, ''), { label: `Dégâts — ${it.name}` });
+    const raw = String(it.atkDamage).replace(/\s+/g, '');
+    const terms = raw.match(/[+-]?(?:\d*d\d+|\d+)/gi);
+    if (!terms || !terms.some(x => /d/i.test(x))) { toast(`Notation non lançable : ${it.atkDamage}`); return; }
+    rollDice(terms.join('').replace(/^\+/, ''), { label: `Dégâts — ${it.name}` });
   }));
 }
 
@@ -465,6 +466,7 @@ function openCustomAdversaryModal(onDone) {
       s.encounter.active.push({
         uid: uid(), advId: null, name,
         type: $('#ca-type', sheet).value,
+        tier: 1,
         difficulty: parseInt($('#ca-diff', sheet).value, 10) || 12,
         hpMax: parseInt($('#ca-hp', sheet).value, 10) || 5,
         hpMarked: 0,

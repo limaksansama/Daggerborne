@@ -906,6 +906,17 @@ export const EN_UI = {
   'Sur Android (APK/WebView), utilisez Partager/Enregistrer ou Copier le JSON pour sauvegarder vos données.': 'On Android (APK/WebView), use Share/Save or Copy JSON to back up your data.',
   "Ex. « J'ai vécu parmi les loups »": 'E.g. “I lived among the wolves”',
   "Lancez les Dés de Dualité : sur un Double (Critique), tous vos PV et Stress sont restaurés ! Si Espoir > Peur, vous guérissez autant de PV que le dé d'Espoir ; sinon vous mourez.": "Roll the Duality Dice: on a Double (Critical), all your HP and Stress are restored! If Hope > Fear, you heal HP equal to the Hope die; otherwise you die.",
+  'Inconscient': 'Unconscious',
+  'Étourdi': 'Stunned',
+  'Aveuglé': 'Blind',
+  'Apeuré': 'Frightened',
+  'Brûlé': 'Burned',
+  'Furtif': 'Hidden',
+  'Notes de jeu': 'Game notes',
+  "Points d'amélioration": 'Advancement points',
+  'Aucune arme disponible.': 'No weapons available.',
+  'Aucune armure disponible.': 'No armor available.',
+  'Palier brut :': 'Raw tier:',
 };
 
 
@@ -928,5 +939,5 @@ export const EN_PATTERNS = [
   [/\s+”/g, '”'],
   [/\b(\d+)\s+dés\b/g, '$1 dice'],
   [/\b(\d+)\s+dé(?=\s|[!?.,;:]|$)/g, '$1 die'],
-  [/LANCER\s+(\d+)\s+dice\s+!/g, 'ROLL $1 dice!'],
+  [/(?:LANCER|ROLL)\s+(\d+)\s+(?:dice|die)\s*!/g, (_, n) => `ROLL ${n} ${Number(n) === 1 ? 'die' : 'dice'}!`],
 ];

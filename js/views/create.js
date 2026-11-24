@@ -1,5 +1,5 @@
 /* Assistant de création de personnage — 9 étapes guidées */
-import { $, $$, el, esc, go, T, data, toast, uid, newCharacter, saveChar, getState, setState } from '../core.js';
+import { $, $$, el, esc, go, T, data, toast, confirmModal, uid, newCharacter, saveChar, getState, setState } from '../core.js';
 
 import { t, getLang } from '../i18n.js';
 import { openCodexDetail } from './compendium.js';
@@ -128,8 +128,8 @@ async function draw(main) {
     if (i < wiz.step) { wiz.step = i; draw(main); }
   }));
   $('#w-prev', root)?.addEventListener('click', () => { wiz.step--; draw(main); });
-  $('#w-reset', root)?.addEventListener('click', () => {
-    if (confirm(t('createReset'))) {
+  $('#w-reset', root)?.addEventListener('click', async () => {
+    if (await confirmModal(t('createReset'), { danger: true })) {
       wiz = initWiz();
       draw(main);
     }
