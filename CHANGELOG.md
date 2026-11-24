@@ -3,7 +3,48 @@
 Toutes les modifications notables de **Daggerborne** sont documentées dans ce fichier.
 
 Le format s'inspire de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
-La version de référence du projet est celle de `package.json` (`0.6.2-beta`).
+La version de référence du projet est celle de `package.json` (`0.7.0-beta`).
+
+## [0.7.0-beta] — 23 novembre 2026
+
+### Ajouté — ergonomie PWA / Android & fiche de personnage
+
+- **Pré-remplissage SRD 2.0 (`CLASSE & APTITUDES`)** : pré-remplissage automatique des aptitudes de classe et des cartes de sous-classe actives (Fondation, Spécialisation, Maîtrise) et de multiclassage lors de la création et des migrations, tout en préservant les éditions manuelles du joueur (`customClassFeature`).
+- **Fiche mobile en mode portrait** : barre de sous-onglets sticky en haut de la fiche (`Combat`, `Traits & Exp.`, `Cartes`, `Sac & Or`) et empilement vertical en 1 colonne sur mobile/tablette portrait.
+- **Lanceur de Dés de Dualité (`dice.js`)** : ajout d'un sélecteur de personnage (`#roll-char`) pour changer de fiche ou repasser en jet libre directement depuis l'écran Dés.
+- **Modale de confirmation thémée (`confirmModal`)** : remplacement des boîtes `confirm()` natives bloquantes dans l'assistant de création, les outils MJ, la fiche et les réglages.
+- **Outils MJ (Pool de Peur)** : ajout d'un repère visuel (bordure et séparateur dorés) après le 12e hexagone pour matérialiser le maximum recommandé.
+- **Splash & Android** : ajout de `<meta name="theme-color" content="#0d0c14">` dans `index.html` et harmonisation des chemins de logos DPCGL sous `assets/`.
+
+### Corrigé — mise en page, responsive & accessibilité
+
+- **Assistant de création (`create.js`)** : barre d'actions (`Retour`, `Recommencer`, `Continuer`) positionnée en `sticky` au-dessus de la barre de navigation inférieure avec dégradé sombre et `padding-bottom` global ajusté sur le conteneur principal.
+- **Boutons flottants (horloge & raccourci dés 3D)** : masqués sur l'onglet `Dés` (y compris le mini-raccourci quand replié), remontés au-dessus de la barre d'actions dans l'assistant de création, et rendus rétractables sur mobile (`< 640px`).
+- **Grilles responsive & zones tactiles** : passage en 2 colonnes sous `640px` (`1fr` sous `380px`) avec masquage des descriptions longues dans les cartes de grille, rétablissement de `.dh-fl.w2` sur 2 colonnes sous `999px`, alignement de `.dh-mtabs` sous `.topbar`, et cibles tactiles `44×44 px` minimum sur les boutons `−` / `+`.
+- **Écran Dés, Compendium & contrastes** : harmonisation du `padding-top` sur l'écran `Dés de Dualité`, troncature avec ellipse (`max-width: 115px`) des capsules de formule longues dans l'historique, flou d'arrière-plan (`backdrop-filter: blur(5px)`) et assombrissement de la modale de résultat, fondu/scroll horizontal des onglets du Compendium, et contraste amélioré des textes secondaires et `<select>` actifs (`#a8a29e`).
+
+### Corrigé — règles SRD 2.0 & logique applicative
+
+- **Sauvegarde des paliers (`tierUses`)** : ajout de `sanitizeTierUses()` dans `js/rules.js` pour préserver les compteurs imbriqués par palier (`1` à `4`) lors des chargements et imports (au lieu de les écraser).
+- **Personnalisations d'armes et d'armure** : préservation des drapeaux `customName`, `customStats` et `customFeature` dans `sanitizeWeapon()` et `armorCard` lors de la sanitisation.
+- **Dés de Dualité & Expériences** : application des bonus de Forme bestiale et des malus d'équipement lourd (`equipmentPenalty`) dans `dice.js` ; vérification et déduction de **1 Espoir** lors de l'utilisation d'une Expérience (avec remboursement en cas d'annulation) et sauvegarde groupée dans `rollDuality()`. Suppression du moteur de jets doublon inutilisé dans `js/core.js`.
+- **Montée en niveau (`levelup.js`)** : plafonnement de l'échange de carte (étape 4) au minimum entre le niveau de l'ancienne carte et le plafond du domaine ; instantané des Expériences avant mutation pour éviter tout décalage d'index ; retour d'historique basé sur `history.state?.dhLvl`.
+- **Fiche & Outils MJ** : récupération de `subcardCount` depuis `subcardTaken`, garde contre les valeurs `NaN` sur le champ d'Évasion, calcul multi-dés complet sur les attaques d'adversaires en rencontre (ex. `2d8+1d4+2`), et initialisation de `tier: 1` sur les adversaires rapides.
+
+### Corrigé — sécurité & stockage local
+
+- **Assainissement par liste blanche (`sanitizeCharacter`)** : rejet des clés inconnues lors d'imports JSON tout en conservant les champs SRD légitimes ; ajout des sanitizers `sanitizeAncestry()`, `sanitizeCommunity()` et `sanitizeMixedAncestry()`.
+- **Limites de taille & médias** : mesure stricte en octets UTF-8 (`TextEncoder`) sur les imports JSON (personnages et sauvegardes complètes) et limite de 15 Mo appliquée avant `URL.createObjectURL` lors de l'import de portrait.
+- **Politique de sécurité & échappement** : ajout de `<meta http-equiv="Content-Security-Policy">` dans `index.html`, ajout de `form-action 'self'` dans `server.js`, échappement des attributs/libellés dans `showBanner()` (`dice3d.js`), `rel="noopener noreferrer"` sur les liens externes, et gestion `try/catch` sur l'import de sauvegarde complète.
+- **Stockage hybride (`IndexedDB` / `localStorage`)** : marqueur `_strippedPortraits` pour restaurer les portraits depuis IndexedDB lorsque le secours `localStorage` allégé est plus récent après saturation de quota.
+
+### Corrigé — traductions FR/EN, données & PWA
+
+- **Re-localisation bilingue (`sheet.js`)** : mise à jour complète au changement de langue pour les cartes de sous-classe actives, blocs de Multiclassage, ascendances mixtes (`mixedAncestry`) et anciens objets d'inventaire ; priorité aux descriptions EN (`descEn`/`desc`) dans l'onglet Inventaire en mode anglais.
+- **Données & dictionnaire EN** : suppression des clés françaises superflues (`descFr`, `impulsesFr`) dans `data/en/environments.json`, ajout des traductions EN manquantes dans `js/en-ui.js` (états, éditeur d'équipement, notes) et correction du motif `/(?:LANCER|ROLL)\s+(\d+)\s+(?:dice|die)\s*!/g`.
+- **Service Worker & mise à jour (`sw.js`, `app.js`)** : priorité au cache exact sur les URL versionnées (`?v=`) avant le repli `ignoreSearch` hors-ligne, suppression du `skipWaiting()` automatique pendant `install`, promotion propre des mises à jour en attente au démarrage et toast cliquable en cours de session.
+- **Version** : `v.0.7.0-beta` ; `DATA_VER` `v37`, cache `daggerborne-v67` (`?v=67`).
+- **Vérifications** : `npm run lint` OK (`21` fichiers JS), `npm test` **60/60 tests réussis**, `npm run build` OK (`Static site ready`).
 
 ## [0.6.2-beta] — 23 novembre 2026
 
