@@ -1,8 +1,9 @@
 ================================================================================
 PART 1: SOFTWARE SOURCE CODE (MIT LICENSE)
 ================================================================================
-Applies to all original application source code, UI components, styles, and
-build scripts in this repository, excluding the Game Content defined in Part 2.
+Applies to all original application source code, UI components, original SVG
+domain icons, styles, and build scripts in this repository, excluding the Game
+Content defined in Part 2 and the AGPL-3.0 datasets defined in Part 3.
 
 Copyright (c) 2026 limaksansama
 Portions adapted from Foundryborne (Copyright (c) Foundryborne contributors)
@@ -26,15 +27,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ================================================================================
-PART 2: GAME CONTENT & ASSETS (DPCGL 2.0)
+PART 2: GAME CONTENT & COMMUNITY ASSETS (DPCGL 2.0)
 ================================================================================
 The MIT License above does NOT apply to any game mechanics, SRD data files
-(JSON), French translations (Adaptive Content), Domain icons, or Darrington
-Press Community Content logos included in this project.
+(JSON), French translations (Adaptive Content), or Darrington Press Community
+Content logos included in this project.
 
 This product includes materials from the Daggerheart System Reference Document
-2.0, Critical Role, LLC. under the terms of the Darrington Press Community
-Gaming (DPCGL) License 2.0. More information can be found at
+2.0, © 2026 Critical Role, LLC. under the terms of the Darrington Press Community
+Gaming (DPCGL) License. More information can be found at
 https://www.daggerheart.com and https://darringtonpress.com/license/.
 This content has been translated into French and adapted for an interactive
 digital character sheet.
@@ -42,3 +43,24 @@ digital character sheet.
 Darrington Press™ and the Darrington Press authorized work logo are trademarks
 of Critical Role, LLC and used with permission. Daggerheart™ Compatible.
 Terms at Daggerheart.com.
+
+================================================================================
+PART 3: THIRD-PARTY FRENCH BESTIARY & ENVIRONMENTS (GNU AGPL-3.0)
+================================================================================
+The French adversary and environment descriptions and features in
+`data/adversaries.json` and `data/environments.json` incorporate adapted
+materials from the community module "Daggerheart DRS - Français (non officiel)"
+by Sasmira, licensed under the GNU Affero General Public License v3.0
+(AGPL-3.0):
+
+  Source repository: https://gitlab.com/sasmira/daggerheart-fr-foundryborne
+  Modifications made: Converted Foundry VTT journal/actor HTML and @UUID/@Lookup
+  tokens into static JSON entries for Daggerborne, unified SRD 2.0 terminology,
+  and stripped non-SRD tags.
+
+Because these AGPL-3.0 JSON datasets are bundled and distributed with this
+application, the combined distribution and source repository are made available
+in compliance with the GNU AGPL-3.0 terms (with the complete source code
+available in this repository alongside the full AGPL-3.0 license text at
+https://www.gnu.org/licenses/agpl-3.0.txt). Note that the underlying
+Daggerheart SRD 2.0 game rules and mechanics remain subject to Part 2 (DPCGL).

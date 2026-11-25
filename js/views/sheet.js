@@ -2,8 +2,7 @@
    en-tête identité + badge Niveau · bande Évasion/Armure + 6 cartes de traits ·
    2 colonnes (Dégâts&Santé/Espoir/Expériences/Or/Aptitude || Armes/Armure/Inventaire).
    Thème sombre conservé, mobile = onglets Combat / Stats / Équipement / Plus. */
-import { $, $$, el, esc, go, T, data, toast, confirmModal, getChar, saveChar, getState, setState, uid, exportJsonFile, exportPdfFile, importCharacterFromText, MAX_CHAR_IMPORT_BYTES } from '../core.js';
-import { exportCharacterPdf } from '../pdfExport.js';
+import { $, $$, el, esc, go, T, data, toast, confirmModal, getChar, saveChar, getState, setState, uid, exportJsonFile, importCharacterFromText, MAX_CHAR_IMPORT_BYTES } from '../core.js';
 import { rollDuality, rollDice, rollAttack, rollDamage, rollCustomDamage, isRolling } from '../dice3d.js';
 import { computeDamageApplication, calcDamageSpec, tierOf, nextDieStep, armorThresholdBonus, equipmentPenalty } from '../rules.js';
 import { openLevelUp } from './levelup.js';
@@ -480,7 +479,6 @@ export async function render(main, params) {
       <span class="dh-sp"></span>
       <button class="btn ghost small" id="rest-short" title="Repos court : efface les Stress">Repos court</button>
       <button class="btn ghost small" id="rest-long" title="Repos long : PV max, Stress 0, Espoir 2">Repos long</button>
-      <button class="btn ghost small" id="btn-export-pdf" title="${esc(t('sheetExportPdfTitle'))}">📄 PDF</button>
       <button class="btn ghost small" id="btn-export" title="Exporter en JSON">⬆</button>
       <button class="btn ghost small" id="btn-import" title="Importer un personnage JSON">⬇</button>
       <button class="btn danger small" id="btn-delete" title="Supprimer le personnage">🗑</button>
@@ -1480,23 +1478,6 @@ function bindAll(root, c, ctx) {
   /* --- actions d'en-tête : repos court / repos long guidés --- */
   $('#rest-short', root).addEventListener('click', () => openRestModal(c, 'short', () => render(main, params)));
   $('#rest-long', root).addEventListener('click', () => openRestModal(c, 'long', () => render(main, params)));
-  $('#btn-export-pdf', root).addEventListener('click', async (e) => {
-    const btn = e.currentTarget;
-    if (btn.disabled) return;
-    const prevLabel = btn.textContent;
-    btn.disabled = true;
-    btn.textContent = '⏳ PDF…';
-    try {
-      toast(t('sheetExportPdfGenerating'));
-      const res = await exportCharacterPdf(c);
-      exportPdfFile(res.filename, res.bytes, `${c.name || t('unnamed')} — PDF`);
-    } catch (err) {
-      toast(t('sheetExportPdfError'));
-    } finally {
-      btn.disabled = false;
-      btn.textContent = prevLabel;
-    }
-  });
   $('#btn-export', root).addEventListener('click', () => {
     const slug = (c.name || 'perso').toLowerCase().replace(/[^a-z0-9_-]+/gi, '-').replace(/^-+|-+$/g, '') || 'perso';
     exportJsonFile(`daggerborne-${slug}.json`, c, `Exporter ${c.name || 'le personnage'}`);
@@ -2306,7 +2287,7 @@ async function tabCards(body, c, ctx) {
       <div class="dc-head">
         <span class="dc-lvl">${card.level}</span>
         <span class="dc-name">${esc(card.fr)}</span>
-        <span class="dc-domain"><img src="assets/icons/domain-card/${card.domain}.png" alt="">${esc(dom.fr)}</span>
+        <span class="dc-domain"><img src="assets/icons/domain-card/${card.domain}.svg" alt="">${esc(dom.fr)}</span>
         <span class="dc-type">${T.cardType[card.type]}</span>
         <span class="dc-recall">⟲ ${card.recall}</span>
         ${metaCtrls}

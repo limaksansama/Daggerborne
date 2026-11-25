@@ -140,7 +140,7 @@ async function drawSubfilters(main, seq) {
     if (!$('#subfilters', main) || !sf.isConnected || seq !== renderSeq) return;
     sf.appendChild(el(`<button class="filter-chip ${ui.domain === null ? 'active' : ''}" data-dom="">Tous</button>`));
     for (const [k, d] of Object.entries(domains)) {
-      sf.appendChild(el(`<button class="filter-chip ${ui.domain === k ? 'active' : ''}" data-dom="${k}"><img src="assets/icons/domain-card/${k}.png" alt="">${esc(d.fr)}</button>`));
+      sf.appendChild(el(`<button class="filter-chip ${ui.domain === k ? 'active' : ''}" data-dom="${k}"><img src="assets/icons/domain-card/${k}.svg" alt="">${esc(d.fr)}</button>`));
     }
   } else if (ui.tab === 'items') {
     const types = [
@@ -191,7 +191,7 @@ async function listResults(main, seq = renderSeq) {
       mk({
         key: c.id, type: 'card', raw: c, name: c.fr,
         sub: `${domains[c.domain].fr} · Niveau ${c.level} · ${T.cardType[c.type]} · Rappel ${c.recall}`,
-        icon: `<img src="assets/icons/domain-card/${c.domain}.png" alt="">`,
+        icon: `<img src="assets/icons/domain-card/${c.domain}.svg" alt="">`,
         fanTag: c.fan ? '<span class="tag fan">H&F</span>' : '',
       });
     }
@@ -221,7 +221,7 @@ async function listResults(main, seq = renderSeq) {
     for (const c of list) {
       grid.appendChild(codexTile({
         kind: 'class', kicker: 'Classe', name: c.fr,
-        icons: c.domains.map(d => `assets/icons/domain-card/${d}.png`), glyph: '⚔',
+        icons: c.domains.map(d => `assets/icons/domain-card/${d}.svg`), glyph: '⚔',
         sub: `${c.domains.map(d => domains[d]?.fr || d).join(' · ')} · PV ${c.hp} · Évasion ${c.evasion}`,
         fan: c.fan, foot: `${c.features.length} ${t('sheetFeatures').toLowerCase()}`,
         onClick: () => showDetail(main, c, 'class'),
@@ -354,7 +354,7 @@ async function showDetail(main, raw, type) {
       title: raw.fr,
       subtitle: `${T.cardType[raw.type]} · Niveau ${raw.level}`,
       stats: [[t('cmpRecall'), raw.recall]],
-      icons: [`assets/icons/domain-card/${raw.domain}.png`], glyph: '❖', badge: raw.level,
+      icons: [`assets/icons/domain-card/${raw.domain}.svg`], glyph: '❖', badge: raw.level,
       body: `<p class="cc-lead">${esc(raw.desc)}</p>`,
       footLeft: raw.fan ? 'Hope & Fear' : 'SRD 2.0',
       footRight: domainName,
@@ -369,7 +369,7 @@ async function showDetail(main, raw, type) {
       title: raw.fr,
       subtitle: `${getLang() === 'en' ? '' : raw.en + ' · '}${domainTxt}`,
       stats: [['PV', raw.hp], [t('sheetEvasion'), raw.evasion]],
-      icons: raw.domains.map(d => `assets/icons/domain-card/${d}.png`), glyph: '⚔',
+      icons: raw.domains.map(d => `assets/icons/domain-card/${d}.svg`), glyph: '⚔',
       body: `<p class="cc-lead">${esc(raw.desc)}</p>
         <div class="cc-callout"><b>✦ ${esc(raw.hopeAbility)} <span>(${getLang() === 'en' ? '3 Hope' : '3 Espoirs'})</span></b><p>${esc(raw.hopeDesc)}</p></div>
         <div class="cc-section">${t('sheetFeatures')}</div>

@@ -2,7 +2,7 @@
 import {
   $$,
   $, esc, getState, setState, toast, confirmModal, exportJsonFile,
-  importFullBackupFromText, openPasteJsonModal, getStorageInfo, cloudSync, MAX_BACKUP_IMPORT_BYTES,
+  importFullBackupFromText, openPasteJsonModal, getStorageInfo, exportBackupPayload, MAX_BACKUP_IMPORT_BYTES,
 } from '../core.js';
 import { t, getLang } from '../i18n.js';
 
@@ -10,7 +10,6 @@ export async function render(main, params) {
   main.classList.remove('wide');
   const st = getState();
   const info = getStorageInfo();
-  const cs = cloudSync.getStatus();
 
   main.innerHTML = `
   <div class="view">
@@ -30,15 +29,6 @@ export async function render(main, params) {
         <button class="btn danger small" id="wipe-all">Tout effacer</button>
       </div>
       <input type="file" id="file-backup" accept=".json,application/json,text/plain" style="display:none">
-    </div>
-
-    <div class="section-title">${t('setSyncCloud')}</div>
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.4rem">
-        <b style="color:var(--golden)">☁ Google Drive</b>
-        <span class="tag">${esc(cs.tierLabel)}</span>
-      </div>
-      <p class="ch-desc">${esc(cs.summary)}</p>
     </div>
 
     <div class="section-title">${t('settingsLang')}</div>
@@ -74,8 +64,8 @@ export async function render(main, params) {
       <div class="ms-body" style="font-size:.86rem;color:var(--text-dim);line-height:1.6">
         <p>Fiche de personnage numérique interactive <b>${t('setCompatible')}</b> : création guidée, dés de Dualité, compendium et outils du MJ. Fonctionne hors-ligne après le premier chargement, sur mobile et tablette.</p>
         ${getLang() === 'en'
-          ? '<p style="margin-top:.6rem">English content based on the <b>official Daggerheart 2.0 SRD</b> (Darrington Press), with community translations for the <b>Hope &amp; Fear</b> supplement (marked “H&amp;F”).</p>'
-          : `<p style="margin-top:.6rem">Contenu en français issu du <b>${t('setRuleBook')}</b> (traduction Black Book Éditions) pour le cœur des règles, et traductions amateurs pour le supplément <b>Hope &amp; Fear</b> (marqué « H&F »).</p>`}
+          ? '<p style="margin-top:.6rem">English content based on the <b>official Daggerheart 2.0 SRD</b> (Darrington Press), including the Hope &amp; Fear additions integrated into SRD 2.0.</p>'
+          : `<p style="margin-top:.6rem">Contenu en français issu d'une traduction communautaire du <b>${t('setRuleBook')}</b> (incluant les ajouts Hope &amp; Fear du SRD 2.0).</p>`}
       </div>
     </div>
 
@@ -86,7 +76,7 @@ export async function render(main, params) {
     </div>
     <div class="license-box">
       <b>Attribution officielle — DPCGL 2.0</b><br>
-      <span style="font-size:.8rem;color:var(--text-dim);line-height:1.6;display:inline-block;margin-top:.3rem">This product includes materials from the Daggerheart System Reference Document 2.0, Critical Role, LLC. under the terms of the Darrington Press Community Gaming (DPCGL) License. More information can be found at https://www.daggerheart.com. This content has been translated into French and adapted for an interactive digital character sheet.</span>
+      <span style="font-size:.8rem;color:var(--text-dim);line-height:1.6;display:inline-block;margin-top:.3rem">This product includes materials from the Daggerheart System Reference Document 2.0, © 2026 Critical Role, LLC. under the terms of the Darrington Press Community Gaming (DPCGL) License. More information can be found at <a href="https://www.daggerheart.com" style="color:var(--golden)" target="_blank" rel="noopener noreferrer">https://www.daggerheart.com</a> and <a href="https://darringtonpress.com/license/" style="color:var(--golden)" target="_blank" rel="noopener noreferrer">https://darringtonpress.com/license/</a>. This content has been translated into French and adapted for an interactive digital character sheet.</span>
     </div>
     <div class="license-box">
       <div class="license-logo-row">
@@ -98,8 +88,13 @@ export async function render(main, params) {
       </div>
     </div>
     <div class="license-box">
+      <b>Traductions du bestiaire et des environnements (AGPL-3.0)</b><br>
+      <span style="font-size:.8rem;color:var(--text-dim);line-height:1.6;display:inline-block;margin-top:.3rem">Les descriptions et capacités françaises des adversaires et environnements intègrent des éléments du module communautaire <b>Daggerheart DRS - Français (non officiel)</b> de Sasmira, distribué sous licence GNU AGPL-3.0.</span>
+      <span style="font-size:.78rem;color:var(--text-faint);display:inline-block;margin-top:.4rem">Source &amp; licence AGPL-3.0 : <a href="https://gitlab.com/sasmira/daggerheart-fr-foundryborne" style="color:var(--golden)" target="_blank" rel="noopener noreferrer">gitlab.com/sasmira/daggerheart-fr-foundryborne</a></span>
+    </div>
+    <div class="license-box">
       <b>Licence Open Source (code technique)</b><br>
-      <span style="font-size:.8rem;color:var(--text-dim);line-height:1.6;display:inline-block;margin-top:.3rem">Portions of the data architecture and system logic are adapted from the Foundryborne Daggerheart system, licensed under the MIT License (Copyright © Foundryborne contributors).</span>
+      <span style="font-size:.8rem;color:var(--text-dim);line-height:1.6;display:inline-block;margin-top:.3rem">Portions of the data architecture and system logic are adapted from the Foundryborne Daggerheart system, licensed under the MIT License (Copyright © Foundryborne contributors). Le présent projet est distribué dans le respect des licences MIT et GNU AGPL-3.0 applicables à ses composants.</span>
       <span style="font-size:.78rem;color:var(--text-faint);display:inline-block;margin-top:.4rem">Texte complet : <a href="https://github.com/Foundryborne/daggerheart/blob/main/LICENSE" style="color:var(--golden)" target="_blank" rel="noopener noreferrer">github.com/Foundryborne/daggerheart/LICENSE</a></span>
     </div>
     <div class="section-title" style="font-size:.9rem">Contributeurs du module (MIT)</div>
@@ -107,7 +102,7 @@ export async function render(main, params) {
       ${['WBHarry', 'Supe (CarlosFdez)', 'cptn-cosmo', 'Ikraik', 'IrkTheImp', 'jacobwojoski', 'moliloo', 'Mysteryusy', 'JimCanE', 'Po0lp', 'JoaquinP', '+ la communauté Foundryborne'].map(n => `<div class="cr"><span>${esc(n)}</span><span class="cr-role">Module Foundry</span></div>`).join('')}
     </div>
     <p class="ch-desc" style="font-size:.72rem;color:var(--text-faint);margin-top:.9rem;line-height:1.6">
-      Application non officielle, sans affiliation avec Critical Role, Darrington Press, Black Book Éditions ni Foundry Gaming LLC. Créée pour un usage personnel et communautaire dans le respect des licences ci-dessus.
+      Application non officielle et gratuite, sans affiliation avec Critical Role, Darrington Press, Black Book Éditions ni Foundry Gaming LLC.
     </p>
   </div>`;
 
@@ -132,7 +127,7 @@ export async function render(main, params) {
     }
   }));
   $('#exp-all', main).addEventListener('click', () => {
-    exportJsonFile('daggerborne-sauvegarde.json', cloudSync.exportPayload(), 'Exporter toute la sauvegarde');
+    exportJsonFile('daggerborne-sauvegarde.json', exportBackupPayload(), 'Exporter toute la sauvegarde');
   });
   $('#imp-all', main).addEventListener('click', () => $('#file-backup', main).click());
   $('#file-backup', main).addEventListener('change', (e) => {

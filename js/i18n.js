@@ -288,10 +288,6 @@ const STRINGS = {
   settingsPasteBackup: ['📋 Coller une sauvegarde', '📋 Paste a backup'],
   settingsClearRolls: ['Effacer les jets', 'Clear rolls'],
   settingsWipeAll: ['Tout effacer', 'Erase everything'],
-  settingsCloud: ['Synchronisation Cloud', 'Cloud Sync'],
-  settingsProSoon: ['Option Pro (à venir)', 'Pro option (coming soon)'],
-  settingsCloudDesc: ['La synchronisation automatique vers Google Drive sera proposée en option payante. Exportez vos sauvegardes JSON gratuitement à tout moment.',
-                      'Automatic Google Drive sync will be offered as a paid option. Export your JSON backups for free at any time.'],
   settingsRules: ['Règles & Préférences', 'Rules & Preferences'],
   settingsLang: ['Langue / Language', 'Language / Langue'],
   settingsLangDesc: ['Basculez l\'interface et le contenu du jeu (SRD officiel en anglais).',
@@ -400,7 +396,6 @@ const STRINGS = {
   setCredits: ['Crédits', 'Credits'],
   setRollsCleared: ['Historique des jets effacé.', 'Roll history cleared.'],
   setRuleBook: ['SRD 2.0 officiel de Daggerheart', 'official Daggerheart 2.0 SRD'],
-  setSyncCloud: ['Synchronisation & sauvegarde', 'Sync & backup'],
   setUnofficial: ['Application non officielle, à usage personnel.', 'Unofficial app, for personal use.'],
   setWipeConfirm: ["Effacer TOUS les personnages, jets et données d'affrontement ? Cette action est irréversible.", 'Wipe ALL characters, rolls and encounter data? This cannot be undone.'],
   cmpAbilities: ['Aptitudes', 'Abilities'],
@@ -520,12 +515,6 @@ const STRINGS = {
   sheetTabTraitsExp: ['Traits & Exp.', 'Traits & Exp.'],
   sheetTabCards: ['Cartes', 'Cards'],
   sheetTabBagGold: ['Sac & Or', 'Bag & Gold'],
-  sheetExportPdfTitle: ['Exporter en PDF complet (fiche officielle + dossier)', 'Export full PDF (official sheet + folio)'],
-  sheetExportPdfGenerating: ['Génération du PDF…', 'Generating PDF…'],
-  sheetExportPdfError: ['Impossible de générer le PDF.', 'Failed to generate PDF.'],
-  corePdfDownloaded: ['PDF téléchargé : {name}', 'PDF downloaded: {name}'],
-  corePdfReady: ['PDF prêt à partager ou enregistrer', 'PDF ready to share or save'],
-  corePdfMobileHint: ['Sur Android (APK/WebView) ou tablette, utilisez Partager ou Télécharger pour enregistrer la fiche PDF.', 'On Android (APK/WebView) or tablet, use Share or Download to save the PDF sheet.'],
 };
 
 export function t(key, vars) {

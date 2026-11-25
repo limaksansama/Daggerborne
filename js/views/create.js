@@ -172,7 +172,7 @@ async function stepClass(body) {
     const domNames = c.domains.map(d => domains[d].fr).join(' · ');
     grid.appendChild(wizChoice({
       kind: 'class', kicker: 'Classe', name: c.fr,
-      icons: c.domains.map(d => `assets/icons/domain-card/${d}.png`), glyph: '⚔',
+      icons: c.domains.map(d => `assets/icons/domain-card/${d}.svg`), glyph: '⚔',
       sub: `${domNames} · PV ${c.hp} · Évasion ${c.evasion}`,
       info: c.desc, fan: c.fan,
       foot: `${c.features.length} ${t('sheetFeatures').toLowerCase()}`,
@@ -529,7 +529,7 @@ async function stepCards(body) {
     const sel = wiz.cardIds.includes(c.id);
     const btn = el(`<button class="choice ${sel ? 'selected' : ''}" data-id="${c.id}">
       <div class="ch-head">
-        <img src="assets/icons/domain-card/${c.domain}.png" alt="" style="width:22px;height:22px">
+        <img src="assets/icons/domain-card/${c.domain}.svg" alt="" style="width:22px;height:22px">
         <span class="ch-name">${esc(c.fr)}</span>
         ${c.fan ? '<span class="tag fan">' + t('sheetTradAm') + '</span>' : ''}
       </div>

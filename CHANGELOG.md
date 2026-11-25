@@ -7,25 +7,24 @@ La version de référence du projet est celle de `package.json` (`0.8.0-BETA`).
 
 ## [0.8.0-BETA] — 24 novembre 2026
 
-### Ajouté — export PDF complet hors-ligne
+### Conformité SRD 2.0, DPCGL & Licences
 
-- **Bouton `📄 PDF` sur la fiche de personnage (`sheet.js`, `pdfExport.js`)** : génère en un clic un dossier PDF complet prêt à imprimer ou partager, sans aucune dépendance serveur ni connexion Internet.
-- **Fiches officielles Daggerheart pré-remplies (EN)** : prise en charge des **13 classes** issues des deux livrets officiels (les 9 classes de base + les 4 classes *Hope & Fear* : Assassin, Brawler, Warlock, Witch) ainsi que d'une fiche générique de secours :
-  - en-tête identité (nom, pronoms, héritage/communauté, sous-classe, niveau) ;
-  - Évasion effective, Valeur d'armure, 12 emplacements d'armure cochés/verrouillés, seuils de dégâts Majeur/Grave calculés, 6 traits avec bonus et coches d'amélioration, Maîtrise, PV, Stress, Espoir et Cicatrices ;
-  - 5 premières Expériences, piste d'or (poignées, sacs, coffre), armes actives principale/secondaire (avec dégâts calculés selon la Maîtrise et aptitudes), armure active, inventaire (5 lignes + renvoi si surplus) et 2 emplacements d'armes de réserve.
-- **Pages spéciales de classe & Guide d'évolution** : inclusion automatique des pages *Druid Beastform* (avec bandeau de forme bestiale active), *Ranger Companion* (nom, espèce, évasion, attaque, dé de dégâts, expériences et stress du compagnon) et *Brawler Martial Artist*, plus le **Guide de classe** avec les cases d'évolution des paliers 2, 3 et 4 cochées automatiquement (`tierUses`).
-- **Dossier complet récapitulatif (*Character Folio*)** : pages additionnelles paginées contenant le portrait (JPEG/PNG), le résumé d'état (conditions, repos courts, multiclassage, forme bestiale, transformation), toutes les aptitudes, l'intégralité des cartes de domaine (En main et Caveau avec descriptions complètes), l'inventaire complet, les expériences supplémentaires (6+), les réponses de background, les notes et le journal de bord.
-- **Compatibilité PWA, Desktop & Android APK (`core.js`, `sw.js`)** : librairie `pdf-lib` embarquée localement, normalisation texte WinAnsi (ligatures `œ`/`æ`, tirets, symboles et accents préservés), précache PWA complet (module, moteur PDF et les deux PDF officiels) et modale Android/WebView dédiée avec `Partager` et `Télécharger`.
+- **Retrait des PDF officiels et désactivation de l'export PDF** : suppression des deux livrets PDF officiels Darrington Press (`public/assets/aistudio/*.pdf`), de `js/pdfExport.js`, de `js/vendor/pdf-lib.esm.min.js` et du bouton `📄 PDF` sur la fiche afin de ne redistribuer aucun modèle PDF protégé.
+- **Désactivation de l'option Google Drive Pro** : suppression du bloc payant / « Option Pro à venir » (`cloudSync`) dans les Réglages et `core.js`, remplacé par l'export/import JSON local gratuit (`exportBackupPayload()`).
+- **Icônes de domaine SVG originales** : remplacement des 10 emblèmes PNG officiels sous `assets/icons/domain-card/` par 10 icônes vectorielles SVG originales dessinées pour Daggerborne (`create.js`, `sheet.js`, `compendium.js`, `sw.js`).
+- **Mentions légales & licences alignées (`LICENSE`, `README.md`, `settings.js`, `en-ui.js`)** :
+  - ajout de l'attribution DPCGL 2.0 exacte (`© 2026 Critical Role, LLC.`, liens `daggerheart.com` et `darringtonpress.com/license/`) ;
+  - création d'une Partie 3 dédiée à la licence **GNU AGPL-3.0** pour le bestiaire et les environnements issus de *Daggerheart DRS - Français* (Sasmira), avec lien source et résumé des adaptations ;
+  - suppression des mentions laissant entendre une réutilisation du texte commercial Black Book Éditions (remplacées par une formulation exacte de traduction communautaire du SRD 2.0 + non-affiliation).
 
 ### Modifié — workflow GitHub Actions Android (`build-apk.yml`)
 
-- **Migration vers les actions compatibles Node.js 24 & Java 17** : mise à jour de `actions/checkout@v6`, `actions/setup-node@v6` (Node 22), `actions/setup-java@v5`, `android-actions/setup-android@v4` et `actions/upload-artifact@v6`, et copie du dossier `public/` dans l'archive `www/` de l'APK.
+- **Migration vers les actions compatibles Node.js 24 & Java 17** : mise à jour de `actions/checkout@v6`, `actions/setup-node@v6` (Node 22), `actions/setup-java@v5`, `android-actions/setup-android@v4` et `actions/upload-artifact@v6`, et retrait du dossier `public` supprimé de l'étape de copie `www/`.
 
 ### Technique & vérifications
 
-- **Version** : `v.0.8.0-BETA` ; `DATA_VER` `v37`, cache `daggerborne-v69` (`?v=69`).
-- **Vérifications** : `npm run lint` OK (`22` fichiers JS), `npm test` **62/62 tests réussis**, `npm run build` OK (`Static site ready`).
+- **Version** : `v.0.8.0-BETA` ; `DATA_VER` `v37`, cache `daggerborne-v70` (`?v=70`).
+- **Vérifications** : `npm run lint` OK (`21` fichiers JS), `npm test` OK, `npm run build` OK (`Static site ready`).
 
 ## [0.7.0-beta] — 23 novembre 2026
 

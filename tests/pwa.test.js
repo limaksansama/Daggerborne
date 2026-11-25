@@ -75,16 +75,31 @@ test('Tout module local importé est précaché par le service worker', () => {
   assert.deepEqual(missing, [], `Modules importés absents du précache :\n${missing.join('\n')}`);
 });
 
-test('Les ressources d\'export PDF (pdfExport, pdf-lib et modèles officiels) sont précachées et présentes sur disque', () => {
+test('Conformité pré-publication : aucun PDF officiel, icônes SVG originales précachées, aucune option payante et attribution DPCGL 2.0', () => {
   const cached = new Set(precacheList());
-  const required = [
-    'js/pdfExport.js',
-    'js/vendor/pdf-lib.esm.min.js',
-    'public/assets/aistudio/Character-Sheets-and-Guides-Daggerheart-Aug252026_419c805c.pdf',
-    'public/assets/aistudio/CharacterGuidesAndSheetsTile_HF_2026-07-23_7532a806.pdf',
-  ];
-  for (const rel of required) {
-    assert.ok(cached.has(rel), `${rel} doit être précaché dans sw.js`);
-    assert.ok(fs.existsSync(path.join(ROOT, rel)), `${rel} doit exister sur disque`);
+  const swText = read('sw.js');
+
+  assert.equal(fs.existsSync(path.join(ROOT, 'public')), false, 'Le dossier public/ (PDF officiels) doit être supprimé');
+  assert.doesNotMatch(swText, /\.pdf/i, 'Aucun fichier .pdf ne doit rester dans sw.js');
+  assert.doesNotMatch(swText, /pdfExport|pdf-lib/i, 'Aucune référence pdfExport/pdf-lib ne doit rester dans sw.js');
+
+  const domains = ['arcana', 'blade', 'bone', 'codex', 'dread', 'grace', 'midnight', 'sage', 'splendor', 'valor'];
+  for (const d of domains) {
+    const svgRel = `assets/icons/domain-card/${d}.svg`;
+    const pngRel = `assets/icons/domain-card/${d}.png`;
+    assert.ok(fs.existsSync(path.join(ROOT, svgRel)), `${svgRel} doit exister`);
+    assert.ok(cached.has(svgRel), `${svgRel} doit être précaché dans sw.js`);
+    assert.equal(fs.existsSync(path.join(ROOT, pngRel)), false, `${pngRel} officiel doit être supprimé`);
   }
+
+  for (const rel of ['js/core.js', 'js/views/settings.js', 'js/i18n.js']) {
+    const src = read(rel);
+    assert.doesNotMatch(src, /pro-upcoming|option payante|Option Pro/i, `${rel} ne doit contenir aucune mention d'option payante Pro`);
+  }
+
+  const settingsSrc = read('js/views/settings.js');
+  assert.ok(settingsSrc.includes('https://www.daggerheart.com'), 'settings.js doit inclure https://www.daggerheart.com');
+  assert.ok(settingsSrc.includes('https://darringtonpress.com/license/'), 'settings.js doit inclure https://darringtonpress.com/license/');
+  assert.ok(settingsSrc.includes('Critical Role, LLC.'), 'settings.js doit mentionner Critical Role, LLC.');
+  assert.ok(settingsSrc.includes('AGPL-3.0'), 'settings.js doit mentionner la licence AGPL-3.0');
 });

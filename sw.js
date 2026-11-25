@@ -1,12 +1,11 @@
 /* Service worker — cache-first PWA for Daggerborne */
-const VERSION = 'daggerborne-v69';
+const VERSION = 'daggerborne-v70';
 const CORE = [
   './', './index.html', './manifest.webmanifest',
   './css/app.css', './css/sheet2.css', './css/dice-box.css', './js/app.js', './js/core.js',
-  './js/dice3d.js', './js/fab.js', './js/gmRules.js', './js/rules.js', './js/feat-parse.js', './js/en-ui.js', './js/i18n-dom.js', './js/pdfExport.js',
+  './js/dice3d.js', './js/fab.js', './js/gmRules.js', './js/rules.js', './js/feat-parse.js', './js/en-ui.js', './js/i18n-dom.js',
   './js/vendor/dice-box.es.min.js', './js/vendor/world.offscreen.min.js',
   './js/vendor/world.onscreen.min.js', './js/vendor/world.none.min.js',
-  './js/vendor/pdf-lib.esm.min.js',
   './js/views/home.js', './js/views/chars.js', './js/views/create.js', './js/views/sheet.js',
   './js/views/levelup.js',
   './js/views/dice.js', './js/views/compendium.js', './js/views/gm.js', './js/views/settings.js',
@@ -25,11 +24,11 @@ const CORE = [
   './assets/icons/icon-64.png', './assets/icons/icon-96.png', './assets/icons/icon-128.png',
   './assets/icons/icon-192.png', './assets/icons/icon-256.png', './assets/icons/icon-384.png', './assets/icons/icon-512.png',
   './assets/icons/maskable-192.png', './assets/icons/maskable-512.png',
-  './assets/icons/domain-card/arcana.png', './assets/icons/domain-card/blade.png',
-  './assets/icons/domain-card/bone.png', './assets/icons/domain-card/codex.png',
-  './assets/icons/domain-card/dread.png', './assets/icons/domain-card/grace.png',
-  './assets/icons/domain-card/midnight.png', './assets/icons/domain-card/sage.png',
-  './assets/icons/domain-card/splendor.png', './assets/icons/domain-card/valor.png',
+  './assets/icons/domain-card/arcana.svg', './assets/icons/domain-card/blade.svg',
+  './assets/icons/domain-card/bone.svg', './assets/icons/domain-card/codex.svg',
+  './assets/icons/domain-card/dread.svg', './assets/icons/domain-card/grace.svg',
+  './assets/icons/domain-card/midnight.svg', './assets/icons/domain-card/sage.svg',
+  './assets/icons/domain-card/splendor.svg', './assets/icons/domain-card/valor.svg',
   /* logo communautaire officiel DPCGL (fiole d'alchimie) — requis hors-ligne */
   './assets/dpcgl-community-logo.png',
   './assets/dpcgl-community-logo-light.png',
@@ -41,9 +40,6 @@ const CORE = [
   './assets/dice-box/themes/hope-v2/diffuse-light.png', './assets/dice-box/themes/hope-v2/specular.jpg',
   './assets/dice-box/themes/fear-v2/theme.config.json', './assets/dice-box/themes/fear-v2/default.json',
   './assets/dice-box/themes/fear-v2/diffuse-light.png', './assets/dice-box/themes/fear-v2/specular.jpg',
-  /* ---- export PDF officiel hors-ligne ---- */
-  './public/assets/aistudio/Character-Sheets-and-Guides-Daggerheart-Aug252026_419c805c.pdf',
-  './public/assets/aistudio/CharacterGuidesAndSheetsTile_HF_2026-07-23_7532a806.pdf',
 ];
 
 self.addEventListener('install', (e) => {

@@ -24,9 +24,9 @@ Compendium & Outils du MJ
  * Bestiaire & Environnements : 264 adversaires complets et 47 environnements prêts à l'emploi, filtrables par palier et par type.
  * Écran du MJ : réserve de Peur, gestion des comptes à rebours et aide-mémoire des règles (conditions, repos, création d'affrontements).
 Langues et traduction
-L'interface et le cœur des règles utilisent la terminologie française officielle de Black Book Éditions.
+L'interface et le cœur des règles proposent une traduction française communautaire du SRD 2.0 officiel.
  * Contenu traduit : règles de base, créateur de personnage, 210 cartes de domaine, 246 objets d'inventaire.
- * Contenu Hope & Fear : les ajouts de l'extension (domaine Effroi, 4 classes, ascendances/communautés) disposent d'une traduction amateure signalée par un badge « H&F ».
+ * Contenu Hope & Fear : les ajouts intégrés au SRD 2.0 (domaine Effroi, 4 classes, ascendances/communautés) disposent d'une traduction communautaire signalée par un badge « H&F ».
  * Bestiaire : les statblocks des 264 adversaires et les 47 environnements sont entièrement traduits en français (descriptions, capacités, motivations et attaques).
 Installation & Lancement
 L'application est une PWA (Progressive Web App) purement statique.
@@ -48,8 +48,8 @@ Notes techniques & Contribution
 Les données du jeu sont déjà compilées dans `data/` à partir du SRD 2.0 officiel et des traductions communautaires (voir les licences ci-dessous). Les scripts de génération ne sont pas inclus dans ce dépôt public : pour mettre à jour les données, repartez des sources SRD/DRS et régénérez les fichiers JSON.
 
 Licences & Crédits
- * Règles et contenu : Daggerheart SRD 2.0 © Critical Role, LLC — sous licence Darrington Press Community Gaming License (DPCGL).
- * Terminologie française : © Black Book Éditions (Livre de règles Daggerheart, 2026).
- * Traductions du bestiaire et des environnements : module communautaire **Daggerheart DRS - Français (non officiel)** de Sasmira, sous AGPL-3.0 — <https://gitlab.com/sasmira/daggerheart-fr-foundryborne>.
- * Architecture & Design : inspirés du module Foundryborne Daggerheart (© 2025 WBHarry, licence MIT).
-Application non officielle développée par des fans, sans affiliation avec Critical Role, Darrington Press ou Black Book Éditions.
+ * Règles et contenu : This product includes materials from the Daggerheart System Reference Document 2.0, © 2026 Critical Role, LLC. under the terms of the Darrington Press Community Gaming (DPCGL) License — <https://www.daggerheart.com> · <https://darringtonpress.com/license/>.
+ * Icônes de domaines : icônes vectorielles originales (SVG) créées spécifiquement pour Daggerborne (sous licence MIT).
+ * Traductions du bestiaire et des environnements : module communautaire **Daggerheart DRS - Français (non officiel)** de Sasmira, sous GNU AGPL-3.0 — <https://gitlab.com/sasmira/daggerheart-fr-foundryborne>. Le code et les données adaptées sont distribués conformément aux termes MIT et GNU AGPL-3.0 détaillés dans `LICENSE`.
+ * Architecture & Design : inspirés du module Foundryborne Daggerheart (© Foundryborne contributors, licence MIT).
+Application non officielle et gratuite développée par des fans, sans affiliation avec Critical Role, Darrington Press, Black Book Éditions ni Foundry Gaming LLC.

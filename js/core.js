@@ -308,26 +308,14 @@ export function getStorageInfo() {
   };
 }
 
-/* Point d'extension Cloud Sync — préparé pour l'option payante Google Drive (Pro) */
-export const cloudSync = {
-  provider: 'google-drive',
-  tier: 'pro-upcoming',
-  enabled: false,
-  getStatus() {
-    return {
-      configured: false,
-      tierLabel: t('settingsProSoon'),
-      summary: t('settingsCloudDesc'),
-    };
-  },
-  exportPayload() {
-    return {
-      schema: 'daggerborne-backup-v1',
-      exportedAt: new Date().toISOString(),
-      data: JSON.parse(JSON.stringify(getState())),
-    };
-  },
-};
+/* Prépare l'objet de sauvegarde JSON complet pour export local */
+export function exportBackupPayload() {
+  return {
+    schema: 'daggerborne-backup-v1',
+    exportedAt: new Date().toISOString(),
+    data: JSON.parse(JSON.stringify(getState())),
+  };
+}
 
 /* filet de sécurité pour les imports d'anciens JSON : complète les champs manquants */
 export function ensureCharacter(obj) {
@@ -604,98 +592,6 @@ export function exportJsonFile(filename, dataObj, title = 'Export JSON') {
           await navigator.share({ title, text: json });
         } catch (err2) {
           if (err2?.name !== 'AbortError') toast('Partage impossible — utilisez « Copier le JSON ».');
-        }
-      }
-    }
-  });
-}
-
-/* ---------- export PDF compatible Desktop, Android navigateur/PWA et APK/WebView ---------- */
-export function exportPdfFile(filename, bytes, title = 'Export PDF') {
-  const blob = new Blob([bytes], { type: 'application/pdf' });
-  const isAndroid = /Android/i.test(navigator.userAgent);
-  const isWebView = /;\s*wv\)/i.test(navigator.userAgent) || !!window.Capacitor?.isNativePlatform?.();
-
-  const triggerDownload = () => {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => {
-      a.remove();
-      URL.revokeObjectURL(url);
-    }, 30000);
-  };
-
-  if (!isAndroid && !isWebView) {
-    triggerDownload();
-    toast(t('corePdfDownloaded', { name: filename }));
-    return;
-  }
-
-  if (!isWebView) {
-    try { triggerDownload(); } catch (e) { /* fallback via modal ci-dessous */ }
-  }
-
-  const back = el(`<div class="modal-back"></div>`);
-  const sheet = el(`<div class="modal-sheet"></div>`);
-  back.appendChild(sheet);
-  document.body.appendChild(back);
-  back.addEventListener('click', (e) => { if (e.target === back) back.remove(); });
-
-  const kb = (blob.size / 1024).toFixed(0);
-  const canShareApi = typeof navigator.share === 'function';
-  sheet.innerHTML = `
-    <h3>${esc(title)}</h3>
-    <div class="ms-meta">${esc(filename)} · ${kb} Ko</div>
-    <p class="page-sub" style="margin:.4rem 0 .8rem;font-size:.8rem">${esc(t('corePdfMobileHint'))}</p>
-    <div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.8rem">
-      ${canShareApi ? `<button class="btn" id="pdf-share">📤 ${esc(t('coreShare'))}</button>` : ''}
-      <button class="btn ${canShareApi ? 'ghost' : ''}" id="pdf-dl">💾 ${esc(t('coreDownload'))}</button>
-    </div>
-    <div class="modal-close-row"><button class="btn ghost small" id="pdf-close">${esc(t('close'))}</button></div>`;
-
-  $('#pdf-close', sheet).addEventListener('click', () => back.remove());
-
-  $('#pdf-dl', sheet).addEventListener('click', async () => {
-    try {
-      if (window.showSaveFilePicker) {
-        const handle = await window.showSaveFilePicker({
-          suggestedName: filename,
-          types: [{ description: 'PDF', accept: { 'application/pdf': ['.pdf'] } }],
-        });
-        const writable = await handle.createWritable();
-        await writable.write(blob);
-        await writable.close();
-        toast(t('corePdfDownloaded', { name: filename }));
-        return;
-      }
-      triggerDownload();
-      toast(t('corePdfDownloaded', { name: filename }));
-    } catch (err) {
-      if (err?.name !== 'AbortError') toast(t('corePdfReady'));
-    }
-  });
-
-  $('#pdf-share', sheet)?.addEventListener('click', async () => {
-    try {
-      const pdfFile = new File([blob], filename, { type: 'application/pdf' });
-      if (navigator.canShare?.({ files: [pdfFile] })) {
-        await navigator.share({ title, files: [pdfFile] });
-      } else {
-        triggerDownload();
-        toast(t('corePdfDownloaded', { name: filename }));
-      }
-    } catch (err) {
-      if (err?.name !== 'AbortError') {
-        try {
-          triggerDownload();
-          toast(t('corePdfDownloaded', { name: filename }));
-        } catch (e2) {
-          toast(t('sheetExportPdfError'));
         }
       }
     }

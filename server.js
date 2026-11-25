@@ -18,7 +18,7 @@ app.use((req, res, next) => {
   next();
 });
 
-for (const dir of ['css', 'js', 'data', 'assets', 'public']) {
+for (const dir of ['css', 'js', 'data', 'assets']) {
   app.use(`/${dir}`, express.static(path.join(__dirname, dir), { dotfiles: 'ignore' }));
 }
 

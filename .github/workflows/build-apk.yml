@@ -45,7 +45,7 @@ jobs:
           rm -rf www android
           mkdir -p www
           cp index.html manifest.webmanifest sw.js www/
-          cp -R assets css js data public www/
+          cp -R assets css js data www/
 
       - name: Create Android project
         run: npx cap add android

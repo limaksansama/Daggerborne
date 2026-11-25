@@ -369,7 +369,7 @@ test('core: importFullBackupFromText supports merge and replace modes', () => {
   const existing = core.newCharacter({ id: 'c-1', name: 'Kaliros', level: 2 });
   core.saveChar(existing);
 
-  const backup = core.cloudSync.exportPayload();
+  const backup = core.exportBackupPayload();
   backup.data.characters[0].name = 'Kaliros Évolué';
   backup.data.characters.push({ id: 'c-2', name: 'Vaelen', traits: { agility: 2 } });
 
@@ -967,140 +967,25 @@ test('regressions: levelup swap cap, mixedAncestry & subcardTaken migration, dic
   }
 });
 
-/* ==================== Complete PDF Character Export Tests ==================== */
-test('pdfExport: renders #btn-export-pdf, maps classes/specials cleanly, and generates valid reloadable PDFs from official sheets', async () => {
+/* ==================== Disabled PDF Export & Google Drive Pro Checks ==================== */
+test('compliance: sheet omits #btn-export-pdf and settings omits Google Drive Pro card', async () => {
   resetTestState();
-  const pdfLib = await import('../js/vendor/pdf-lib.esm.min.js');
-  const pdfExport = await import('../js/pdfExport.js');
-  const { pdfSafeText, resolvePdfMapping, exportCharacterPdf } = pdfExport;
+  const c = core.newCharacter({ id: 'clean-char', name: 'Lyra' });
+  core.saveChar(c);
 
-  /* 1. WinAnsi text normalization preserves accented letters and converts ligatures/symbols safely */
-  assert.equal(pdfSafeText('Cœur d’ébène — ★ 100 %… « prêt »'), 'Coeur d\'ébène - * 100 %... " prêt "');
-
-  const enClasses = await core.data('classes', 'en');
-  const enSubclasses = await core.data('subclasses', 'en');
-  const enWeapons = await core.data('weapons', 'en');
-  const enArmors = await core.data('armors', 'en');
-  const enCards = await core.data('domainCards', 'en');
-
-  /* 2. Class & Special-page mapping */
-  const rangerCl = enClasses.find(x => x.en === 'Ranger');
-  const beastSub = enSubclasses.find(x => x.classId === rangerCl.id && x.en === 'Beastbound');
-  const rangerMap = resolvePdfMapping({ classId: rangerCl.id, subclassId: beastSub.id }, enClasses, enSubclasses);
-  assert.deepEqual({ file: rangerMap.file, sheet: rangerMap.sheet, guide: rangerMap.guide, extra: rangerMap.extra }, {
-    file: 'main', sheet: 8, guide: 10, extra: [9],
-  });
-
-  const brawlerCl = enClasses.find(x => x.en === 'Brawler');
-  const martialSub = enSubclasses.find(x => x.classId === brawlerCl.id && x.en === 'Martial Artist');
-  const brawlerMap = resolvePdfMapping({ classId: brawlerCl.id, subclassId: martialSub.id }, enClasses, enSubclasses);
-  assert.deepEqual({ file: brawlerMap.file, sheet: brawlerMap.sheet, guide: brawlerMap.guide, extra: brawlerMap.extra }, {
-    file: 'hf', sheet: 2, guide: 4, extra: [3],
-  });
-
-  const fallbackMap = resolvePdfMapping({ classId: 'unknown', className: 'Homebrew' }, enClasses, enSubclasses);
-  assert.equal(fallbackMap.isGeneric, true);
-  assert.equal(fallbackMap.sheet, 21);
-
-  /* 3. End-to-end generation on Ranger + Companion + full stats + portrait + folio overflow */
-  const loadBytes = async (rel) => new Uint8Array(fs.readFileSync(path.join(ROOT, rel)));
-  /* 1x1 transparent PNG data URL */
-  const tinyPng = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=';
-
-  const ranger = core.newCharacter({
-    id: 'pdf-ranger',
-    name: 'Lyra Cœur-de-Chêne',
-    pronouns: 'elle',
-    classId: rangerCl.id,
-    className: 'Rôdeur',
-    subclassId: beastSub.id,
-    subclassText: 'Maître des bêtes',
-    portrait: tinyPng,
-    level: 5,
-    proficiency: 3,
-    evasion: 13,
-    scars: 1,
-    hope: { max: 6, current: 4 },
-    hp: { max: 8, current: 5, active: 8, unlocked: 2 },
-    stress: { max: 7, current: 3, active: 7, unlocked: 1 },
-    traits: { agility: 2, strength: 1, finesse: 1, instinct: 2, presence: 0, knowledge: -1 },
-    traitMarks: ['agility', 'instinct'],
-    tierUses: { 2: { attributes: 2, hitPointSlots: 1 }, 3: { proficiency: 1, experiences: 1 } },
-    goldTrack: { handfuls: 4, bags: 2, chests: 1 },
-    armorSlots: { max: 12, used: 2 },
-    armorCard: { compendiumId: enArmors[0].id, name: enArmors[0].fr, baseScore: 4, baseMajor: 7, baseSevere: 14, feature: enArmors[0].desc || '' },
-    weapons: [
-      { uid: 'pw1', compendiumId: enWeapons[0].id, name: enWeapons[0].fr, trait: 'agility', range: 'Proche', dice: 'd8', dmgBonus: 2, dmgType: 'phy', hands: 'two', state: 'active', primary: true },
-      { uid: 'iw1', compendiumId: enWeapons[1].id, name: enWeapons[1].fr, trait: 'finesse', range: 'Mêlée', dice: 'd6', dmgBonus: 0, dmgType: 'phy', hands: 'one', state: 'inventory', secondary: true },
-    ],
-    experiences: [
-      { name: 'Pistage sylvestre', mod: 3 },
-      { name: 'Tir instinctif', mod: 2 },
-      { name: 'Herboristerie', mod: 2 },
-      { name: 'Survie alpine', mod: 2 },
-      { name: 'Cartographie', mod: 2 },
-      { name: 'Langage des bêtes', mod: 2 },
-    ],
-    companion: {
-      name: 'Ombreloup',
-      species: 'Loup gris',
-      evasion: 11,
-      attackName: 'Morsure',
-      range: 'Mêlée',
-      dice: 'd8',
-      dmgType: 'phy',
-      stress: { max: 4, current: 2 },
-      experiences: [{ name: 'Pistage', mod: 2 }, { name: 'Intimidation', mod: 2 }],
-    },
-    inventory: Array.from({ length: 7 }, (_, i) => ({ name: `Ration spéciale #${i + 1}`, qty: i + 1, desc: 'Provisions de piste' })),
-    domainCards: [
-      { cardId: enCards[0].id, inHand: true },
-      { cardId: enCards[1].id, inHand: false },
-    ],
-    backgroundAnswers: { 0: 'Originaire de la forêt de Valombre.' },
-    notes: 'Reste fidèle à la meute — note accentuée œ/à/é.',
-    journal: [{ date: '2026-11-24', text: 'Rencontre avec le dragon des cendres.' }],
-  });
-  core.saveChar(ranger);
-
-  /* Sheet renders #btn-export-pdf */
   const main = new MockElement('main');
   globalThis.document.body.appendChild(main);
   try {
-    await views.sheet.render(main, 'pdf-ranger');
-    assert.ok(main.querySelector('#btn-export-pdf'), 'Sheet toolbar must render #btn-export-pdf');
+    await views.sheet.render(main, 'clean-char');
+    assert.equal(main.querySelector('#btn-export-pdf'), null, 'Sheet must NOT render #btn-export-pdf');
+    assert.equal(core.cloudSync, undefined, 'core.cloudSync Pro placeholder must be removed');
+    assert.equal(typeof core.exportBackupPayload, 'function');
+
+    main.innerHTML = '';
+    await views.settings.render(main);
+    assert.doesNotMatch(main.innerHTML, /Google Drive|Option Pro|pro-upcoming/i, 'Settings must NOT render Google Drive Pro card');
   } finally {
     main.remove();
   }
-
-  const outRanger = await exportCharacterPdf(ranger, { pdfLib, loadBytes, lang: 'fr' });
-  assert.equal(outRanger.filename, 'daggerborne-lyra-c-ur-de-ch-ne.pdf');
-  assert.ok(outRanger.bytes instanceof Uint8Array && outRanger.bytes.length > 50000);
-  const reloadedRanger = await pdfLib.PDFDocument.load(outRanger.bytes);
-  assert.ok(reloadedRanger.getPageCount() >= 4, 'Ranger + Companion + Guide + Folio expected (>=4 pages)');
-
-  /* 4. Hope & Fear class (Warlock) + Generic fallback */
-  const warlockCl = enClasses.find(x => x.en === 'Warlock');
-  const warlock = core.newCharacter({
-    id: 'pdf-warlock',
-    name: 'Malakor',
-    classId: warlockCl.id,
-    className: 'Sorcier de Pacte',
-    level: 2,
-  });
-  const outWarlock = await exportCharacterPdf(warlock, { pdfLib, loadBytes, lang: 'en' });
-  const reloadedWarlock = await pdfLib.PDFDocument.load(outWarlock.bytes);
-  assert.ok(reloadedWarlock.getPageCount() >= 3, 'Warlock HF sheet + guide + folio expected');
-
-  const genericChar = core.newCharacter({
-    id: 'pdf-generic',
-    name: 'Wanderer',
-    classId: 'unknown',
-    hopeFeature: 'Spend 3 Hope to recover 2 Stress.',
-    classFeature: 'Custom homebrew abilities.',
-  });
-  const outGeneric = await exportCharacterPdf(genericChar, { pdfLib, loadBytes, lang: 'en' });
-  const reloadedGeneric = await pdfLib.PDFDocument.load(outGeneric.bytes);
-  assert.ok(reloadedGeneric.getPageCount() >= 2, 'Generic sheet + folio expected');
 });
 
