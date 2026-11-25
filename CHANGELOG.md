@@ -3,7 +3,29 @@
 Toutes les modifications notables de **Daggerborne** sont documentées dans ce fichier.
 
 Le format s'inspire de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
-La version de référence du projet est celle de `package.json` (`0.7.0-beta`).
+La version de référence du projet est celle de `package.json` (`0.8.0-BETA`).
+
+## [0.8.0-BETA] — 24 novembre 2026
+
+### Ajouté — export PDF complet hors-ligne
+
+- **Bouton `📄 PDF` sur la fiche de personnage (`sheet.js`, `pdfExport.js`)** : génère en un clic un dossier PDF complet prêt à imprimer ou partager, sans aucune dépendance serveur ni connexion Internet.
+- **Fiches officielles Daggerheart pré-remplies (EN)** : prise en charge des **13 classes** issues des deux livrets officiels (les 9 classes de base + les 4 classes *Hope & Fear* : Assassin, Brawler, Warlock, Witch) ainsi que d'une fiche générique de secours :
+  - en-tête identité (nom, pronoms, héritage/communauté, sous-classe, niveau) ;
+  - Évasion effective, Valeur d'armure, 12 emplacements d'armure cochés/verrouillés, seuils de dégâts Majeur/Grave calculés, 6 traits avec bonus et coches d'amélioration, Maîtrise, PV, Stress, Espoir et Cicatrices ;
+  - 5 premières Expériences, piste d'or (poignées, sacs, coffre), armes actives principale/secondaire (avec dégâts calculés selon la Maîtrise et aptitudes), armure active, inventaire (5 lignes + renvoi si surplus) et 2 emplacements d'armes de réserve.
+- **Pages spéciales de classe & Guide d'évolution** : inclusion automatique des pages *Druid Beastform* (avec bandeau de forme bestiale active), *Ranger Companion* (nom, espèce, évasion, attaque, dé de dégâts, expériences et stress du compagnon) et *Brawler Martial Artist*, plus le **Guide de classe** avec les cases d'évolution des paliers 2, 3 et 4 cochées automatiquement (`tierUses`).
+- **Dossier complet récapitulatif (*Character Folio*)** : pages additionnelles paginées contenant le portrait (JPEG/PNG), le résumé d'état (conditions, repos courts, multiclassage, forme bestiale, transformation), toutes les aptitudes, l'intégralité des cartes de domaine (En main et Caveau avec descriptions complètes), l'inventaire complet, les expériences supplémentaires (6+), les réponses de background, les notes et le journal de bord.
+- **Compatibilité PWA, Desktop & Android APK (`core.js`, `sw.js`)** : librairie `pdf-lib` embarquée localement, normalisation texte WinAnsi (ligatures `œ`/`æ`, tirets, symboles et accents préservés), précache PWA complet (module, moteur PDF et les deux PDF officiels) et modale Android/WebView dédiée avec `Partager` et `Télécharger`.
+
+### Modifié — workflow GitHub Actions Android (`build-apk.yml`)
+
+- **Migration vers les actions compatibles Node.js 24 & Java 17** : mise à jour de `actions/checkout@v6`, `actions/setup-node@v6` (Node 22), `actions/setup-java@v5`, `android-actions/setup-android@v4` et `actions/upload-artifact@v6`, et copie du dossier `public/` dans l'archive `www/` de l'APK.
+
+### Technique & vérifications
+
+- **Version** : `v.0.8.0-BETA` ; `DATA_VER` `v37`, cache `daggerborne-v69` (`?v=69`).
+- **Vérifications** : `npm run lint` OK (`22` fichiers JS), `npm test` **62/62 tests réussis**, `npm run build` OK (`Static site ready`).
 
 ## [0.7.0-beta] — 23 novembre 2026
 

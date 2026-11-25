@@ -74,3 +74,17 @@ test('Tout module local importé est précaché par le service worker', () => {
   }
   assert.deepEqual(missing, [], `Modules importés absents du précache :\n${missing.join('\n')}`);
 });
+
+test('Les ressources d\'export PDF (pdfExport, pdf-lib et modèles officiels) sont précachées et présentes sur disque', () => {
+  const cached = new Set(precacheList());
+  const required = [
+    'js/pdfExport.js',
+    'js/vendor/pdf-lib.esm.min.js',
+    'public/assets/aistudio/Character-Sheets-and-Guides-Daggerheart-Aug252026_419c805c.pdf',
+    'public/assets/aistudio/CharacterGuidesAndSheetsTile_HF_2026-07-23_7532a806.pdf',
+  ];
+  for (const rel of required) {
+    assert.ok(cached.has(rel), `${rel} doit être précaché dans sw.js`);
+    assert.ok(fs.existsSync(path.join(ROOT, rel)), `${rel} doit exister sur disque`);
+  }
+});

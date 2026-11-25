@@ -1,11 +1,12 @@
 /* Service worker — cache-first PWA for Daggerborne */
-const VERSION = 'daggerborne-v67';
+const VERSION = 'daggerborne-v69';
 const CORE = [
   './', './index.html', './manifest.webmanifest',
   './css/app.css', './css/sheet2.css', './css/dice-box.css', './js/app.js', './js/core.js',
-  './js/dice3d.js', './js/fab.js', './js/gmRules.js', './js/rules.js', './js/feat-parse.js', './js/en-ui.js', './js/i18n-dom.js',
+  './js/dice3d.js', './js/fab.js', './js/gmRules.js', './js/rules.js', './js/feat-parse.js', './js/en-ui.js', './js/i18n-dom.js', './js/pdfExport.js',
   './js/vendor/dice-box.es.min.js', './js/vendor/world.offscreen.min.js',
   './js/vendor/world.onscreen.min.js', './js/vendor/world.none.min.js',
+  './js/vendor/pdf-lib.esm.min.js',
   './js/views/home.js', './js/views/chars.js', './js/views/create.js', './js/views/sheet.js',
   './js/views/levelup.js',
   './js/views/dice.js', './js/views/compendium.js', './js/views/gm.js', './js/views/settings.js',
@@ -40,6 +41,9 @@ const CORE = [
   './assets/dice-box/themes/hope-v2/diffuse-light.png', './assets/dice-box/themes/hope-v2/specular.jpg',
   './assets/dice-box/themes/fear-v2/theme.config.json', './assets/dice-box/themes/fear-v2/default.json',
   './assets/dice-box/themes/fear-v2/diffuse-light.png', './assets/dice-box/themes/fear-v2/specular.jpg',
+  /* ---- export PDF officiel hors-ligne ---- */
+  './public/assets/aistudio/Character-Sheets-and-Guides-Daggerheart-Aug252026_419c805c.pdf',
+  './public/assets/aistudio/CharacterGuidesAndSheetsTile_HF_2026-07-23_7532a806.pdf',
 ];
 
 self.addEventListener('install', (e) => {

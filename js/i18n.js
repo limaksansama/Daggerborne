@@ -520,6 +520,12 @@ const STRINGS = {
   sheetTabTraitsExp: ['Traits & Exp.', 'Traits & Exp.'],
   sheetTabCards: ['Cartes', 'Cards'],
   sheetTabBagGold: ['Sac & Or', 'Bag & Gold'],
+  sheetExportPdfTitle: ['Exporter en PDF complet (fiche officielle + dossier)', 'Export full PDF (official sheet + folio)'],
+  sheetExportPdfGenerating: ['Génération du PDF…', 'Generating PDF…'],
+  sheetExportPdfError: ['Impossible de générer le PDF.', 'Failed to generate PDF.'],
+  corePdfDownloaded: ['PDF téléchargé : {name}', 'PDF downloaded: {name}'],
+  corePdfReady: ['PDF prêt à partager ou enregistrer', 'PDF ready to share or save'],
+  corePdfMobileHint: ['Sur Android (APK/WebView) ou tablette, utilisez Partager ou Télécharger pour enregistrer la fiche PDF.', 'On Android (APK/WebView) or tablet, use Share or Download to save the PDF sheet.'],
 };
 
 export function t(key, vars) {
